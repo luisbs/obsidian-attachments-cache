@@ -6,10 +6,10 @@ type ErrorCode =
     | 'url-request-head'
     | 'url-request-get'
 
-export class ImageError extends Error {
+export class AttachmentError extends Error {
     /**
      * Check the response has a _**statusCode**_
-     * @throws {ImageError}
+     * @throws {AttachmentError}
      */
     static assertResponse(
         url: string,
@@ -18,7 +18,7 @@ export class ImageError extends Error {
     ): void {
         if (response.status < 400) return
 
-        throw new ImageError(
+        throw new AttachmentError(
             code,
             `requested url: ${url}` +
                 `\nresponse status: ${response.status}` +
@@ -31,7 +31,7 @@ export class ImageError extends Error {
         public cause?: unknown,
     ) {
         super()
-        this.name = `ImageError(${this.code})`
+        this.name = `AttachmentError(${this.code})`
         this.message = this.toStringMessage()
     }
 
@@ -40,7 +40,7 @@ export class ImageError extends Error {
     }
 
     toStringMessage(): string {
-        const message = ImageError.#description(this.code)
+        const message = AttachmentError.#description(this.code)
         if (!this.cause) return message
 
         if (this.cause instanceof Error)

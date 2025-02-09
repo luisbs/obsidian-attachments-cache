@@ -3,6 +3,6 @@ __cache/
 .obsidian/workspace.json
 
 # plugins
-.obsidian/plugins/obsidian-image-caching/*
-!.obsidian/plugins/obsidian-image-caching/.hotreload
-!.obsidian/plugins/obsidian-image-caching/data.json
+.obsidian/plugins/obsidian-attachments-cache/*
+!.obsidian/plugins/obsidian-attachments-cache/.hotreload
+!.obsidian/plugins/obsidian-attachments-cache/data.json

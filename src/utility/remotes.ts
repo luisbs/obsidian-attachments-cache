@@ -1,7 +1,7 @@
 import type { CacheRemote, RemoteMatcher } from '@/types'
 import { requestUrl } from 'obsidian'
 import { URL } from '@luis.bs/obsidian-fnc'
-import { ImageError } from './ImageError'
+import { AttachmentError } from './AttachmentError'
 import { compareBySpecificity, getMimeExt } from './strings'
 
 /** Ensures uniqueness and order of a list of remotes. */
@@ -146,7 +146,7 @@ export async function getRemoteExt(url: string): Promise<string> {
         headers: { Referer: referer ? referer + '/' : '' },
     })
 
-    ImageError.assertResponse(url, response, 'url-request-head')
+    AttachmentError.assertResponse(url, response, 'url-request-head')
     return getMimeExt(response.headers['content-type'])
 }
 
@@ -160,6 +160,6 @@ export async function getRemoteContent(url: string): Promise<ArrayBuffer> {
         headers: { Referer: referer ? referer + '/' : '' },
     })
 
-    ImageError.assertResponse(url, response, 'url-request-get')
+    AttachmentError.assertResponse(url, response, 'url-request-get')
     return response.arrayBuffer
 }

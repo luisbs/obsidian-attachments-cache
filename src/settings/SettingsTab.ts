@@ -1,4 +1,8 @@
-import type { CacheConfig, ImageCachingPlugin, PluginSettings } from '@/types'
+import type {
+    AttachmentsCachePlugin,
+    CacheConfig,
+    PluginSettings,
+} from '@/types'
 import {
     ButtonComponent,
     DropdownComponent,
@@ -10,12 +14,12 @@ import { checkPattern, prepareConfigs } from '@/utility'
 import { CacheSettings } from './CacheSettings'
 
 export class SettingsTab extends PluginSettingTab {
-    #plugin: ImageCachingPlugin
+    #plugin: AttachmentsCachePlugin
     #settings: PluginSettings
 
     #configsList?: HTMLDivElement
 
-    constructor(plugin: ImageCachingPlugin) {
+    constructor(plugin: AttachmentsCachePlugin) {
         super(plugin.app, plugin)
         this.#plugin = plugin
         this.#settings = plugin.settings
@@ -27,7 +31,7 @@ export class SettingsTab extends PluginSettingTab {
 
     display(): void {
         this.containerEl.empty()
-        this.containerEl.addClass('image-caching-settings')
+        this.containerEl.addClass('attachments-cache-settings')
 
         this.#displayGeneralSettings()
 
@@ -49,7 +53,7 @@ export class SettingsTab extends PluginSettingTab {
         const charsSetting = this.#newSetting()
         charsSetting.setName('Keep Special Characters')
         charsSetting.setDesc(
-            'If you are having problems with special characters on image paths, disable this setting.',
+            'If you are having problems with special characters on paths, disable this setting.',
         )
         charsSetting.addToggle((toggle) => {
             toggle.setValue(this.#settings.allow_characters)

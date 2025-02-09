@@ -1,4 +1,4 @@
-.image-caching-settings code {
+.attachments-cache-settings code {
     background-color: var(--tag-background);
     color: var(--tag-color);
     border: var(--tag-border-width) solid var(--tag-border-color);
@@ -10,18 +10,18 @@
     line-height: 1;
 }
 
-.image-caching-settings
+.attachments-cache-settings
     :is(.configs-header, .remotes-input)
     .setting-item-description {
     color: orangered;
 }
-.image-caching-settings .configs-header select {
+.attachments-cache-settings .configs-header select {
     min-width: 100px;
     max-width: 200px;
 }
 
 /* Expandable Form */
-.image-caching-settings .configs-list > .setting-item {
+.attachments-cache-settings .configs-list > .setting-item {
     border: 1px solid var(--background-modifier-border);
     border-radius: 0.25em;
     flex-wrap: wrap;
@@ -32,40 +32,40 @@
     overflow-y: hidden;
     height: 74px;
 }
-.image-caching-settings .configs-list > .setting-item.show-details {
+.attachments-cache-settings .configs-list > .setting-item.show-details {
     height: 100%;
 }
 
-.image-caching-settings .configs-list > .setting-item > .setting-item-info {
+.attachments-cache-settings .configs-list > .setting-item > .setting-item-info {
     margin-bottom: 0.75em;
 }
-.image-caching-settings .cache-details {
+.attachments-cache-settings .cache-details {
     border-top: 1px solid var(--background-modifier-border);
     padding: 0.75em 0 0;
     width: 100%;
 }
-.image-caching-settings .cache-details .setting-item {
+.attachments-cache-settings .cache-details .setting-item {
     border-top: none;
     padding: 0;
 }
-.image-caching-settings .cache-details .setting-item-control {
+.attachments-cache-settings .cache-details .setting-item-control {
     flex: 0 1 40%;
     flex-wrap: wrap;
     padding-bottom: 8px;
 }
-.image-caching-settings .cache-details :is(input, select) {
+.attachments-cache-settings .cache-details :is(input, select) {
     width: 100%;
 }
-.image-caching-settings .cache-details textarea {
+.attachments-cache-settings .cache-details textarea {
     width: 100%;
     height: 9ch;
     resize: vertical;
 }
-.image-caching-settings .cache-remotes {
+.attachments-cache-settings .cache-remotes {
     border-top: 1px solid var(--background-modifier-border);
     padding: 0.5em 0;
     width: 100%;
 }
-.image-caching-settings .cache-remotes .setting-item:last-child {
+.attachments-cache-settings .cache-remotes .setting-item:last-child {
     padding-bottom: 0;
 }

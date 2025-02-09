@@ -5,7 +5,7 @@ import builtins from 'builtin-modules'
 import banner from 'vite-plugin-banner'
 import pkg from './package.json'
 
-const DEMO_PATH = 'demo/.obsidian/plugins/obsidian-image-caching'
+const DEMO_PATH = 'demo/.obsidian/plugins/obsidian-attachments-cache'
 
 // https://vitejs.dev/config/
 export default defineConfig((ctx) => {
@@ -18,8 +18,8 @@ export default defineConfig((ctx) => {
             banner(
                 [
                     '/*!',
-                    ` * Copyright (c) 2022-present ${pkg.author.name}`,
-                    ` * ${pkg.name}@${pkg.version} is released under the ${pkg.license} license`,
+                    ` * @copyright Copyright (c) 2022-present ${pkg.author.name}`,
+                    ` * @license ${pkg.name}@${pkg.version} is released under the ${pkg.license} license`,
                     ` * @source ${pkg.repository.url}`,
                     ' */',
                 ].join('\n'),

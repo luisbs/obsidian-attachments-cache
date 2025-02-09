@@ -1,7 +1,7 @@
 {
   "allow_characters": false,
-  "url_param_cache": "cache_image",
-  "url_param_ignore": "ignore_image",
+  "url_param_cache": "cache_file",
+  "url_param_ignore": "ignore_file",
   "cache_configs": [
     {
       "pattern": "*",

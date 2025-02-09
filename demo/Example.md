@@ -32,7 +32,7 @@ The next example is cached based on the `Remotes List`.
 
 The next example is ignored based on the `Remotes List`.
 
-> Remote 
+> Remote
 > ![](https://my.alfred.edu/zoom/_images/foster-lake.jpg)
 
 > Local Cache (should be missing)
@@ -44,10 +44,10 @@ The next example is ignored based on the `Remotes List`.
 
 ### Blacklisted URL uses _URL Param Cache_
 
-The next example is cached base on URL param `cache_image`.
+The next example is cached base on URL param `cache_file`.
 
 > Remote
-> ![](https://wallpaperaccess.com/full/2130189.jpg?cache_image)
+> ![](https://wallpaperaccess.com/full/2130189.jpg?cache_file)
 
 > Local Cache (should be present)
 > ![[2130189.jpg]]
@@ -56,10 +56,10 @@ The next example is cached base on URL param `cache_image`.
 
 ### Whitelisted URL uses _URL Param Ignore_
 
-The next example is ignored base on URL param `cache_image`.
+The next example is ignored base on URL param `cache_file`.
 
 > Remote
-> ![](https://github.com/elementary/wallpapers/blob/main/backgrounds/A%20Trail%20of%20Footprints%20In%20The%20Sand.jpg?raw=true&ignore_image)
+> ![](https://github.com/elementary/wallpapers/blob/main/backgrounds/A%20Trail%20of%20Footprints%20In%20The%20Sand.jpg?raw=true&ignore_file)
 
 > Local Cache (should be missing)
 > ![[A_20Trail_20of_20Footprints_20In_20The_20Sand.jpg]]

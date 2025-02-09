@@ -1,31 +1,31 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { ImageError } from './utility'
+import type { AttachmentError } from './utility'
 
-export { default as ImageCachingPlugin } from './main'
+export { AttachmentsCachePlugin } from './AttachmentsCachePlugin'
 
 //#region Plugin Runtime
 
-export interface ImageCachingPluginAPI {
+export interface AttachmentsCachePluginAPI {
     /** Test whether the attachments should be cached. */
     mayCache(notepath: string, remote: string): boolean
     /**
      * Test whether a remote file is already cached.
-     * @throws {ImageError}
+     * @throws {AttachmentError}
      */
     isCached(notepath: string, remote: string): Promise<boolean>
     /**
      * Tries to map a remote url into a Vault resourcePath.
-     * @throws {ImageError}
+     * @throws {AttachmentError}
      */
     resource(notepath: string, remote: string): Promise<string | undefined>
     /**
      * Tries to map a remote url into a Vault filePath.
-     * @throws {ImageError}
+     * @throws {AttachmentError}
      */
     resolve(notepath: string, remote: string): Promise<string | undefined>
     /**
      * Tries to cache a file locally and returns a Vault resourcePath.
-     * @throws {ImageError}
+     * @throws {AttachmentError}
      */
     cache(notepath: string, remote: string): Promise<string | undefined>
 }

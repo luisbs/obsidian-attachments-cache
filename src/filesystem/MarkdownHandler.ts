@@ -1,7 +1,7 @@
-import type { ImageCachingPlugin } from '@/types'
+import type { AttachmentsCachePlugin } from '@/types'
 
 export class MarkdownHandler {
-    constructor(private plugin: ImageCachingPlugin) {}
+    constructor(private plugin: AttachmentsCachePlugin) {}
 
     public registerMarkdownProcessor(): void {
         this.plugin.registerMarkdownPostProcessor(

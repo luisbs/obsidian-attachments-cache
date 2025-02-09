@@ -1,21 +1,21 @@
 import type {
+    AttachmentsCachePlugin,
+    AttachmentsCachePluginAPI,
     CacheMatcher,
-    ImageCachingPlugin,
-    ImageCachingPluginAPI,
 } from '@/types'
 import { Vault, normalizePath } from 'obsidian'
 import { Logger, URI, URL } from '@luis.bs/obsidian-fnc'
-import { getRemoteContent, getRemoteExt, ImageError } from './utility'
+import { getRemoteContent, getRemoteExt, AttachmentError } from './utility'
 
-export class ImageCachingAPI implements ImageCachingPluginAPI {
-    #log = Logger.consoleLogger(ImageCachingAPI.name)
+export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
+    #log = Logger.consoleLogger(AttachmentsCacheAPI.name)
 
-    #plugin: ImageCachingPlugin
+    #plugin: AttachmentsCachePlugin
     #vault: Vault
 
     #memo = new Map<string, string | undefined>()
 
-    constructor(plugin: ImageCachingPlugin) {
+    constructor(plugin: AttachmentsCachePlugin) {
         this.#plugin = plugin
         this.#vault = plugin.app.vault
     }
@@ -60,12 +60,12 @@ export class ImageCachingAPI implements ImageCachingPluginAPI {
         remote: string,
     ): Promise<string | undefined> {
         if (!URL.isUrl(remote)) {
-            throw new ImageError('remote-no-url', `remote('${remote}')`)
+            throw new AttachmentError('remote-no-url', `remote('${remote}')`)
         }
 
         const baseUrl = URL.getBaseurl(remote)
         if (!baseUrl) {
-            throw new ImageError('remote-no-url', `remote('${remote}')`)
+            throw new AttachmentError('remote-no-url', `remote('${remote}')`)
         }
 
         // faster resolution
@@ -78,7 +78,7 @@ export class ImageCachingAPI implements ImageCachingPluginAPI {
         // ensure normalization
         const name = URI.getBasename(baseUrl)
         const ext = URI.getExt(baseUrl) ?? (await getRemoteExt(remote))
-        if (!name || !ext) throw new ImageError('remote-no-ext')
+        if (!name || !ext) throw new AttachmentError('remote-no-ext')
 
         const path = URI.join(matcher.resolve(notepath), name + '.' + ext)
         const res = !this.#plugin.settings.allow_characters
