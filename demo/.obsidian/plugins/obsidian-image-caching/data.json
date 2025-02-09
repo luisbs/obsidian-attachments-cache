@@ -1,0 +1,23 @@
+{
+  "allow_characters": false,
+  "url_param_cache": "cache_image",
+  "url_param_ignore": "ignore_image",
+  "cache_configs": [
+    {
+      "pattern": "*",
+      "remotes": [
+        {
+          "pattern": "github.com/elementary/wallpapers",
+          "whitelisted": true
+        },
+        {
+          "pattern": "*",
+          "whitelisted": false
+        }
+      ],
+      "enabled": false,
+      "target": "__cache",
+      "mode": "TARGET-PATH"
+    }
+  ]
+}
