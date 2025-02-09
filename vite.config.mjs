@@ -5,7 +5,7 @@ import builtins from 'builtin-modules'
 import banner from 'vite-plugin-banner'
 import pkg from './package.json'
 
-const DEMO_PATH = 'demo/.obsidian/plugins/obsidian-attachments-cache'
+const DEMO_PATH = 'demo/.obsidian/plugins/attachments-cache'
 
 // https://vitejs.dev/config/
 export default defineConfig((ctx) => {

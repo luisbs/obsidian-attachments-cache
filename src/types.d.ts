@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { AttachmentError } from './utility'
 
-export { AttachmentsCachePlugin } from './AttachmentsCachePlugin'
+export { default as AttachmentsCachePlugin } from './main'
 
 //#region Plugin Runtime
 

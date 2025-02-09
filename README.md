@@ -70,7 +70,15 @@ The plugin is not on active development, new features or changes are developed w
 
 ### Thrid-party Integration
 
-An API `AttachmentsCache` is exposed globally for easy integration. The next declare can be used for development:
+An API `AttachmentsCache` is exposed globally for easy integration.
+
+For usage inside a plugin the methods `isPluginEnabled` and `getAPI` are exposed from an npm package named `@luis.bs/obsidian-attachments-cache`
+
+```sh
+pnpm add @luis.bs/obsidian-attachments-cache
+```
+
+On other environments where the package can not be used as a dependency, the API is attach to the global `window` object. The next declare can be used for development:
 
 ```ts
 declare namespace AttachmentsCache {
@@ -78,22 +86,22 @@ declare namespace AttachmentsCache {
   function mayCache(notepath: string, remote: string): boolean
   /**
    * Test whether a remote file is already cached.
-   * @throws {AttachmentError}
+   * @throws {Error}
    */
   function isCached(notepath: string, remote: string): Promise<boolean>
   /**
    * Tries to map a remote url into a Vault resourcePath.
-   * @throws {AttachmentError}
+   * @throws {Error}
    */
   function resource(notepath: string, remote: string): Promise<string | undefined>
   /**
    * Tries to map a remote url into a Vault filePath.
-   * @throws {AttachmentError}
+   * @throws {Error}
    */
   function resolve(notepath: string, remote: string): Promise<string | undefined>
   /**
    * Tries to cache a file locally and returns a Vault resourcePath.
-   * @throws {AttachmentError}
+   * @throws {Error}
    */
   function cache(notepath: string, remote: string): Promise<string | undefined>
 }
