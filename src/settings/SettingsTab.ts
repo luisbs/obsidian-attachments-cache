@@ -10,6 +10,7 @@ import {
     Setting,
     TextComponent,
 } from 'obsidian'
+import {} from '@luis.bs/obsidian-fnc'
 import { checkPattern, prepareConfigs } from '@/utility'
 import { CacheSettings } from './CacheSettings'
 
@@ -35,22 +36,26 @@ export class SettingsTab extends PluginSettingTab {
 
         this.#displayGeneralSettings()
 
-        this.#newSetting().setName('Paths Settings').setHeading()
+        new Setting(this.containerEl).setName('Paths Settings').setHeading()
         this.#displayConfigsHeader()
         this.#configsList = this.containerEl.createDiv('configs-list')
         this.#displayConfigsList()
     }
 
-    #newSetting() {
-        return this.#newSettingAt(this.containerEl)
-    }
-
-    #newSettingAt(container: HTMLElement) {
-        return new Setting(container)
-    }
-
     #displayGeneralSettings(): void {
-        const charsSetting = this.#newSetting()
+        const levelSetting = new Setting(this.containerEl)
+        levelSetting.setName('Plugging Log Level')
+        levelSetting.addDropdown((dropdown) => {
+            dropdown.addOption('ERROR', 'ERROR')
+            dropdown.addOption('WARN', ' WARN')
+            dropdown.addOption('INFO', ' INFO')
+            dropdown.addOption('DEBUG', 'DEBUG')
+            dropdown.addOption('TRACE', 'TRACE')
+            dropdown.setValue(this.#settings.log_level)
+            dropdown.onChange(this.#handle.bind(this, 'log_level'))
+        })
+
+        const charsSetting = new Setting(this.containerEl)
         charsSetting.setName('Keep Special Characters')
         charsSetting.setDesc(
             'If you are having problems with special characters on paths, disable this setting.',
@@ -61,14 +66,14 @@ export class SettingsTab extends PluginSettingTab {
         })
 
         //#region URL params
-        const urlcacheSetting = this.#newSetting()
+        const urlcacheSetting = new Setting(this.containerEl)
         urlcacheSetting.setName('URL Param Cache')
         urlcacheSetting.setDesc('Overrides standard rules and stores the file.')
         urlcacheSetting.addText((input) => {
             input.setValue(this.#settings.url_param_cache)
             input.onChange(this.#handle.bind(this, 'url_param_cache'))
         })
-        const urlignoreSetting = this.#newSetting()
+        const urlignoreSetting = new Setting(this.containerEl)
         urlignoreSetting.setName('URL Param Ignore')
         urlignoreSetting.setDesc(
             'Overrides standard rules and ignores the file.',
@@ -88,7 +93,7 @@ export class SettingsTab extends PluginSettingTab {
         const headerDesc = createFragment()
         const headerDescUl = headerDesc.createEl('ul')
 
-        const headerEl = this.#newSetting()
+        const headerEl = new Setting(this.containerEl)
         headerEl.setClass('configs-header')
         headerEl.setName('Duplicate Vault Path')
         headerEl.setDesc(headerDesc)

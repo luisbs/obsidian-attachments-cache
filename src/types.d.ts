@@ -1,3 +1,4 @@
+import { LogLevel } from '@luis.bs/obsidian-fnc'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { AttachmentError } from './utility'
 
@@ -32,6 +33,8 @@ export interface PluginState {
     url_ignore_matcher: RemoteMatcher
 }
 export interface PluginSettings {
+    /** Defines the minimun level to log while running. */
+    log_level: keyof typeof LogLevel
     /** Stores the user preference over `UTF-8` characters. */
     allow_characters: boolean
     /** User defined URL-param to cache, overrides standard rules. */

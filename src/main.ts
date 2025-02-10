@@ -11,6 +11,9 @@ import { MarkdownHandler } from './filesystem/MarkdownHandler'
 import { AttachmentsCacheAPI } from './AttachmentsCacheAPI'
 
 const DEFAULT_SETTINGS: PluginSettings = {
+    // * WARN level to force the user to choose a lower level when is required
+    // * this decition, prevents the console from been overpopulated by default
+    log_level: 'WARN',
     allow_characters: false,
     url_param_cache: 'cache_file',
     url_param_ignore: 'ignore_file',
@@ -36,11 +39,11 @@ export default class AttachmentsCachePlugin extends Plugin {
 
     constructor(app: App, manifest: PluginManifest) {
         super(app, manifest)
-        this.log.setFormat('[hh:mm:ss.ms] level:')
 
-        // TODO: change to user-defined level
+        // * always printing the first loadSettings()
+        // * after that, the user-defined level is used
         this.log.setLevel(LogLevel.DEBUG)
-
+        this.log.setFormat('[hh:mm:ss.ms] level:')
         this.api = new AttachmentsCacheAPI(this)
         this.markdown = new MarkdownHandler(this)
 
@@ -97,6 +100,8 @@ export default class AttachmentsCachePlugin extends Plugin {
     #prepareState(log: Logger): void {
         log.info('Preparing state')
 
+        // * changes log level based on user input
+        this.log.setLevel(LogLevel[this.settings.log_level])
         this.state = {
             cache_matchers: prepareConfigMatchers(this.settings.cache_configs),
             url_cache_matcher: prepareRemoteMatcher(
