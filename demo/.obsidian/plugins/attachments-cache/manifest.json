@@ -1,9 +1,9 @@
 {
-	"id": "obsidian-image-caching",
-	"name": "Image Caching",
-	"version": "1.3.3",
+	"id": "attachments-cache",
+	"name": "Attachments Cache",
+	"version": "1.3.4",
 	"minAppVersion": "1.8.4",
-	"description": "Plugin to cache images locally",
+	"description": "Plugin to cache attachments",
 	"author": "luisbs",
 	"authorUrl": "https://github.com/luisbs",
 	"fundingUrl": "https://www.buymeacoffee.com/luisbs",

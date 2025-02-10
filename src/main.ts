@@ -1,6 +1,6 @@
 import type { PluginSettings, PluginState } from '@/types'
 import { App, Plugin, PluginManifest } from 'obsidian'
-import { Logger } from '@luis.bs/obsidian-fnc'
+import { Logger, LogLevel } from '@luis.bs/obsidian-fnc'
 import {
     prepareConfigs,
     prepareConfigMatchers,
@@ -26,7 +26,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
 }
 
 export default class AttachmentsCachePlugin extends Plugin {
-    #log = Logger.consoleLogger(AttachmentsCachePlugin.name)
+    public log = Logger.consoleLogger(AttachmentsCachePlugin.name)
 
     public settings = {} as PluginSettings
     public state = {} as PluginState
@@ -36,6 +36,10 @@ export default class AttachmentsCachePlugin extends Plugin {
 
     constructor(app: App, manifest: PluginManifest) {
         super(app, manifest)
+        this.log.setFormat('[hh:mm:ss.ms] level:')
+
+        // TODO: change to user-defined level
+        this.log.setLevel(LogLevel.DEBUG)
 
         this.api = new AttachmentsCacheAPI(this)
         this.markdown = new MarkdownHandler(this)
@@ -57,7 +61,7 @@ export default class AttachmentsCachePlugin extends Plugin {
     // }
 
     async loadSettings(): Promise<void> {
-        const log = this.#log.group('Loading Settings')
+        const group = this.log.group('Loading Settings')
         const { cache_configs, ...primitives } = ((await this.loadData()) ||
             {}) as Partial<PluginSettings>
 
@@ -69,14 +73,14 @@ export default class AttachmentsCachePlugin extends Plugin {
             ...DEFAULT_SETTINGS.cache_configs,
         ])
 
-        log.debug('Loaded: ', this.settings)
-        log.flush('Loaded Settings')
+        group.debug('Loaded: ', this.settings)
 
-        this.#prepareState()
+        this.#prepareState(group)
+        group.flush('Loaded Settings')
     }
 
     async saveSettings(): Promise<void> {
-        const log = this.#log.group('Saving Settings')
+        const group = this.log.group('Saving Settings')
         const data = Object.assign({}, this.settings)
 
         // serialize special data types (Map, Set, etc)
@@ -84,14 +88,15 @@ export default class AttachmentsCachePlugin extends Plugin {
         data.cache_configs = prepareConfigs(data.cache_configs)
 
         await this.saveData(data)
-        log.debug('Saved: ', data)
-        log.flush('Saved Settings')
+        group.debug('Saved: ', data)
 
-        this.#prepareState()
+        this.#prepareState(group)
+        group.flush('Saved Settings')
     }
 
-    #prepareState(): void {
-        this.#log.info('Prepare state')
+    #prepareState(log: Logger): void {
+        log.info('Preparing state')
+
         this.state = {
             cache_matchers: prepareConfigMatchers(this.settings.cache_configs),
             url_cache_matcher: prepareRemoteMatcher(

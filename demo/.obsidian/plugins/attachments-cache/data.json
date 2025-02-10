@@ -15,7 +15,7 @@
           "whitelisted": false
         }
       ],
-      "enabled": false,
+      "enabled": true,
       "target": "__cache",
       "mode": "TARGET-PATH"
     }

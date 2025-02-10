@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@luis.bs/obsidian-fnc':
-        specifier: ^1.3.4
-        version: 1.3.4
+        specifier: ^1.3.6
+        version: 1.3.6
       minimatch:
         specifier: ^10.0.1
         version: 10.0.1
@@ -425,8 +425,8 @@ packages:
     resolution: {integrity: sha512-c7hNEllBlenFTHBky65mhq8WD2kbN9Q6gk0bTk8lSBvc554jpXSkST1iePudpt7+A/AQvuHs9EMqjHDXMY1lrA==}
     engines: {node: '>=18.18'}
 
-  '@luis.bs/obsidian-fnc@1.3.4':
-    resolution: {integrity: sha512-I5mo2lpxS8VnoVb64fEfO8T+C5lWV2MQua/1c9uOV3uFSJK9cA2iX3R581MKLc/7C4eTpXGszcyIT7KvT+nPsg==}
+  '@luis.bs/obsidian-fnc@1.3.6':
+    resolution: {integrity: sha512-N9KQj4UlOvE0IbjAZzBAAAxtHzasL4zc8+KieEkQRFjNDsub8ct3bIdhkQK1Yjtwk3AAQBY7XuIG6QLnOz6zNw==}
 
   '@manypkg/find-root@1.1.0':
     resolution: {integrity: sha512-mki5uBvhHzO8kYYix/WRy2WX8S3B5wdVSc9D6KcU5lQNglP2yt58/VfLuAK49glRXChosY8ap2oJ1qgma3GUVA==}
@@ -2120,7 +2120,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.1': {}
 
-  '@luis.bs/obsidian-fnc@1.3.4':
+  '@luis.bs/obsidian-fnc@1.3.6':
     dependencies:
       '@floating-ui/dom': 1.6.13
 

@@ -1,6 +1,6 @@
 import type { CacheRemote, RemoteMatcher } from '@/types'
 import { requestUrl } from 'obsidian'
-import { URL } from '@luis.bs/obsidian-fnc'
+import { Logger, URL } from '@luis.bs/obsidian-fnc'
 import { AttachmentError } from './AttachmentError'
 import { compareBySpecificity, getMimeExt } from './strings'
 
@@ -136,8 +136,13 @@ export function prepareRemoteMatcher(
     return (remote: string) => regex.test(remote)
 }
 
-/** Request the metadata of a file, to determine the file extension. */
-export async function getRemoteExt(url: string): Promise<string> {
+/**
+ * Request the metadata of a file, to determine the file extension.
+ * @throws {AttachmentError}
+ */
+export async function getRemoteExt(url: string, log: Logger): Promise<string> {
+    log.debug(`Resolving extension for ${url}`)
+
     const referer = URL.getOrigin(url)
     const response = await requestUrl({
         url: url,
@@ -150,8 +155,16 @@ export async function getRemoteExt(url: string): Promise<string> {
     return getMimeExt(response.headers['content-type'])
 }
 
-/** Downloads the content of a file. */
-export async function getRemoteContent(url: string): Promise<ArrayBuffer> {
+/**
+ * Downloads the content of a file.
+ * @throws {AttachmentError}
+ */
+export async function getRemoteContent(
+    url: string,
+    log: Logger,
+): Promise<ArrayBuffer> {
+    log.debug(`Downloading ${url}`)
+
     const referer = URL.getOrigin(url)
     const response = await requestUrl({
         url: url,

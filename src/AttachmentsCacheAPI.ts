@@ -7,51 +7,42 @@ import { Vault, normalizePath } from 'obsidian'
 import { Logger, URI, URL } from '@luis.bs/obsidian-fnc'
 import { getRemoteContent, getRemoteExt, AttachmentError } from './utility'
 
-export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
-    #log = Logger.consoleLogger(AttachmentsCacheAPI.name)
+interface RemoteDef {
+    notepath: string
+    remote: string
+}
 
-    #plugin: AttachmentsCachePlugin
+export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
+    public log: Logger
+
     #vault: Vault
+    #plugin: AttachmentsCachePlugin
 
     #memo = new Map<string, string | undefined>()
 
     constructor(plugin: AttachmentsCachePlugin) {
-        this.#plugin = plugin
+        this.log = plugin.log.make(AttachmentsCacheAPI.name)
         this.#vault = plugin.app.vault
-    }
-
-    #findCache(notepath: string, remote: string): CacheMatcher | undefined {
-        const matcher = this.#plugin.state.cache_matchers //
-            .find((matcher) => matcher.testPath(notepath))
-
-        // not-found or disabled paths
-        if (!matcher?.isEnabled()) return
-
-        // per-link overrides
-        if (this.#plugin.state.url_ignore_matcher(remote)) return
-        if (this.#plugin.state.url_cache_matcher(remote)) return matcher
-
-        // standard behavior
-        return matcher.testRemote(remote) ? matcher : undefined
+        this.#plugin = plugin
     }
 
     mayCache(notepath: string, remote: string): boolean {
-        return !!this.#findCache(notepath, remote)
+        return !!this.#findCacheRule({ notepath, remote }, this.log)
     }
 
     async isCached(notepath: string, remote: string): Promise<boolean> {
-        const resolved = await this.resolve(notepath, remote)
-        return resolved ? await this.#vault.adapter.exists(resolved) : false
+        const localPath = await this.resolve(notepath, remote)
+        return localPath ? await this.#vault.adapter.exists(localPath) : false
     }
 
     async resource(
         notepath: string,
         remote: string,
     ): Promise<string | undefined> {
-        const resolved = await this.resolve(notepath, remote)
-        if (!resolved) return
+        const localPath = await this.resolve(notepath, remote)
+        if (!localPath) return
 
-        const file = this.#vault.getFileByPath(resolved)
+        const file = this.#vault.getFileByPath(localPath)
         return file ? this.#vault.getResourcePath(file) : undefined
     }
 
@@ -59,68 +50,129 @@ export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
         notepath: string,
         remote: string,
     ): Promise<string | undefined> {
-        if (!URL.isUrl(remote)) {
-            throw new AttachmentError('remote-no-url', `remote('${remote}')`)
+        const group = this.log.group('Resolving', { notepath, remote })
+
+        try {
+            const localPath = await this.#resolve({ notepath, remote }, group)
+            if (localPath) {
+                group.flush(`remote resolved to <${localPath}>`)
+                return localPath
+            }
+        } catch (error) {
+            group.error(error)
         }
 
-        const baseUrl = URL.getBaseurl(remote)
-        if (!baseUrl) {
-            throw new AttachmentError('remote-no-url', `remote('${remote}')`)
-        }
-
-        // faster resolution
-        if (this.#memo.has(baseUrl)) return this.#memo.get(baseUrl)
-
-        // identify behavior
-        const matcher = this.#findCache(notepath, remote)
-        if (!matcher) return
-
-        // ensure normalization
-        const name = URI.getBasename(baseUrl)
-        const ext = URI.getExt(baseUrl) ?? (await getRemoteExt(remote))
-        if (!name || !ext) throw new AttachmentError('remote-no-ext')
-
-        const path = URI.join(matcher.resolve(notepath), name + '.' + ext)
-        const res = !this.#plugin.settings.allow_characters
-            ? normalizePath(URI.normalize(path))
-            : normalizePath(path)
-
-        // save for faster resolution
-        this.#memo.set(baseUrl, res)
-        return res
+        group.flush(`remote could not be resolved`)
+        return
     }
 
     async cache(notepath: string, remote: string): Promise<string | undefined> {
-        const log = this.#log.group(`Caching <${remote}>`)
+        const group = this.log.group(`Caching`, { notepath, remote })
 
-        const resolved = await this.resolve(notepath, remote)
-        if (!resolved) {
-            log.flush('Caching avoided', { notepath, remote })
+        try {
+            const localPath = await this.#resolve({ notepath, remote }, group)
+            if (!localPath) {
+                group.info(`remote could not be resolved`)
+                group.flush(`remote was not cached`)
+                return
+            }
+
+            // check existence
+            const cachedFile = this.#vault.getFileByPath(localPath)
+            if (cachedFile) {
+                group.flush(`remote is already in cache`)
+                return this.#vault.getResourcePath(cachedFile)
+            }
+
+            // download file
+            const content = await getRemoteContent(remote, group)
+            await this.#vault.adapter.mkdir(URI.getParent(localPath))
+            await this.#vault.adapter.writeBinary(localPath, content)
+
+            // check result
+            const downloadedFile = this.#vault.getFileByPath(localPath)
+            if (downloadedFile) {
+                group.flush(`remote was cached to <${localPath}>`)
+                return this.#vault.getResourcePath(downloadedFile)
+            }
+        } catch (error) {
+            group.error(error)
+        }
+
+        group.flush(`remote could not be cached`)
+        return
+    }
+
+    #findCacheRule(v: RemoteDef, log?: Logger): CacheMatcher | undefined {
+        log?.debug('searching an active cache rule')
+        const matcher = this.#plugin.state.cache_matchers //
+            .find((matcher) => matcher.testPath(v.notepath))
+
+        // not-found or disabled paths
+        if (!matcher?.isEnabled()) {
+            log?.debug(`notepath does not match and active rule`)
             return
         }
-        log.debug(`Resolved <${resolved}>`, { notepath, remote })
 
-        // check existence
-        const file1 = this.#vault.getFileByPath(resolved)
-        if (file1) {
-            log.flush(`Already cached <${resolved}>`)
-            return this.#vault.getResourcePath(file1)
+        // per-link overrides
+        if (this.#plugin.state.url_ignore_matcher(v.remote)) {
+            log?.debug(`remote is marked to be ignored`)
+            return
+        }
+        if (this.#plugin.state.url_cache_matcher(v.remote)) {
+            log?.debug(`remote is marked to be cached`)
+            return matcher
         }
 
-        // download file
-        // log.warn({ resolved, mkdir: URI.getParent(resolved) })
-        const content = await getRemoteContent(remote)
-        await this.#vault.adapter.mkdir(URI.getParent(resolved))
-        await this.#vault.adapter.writeBinary(resolved, content)
-
-        // check result
-        const file2 = this.#vault.getFileByPath(resolved)
-        if (file2) {
-            log.flush(`Freshly cached <${resolved}>`)
-            return this.#vault.getResourcePath(file2)
+        // standard behavior
+        if (matcher.testRemote(v.remote)) {
+            log?.debug(`remote matches an active rule`)
+            return matcher
         }
 
-        log.flush(`Error caching <${resolved}>`)
-        return
+        log?.debug(`remote does not match and active rule`)
+        return undefined
+    }
+
+    /** @throws {AttachmentError} */
+    async #resolve(v: RemoteDef, log: Logger): Promise<string | undefined> {
+        const baseUrl = URL.getBaseurl(v.remote)
+        if (!baseUrl) {
+            log.debug(`remote is not a valid URL`)
+            throw new AttachmentError('remote-no-url', `remote('${v.remote}')`)
+        }
+
+        // faster resolution
+        const cachedPath = this.#memo.get(baseUrl)
+        if (cachedPath) {
+            log.debug(`remote resolved from cache <${cachedPath}>`)
+            return cachedPath
+        }
+
+        // identify behavior
+        const matcher = this.#findCacheRule(v, log)
+        if (!matcher) {
+            log.debug(`a cache rule could not be matched`)
+            return
+        }
+
+        // ensure normalization
+        const name = URI.getBasename(baseUrl)
+        const ext = URI.getExt(baseUrl) ?? (await getRemoteExt(v.remote, log))
+        if (!name || !ext) {
+            log.debug(`name(${name}) or ext(${ext}) could not be resolved`)
+            throw new AttachmentError('remote-no-ext')
+        }
+
+        const filepath = URI.join(matcher.resolve(v.notepath), name + '.' + ext)
+        const localPath = !this.#plugin.settings.allow_characters
+            ? normalizePath(URI.normalize(filepath))
+            : normalizePath(filepath)
+
+        // save for faster resolution
+        this.#memo.set(baseUrl, localPath)
+
+        log.debug(`remote resolved to <${localPath}>`)
+        return localPath
     }
 }

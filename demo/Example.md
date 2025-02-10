@@ -56,7 +56,7 @@ The next example is cached base on URL param `cache_file`.
 
 ### Whitelisted URL uses _URL Param Ignore_
 
-The next example is ignored base on URL param `cache_file`.
+The next example is ignored base on URL param `ignore_file`.
 
 > Remote
 > ![](https://github.com/elementary/wallpapers/blob/main/backgrounds/A%20Trail%20of%20Footprints%20In%20The%20Sand.jpg?raw=true&ignore_file)
