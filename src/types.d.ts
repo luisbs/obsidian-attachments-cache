@@ -4,23 +4,6 @@ import type { AttachmentError } from './utility'
 
 export { default as AttachmentsCachePlugin } from './main'
 
-//#region Plugin Runtime
-
-export interface AttachmentsCachePluginAPI {
-    /** Test whether the attachments should be cached. */
-    mayCache(notepath: string, remote: string): boolean
-    /** Test whether a remote file is already cached. */
-    isCached(notepath: string, remote: string): Promise<boolean>
-    /** Tries to map a remote url into a Vault resourcePath. */
-    resource(notepath: string, remote: string): Promise<string | undefined>
-    /** Tries to map a remote url into a Vault filePath. */
-    resolve(notepath: string, remote: string): Promise<string | undefined>
-    /** Tries to cache a file locally and returns a Vault resourcePath. */
-    cache(notepath: string, remote: string): Promise<string | undefined>
-}
-
-//#endregion
-
 /**
  *  Pre-calculated plugin state for performance.
  */

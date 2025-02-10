@@ -1,8 +1,5 @@
-import type {
-    AttachmentsCachePlugin,
-    AttachmentsCachePluginAPI,
-    CacheMatcher,
-} from '@/types'
+import type { AttachmentsCachePlugin, CacheMatcher } from '@/types'
+import type { AttachmentsCachePluginAPI } from '@/index'
 import { Vault, normalizePath } from 'obsidian'
 import { Logger, URI, URL } from '@luis.bs/obsidian-fnc'
 import { getRemoteContent, getRemoteExt, AttachmentError } from './utility'

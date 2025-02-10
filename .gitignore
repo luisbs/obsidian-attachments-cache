@@ -3,6 +3,7 @@ node_modules/
 
 # Artifacts
 dist
+lib
 
 # Local artifacts
 .vscode

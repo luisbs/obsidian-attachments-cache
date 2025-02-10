@@ -22,20 +22,27 @@
         "access": "public"
     },
     "files": [
-        "dist/**/*"
+        "lib/**/*"
     ],
     "type": "module",
-    "types": "./dist/types.d.ts",
-    "module": "./dist/main.js",
+    "types": "./lib/index.d.ts",
+    "module": "./lib/obsidian-attachments-cache.esm.js",
+    "exports": {
+        ".": {
+            "types": "./lib/index.d.ts",
+            "module": "./lib/obsidian-attachments-cache.esm.js"
+        }
+    },
     "scripts": {
         "prepare": "simple-git-hooks",
         "lint:eslint": "eslint",
         "lint:prettier": "prettier --check src",
         "lint": "pnpm lint:eslint && pnpm lint:prettier",
-        "watch": "vite build --watch --mode development",
+        "watch": "vite build --watch --mode dev",
         "build": "vite build",
+        "build:lib": "vite build --c ./scripts/vite.config.lib.mjs && tsc -p ./scripts/tsconfig.lib.json",
         "build:version": "node ./scripts/version-bump.mjs && git add manifest.json versions.json",
-        "ci:publish": "pnpm build && clean-pkg-json && changeset publish",
+        "ci:publish": "pnpm build:lib && clean-pkg-json && changeset publish",
         "release": "changeset"
     },
     "dependencies": {
