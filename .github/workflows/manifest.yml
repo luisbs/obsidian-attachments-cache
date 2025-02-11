@@ -31,4 +31,4 @@ jobs:
         run: |
             git config user.name 'github-actions[bot]'
             git config user.email 'github-actions[bot]@users.noreply.github.com'
-            "git commit manifest.json versions.json -m'chore: sync plugin manifest'"
+            git commit manifest.json versions.json -m'chore: sync plugin manifest'
