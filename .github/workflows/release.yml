@@ -8,13 +8,27 @@ jobs:
   release:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
-      pull-requests: write
       id-token: write
     steps:
+      # Since GITHUB_TOKEN will not trigger manifest.yml generate a replacement
+      - name: Generate Access Token
+        uses: actions/create-github-app-token@v1
+        id: access
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.PRIVATE_KEY }}
+
+      - name: Configure Git User
+        run: |
+          git config user.name '${{ steps.access.outputs.app-slug }}[bot]'
+          git config user.email '${{ steps.access.outputs.app-slug }}[bot]@users.noreply.github.com'
+
       - name: Checkout Repo
         uses: actions/checkout@v4
         with:
+          token: ${{ steps.access.outputs.token }}
+          # Prevents the usage of GITHUB_TOKEN
+          persist-credentials: false
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
 
@@ -42,11 +56,11 @@ jobs:
           publish: pnpm run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ steps.access.outputs.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Release a Plugin Version
         if: steps.changesets.outputs.published == 'true'
         run: pnpm run ci:obsidian
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # env:
+        #   GITHUB_TOKEN: ${{ steps.access.outputs.token }}
