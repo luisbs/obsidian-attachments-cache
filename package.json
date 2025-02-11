@@ -41,7 +41,7 @@
         "watch": "vite build --watch --mode dev",
         "build:lib": "vite build --c ./scripts/vite.config.lib.mjs && tsc -p ./scripts/tsconfig.lib.json",
         "build:dist": "vite build --c ./scripts/vite.config.dist.mjs",
-        "ci:publish": "pnpm build:lib && clean-pkg-json && changeset publish",
+        "ci:publish": "pnpm build:lib && clean-pkg-json && changeset publish --no-git-tag",
         "ci:obsidian": "pnpm build:dist && node ./scripts/obsidian-release.mjs",
         "ci:manifest": "node ./scripts/update-manifest.mjs",
         "release": "changeset"
