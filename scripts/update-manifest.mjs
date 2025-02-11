@@ -1,8 +1,8 @@
 import { readFileSync, writeFileSync } from 'node:fs'
-import { exec } from 'node:child_process'
+import { execSync } from 'node:child_process'
 
 const run = (command) => {
-    exec(command, (err, out) => {
+    execSync(command, (err, out) => {
         console.log(out)
         if (err) console.error(err)
     })
