@@ -1,7 +1,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
-const run = (command) => console.log(execSync(command))
+const run = (command) => console.log(execSync(command).toString('utf8'))
 
 const NEW_VERSION = process.env.npm_package_version
 
