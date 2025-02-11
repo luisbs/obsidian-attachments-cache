@@ -3,7 +3,7 @@ import { defineConfig } from 'vite'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
 import builtins from 'builtin-modules'
 import banner from 'vite-plugin-banner'
-import pkg from './package.json'
+import pkg from '../package.json'
 
 const DEMO_PATH = 'demo/.obsidian/plugins/attachments-cache'
 
@@ -12,7 +12,7 @@ export default defineConfig((ctx) => {
     const PRD = ctx.mode === 'production'
 
     return {
-        resolve: { alias: { '@': resolve(__dirname, 'src') } },
+        resolve: { alias: { '@': resolve(__dirname, '../src') } },
 
         plugins: [
             banner(
@@ -45,7 +45,7 @@ export default defineConfig((ctx) => {
             sourcemap: PRD ? false : 'inline',
             emptyOutDir: PRD,
             lib: {
-                entry: resolve(__dirname, 'src/main.ts'),
+                entry: resolve(__dirname, '../src/main.ts'),
                 formats: ['cjs'],
                 fileName: () => 'main.js',
             },

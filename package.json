@@ -39,10 +39,11 @@
         "lint:prettier": "prettier --check src",
         "lint": "pnpm lint:eslint && pnpm lint:prettier",
         "watch": "vite build --watch --mode dev",
-        "build": "vite build",
         "build:lib": "vite build --c ./scripts/vite.config.lib.mjs && tsc -p ./scripts/tsconfig.lib.json",
-        "build:version": "node ./scripts/version-bump.mjs && git add manifest.json versions.json",
+        "build:dist": "vite build --c ./scripts/vite.config.dist.mjs",
         "ci:publish": "pnpm build:lib && clean-pkg-json && changeset publish",
+        "ci:obsidian": "pnpm build:dist && node ./scripts/obsidian-release.mjs",
+        "ci:manifest": "node ./scripts/update-manifest.mjs",
         "release": "changeset"
     },
     "dependencies": {

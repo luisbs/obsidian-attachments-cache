@@ -1,0 +1,32 @@
+name: Sync Plugin Manifest
+
+on:
+  pull_request:
+    branches: [changeset-release/main]
+    types: [opened]
+
+jobs:
+  sync_obsidian_versions:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Install PnPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+
+      - name: Sync Plugin Manifest
+        run: pnpm run ci:manifest
+
+      - name: Commit Changes
+        run: "git commit manifest.json versions.json -m'chore: sync plugin manifest'"
