@@ -1,13 +1,11 @@
 name: Sync Plugin Manifest
 
 on:
-  pull_request:
-    types: [opened]
+  push:
+    branches: [changeset-release/main]
 
 jobs:
-  sync_obsidian_versions:
-    # execute job when a pull request 'changeset-release/main' is created
-    if: startsWith(github.head_ref, 'changeset-release/main')
+  sync_manifest:
     runs-on: ubuntu-latest
     permissions:
       contents: write
