@@ -27,11 +27,6 @@ jobs:
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
 
-      - name: Configure Git User
-        run: |
-          git config user.name '${{ steps.access.outputs.app-slug }}[bot]'
-          git config user.email '${{ steps.access.outputs.app-slug }}[bot]@users.noreply.github.com'
-
       - name: Install PnPM
         uses: pnpm/action-setup@v4
         with:
