@@ -2,4 +2,4 @@
 '@luis.bs/obsidian-attachments-cache': minor
 ---
 
-Add utility functions to to include the API
+dded utility functions to include the API

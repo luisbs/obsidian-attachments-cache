@@ -2,4 +2,4 @@
 '@luis.bs/obsidian-attachments-cache': patch
 ---
 
-Addopt 0-mayor versioning
+Addopted 0-mayor versioning
