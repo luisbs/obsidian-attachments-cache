@@ -1,6 +1,13 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { exec } from 'node:child_process'
 
+const run = (command) => {
+    exec(command, (err, out) => {
+        console.log(out)
+        if (err) console.error(err)
+    })
+}
+
 const NEW_VERSION = process.env.npm_package_version
 
 // update manifest.json with target version
@@ -15,15 +22,15 @@ writeFileSync('versions.json', JSON.stringify(versions, null, '\t'))
 
 // feedback
 console.log('🦋  Generated changes')
-exec('git status --porcelain')
+run('git status --porcelain')
 
 // feedback
 console.log('⧗  Committing changes')
-exec('git config user.name "github-actions[bot]"')
-exec('git config user.email "github-actions[bot]@users.noreply.github.com"')
-exec('git commit manifest.json versions.json -m"chore: sync plugin manifest"')
+run('git config user.name "github-actions[bot]"')
+run('git config user.email "github-actions[bot]@users.noreply.github.com"')
+run('git commit manifest.json versions.json -m"chore: sync plugin manifest"')
 
 // feedback
 console.log('⧗  Pushing changes')
-exec('git push')
+run('git push')
 console.log('✔  Applied changes')
