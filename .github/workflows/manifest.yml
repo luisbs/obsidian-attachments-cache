@@ -25,9 +25,4 @@ jobs:
           cache: pnpm
 
       - name: Sync Plugin Manifest
-        run: |
-            pnpm run ci:manifest
-            git status --porcelain
-            git config user.name 'github-actions[bot-test]'
-            git config user.email 'github-actions[bot-test]@users.noreply.github.com'
-            git commit manifest.json versions.json -m'chore: sync plugin manifest'
+        run: pnpm run ci:manifest
