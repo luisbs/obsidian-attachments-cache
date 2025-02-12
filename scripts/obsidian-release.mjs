@@ -1,5 +1,7 @@
 import { rmSync, readFileSync, writeFileSync } from 'node:fs'
-import { exec } from 'node:child_process'
+import { execSync } from 'node:child_process'
+
+const run = (command) => console.log(execSync(command).toString('utf8'))
 
 const NEW_VERSION = process.env.npm_package_version
 
@@ -13,11 +15,13 @@ const end = changelog.indexOf('## ', start + header.length)
 const section = changelog.substring(start, end)
 
 // prepare release notes
+console.log('Preparing releseas-notes')
 rmSync('release-notes.md', { force: true })
 writeFileSync('release-notes.md', section)
 
 // create release
-exec(
+console.log('Creating Release')
+run(
     `gh release create "${NEW_VERSION}"` +
         ' dist/main.js styles.css manifest.json' +
         ' --notes-file release-notes.md' +
@@ -25,4 +29,5 @@ exec(
 )
 
 // clear artifacts
+console.log('Artifacts Clean up')
 rmSync('release-notes.md', { force: true })

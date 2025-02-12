@@ -23,7 +23,9 @@ run('git status --porcelain')
 console.log('⧗  Committing changes')
 run('git config user.name "github-actions[bot]"')
 run('git config user.email "github-actions[bot]@users.noreply.github.com"')
-run('git commit manifest.json versions.json -m"chore: sync plugin manifest"')
+run(
+    'git commit demo/.obsidian/plugins/attachments-cache/* manifest.json versions.json -m"chore: sync plugin manifest"',
+)
 
 // feedback
 console.log('⧗  Pushing changes')

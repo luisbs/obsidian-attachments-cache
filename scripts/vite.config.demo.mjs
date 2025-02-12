@@ -21,7 +21,7 @@ export default defineConfig({
         emptyOutDir: false,
         outDir: 'demo/.obsidian/plugins/attachments-cache',
         target: 'es2022',
-        sourcemap: true,
+        sourcemap: 'inline',
         rollupOptions: rollupOptions(),
         lib: {
             formats: ['cjs'],
