@@ -43,7 +43,11 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: run1
-        run: pnpm run
+        run: |
+          pwd
+          ls -la
+          git status
+          pnpm run
 
       - name: Create Release Pull Request or Publish to NPM
         # fork to correctly handle `changeset publish --no-git-tag`
@@ -61,7 +65,11 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: run2
-        run: pnpm run
+        run: |
+          pwd
+          ls -la
+          git status
+          pnpm run
 
       - name: Create GitHub Release
         if: steps.changesets.outputs.published == 'true'
