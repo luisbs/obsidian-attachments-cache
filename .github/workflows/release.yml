@@ -42,6 +42,9 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: run1
+        run: pnpm run
+
       - name: Create Release Pull Request or Publish to NPM
         # fork to correctly handle `changeset publish --no-git-tag`
         uses: luisbs/changesets-action@v1
@@ -57,10 +60,11 @@ jobs:
           GITHUB_TOKEN: ${{ steps.access.outputs.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - run: npm run | tee -a "$GITHUB_OUTPUT"
+      - name: run2
+        run: pnpm run
 
       - name: Create GitHub Release
         if: steps.changesets.outputs.published == 'true'
-        run: pwd && pnpm run ci:obsidian
+        run: pnpm run ci:obsidian
         # env:
         #   GITHUB_TOKEN: ${{ steps.access.outputs.token }}
