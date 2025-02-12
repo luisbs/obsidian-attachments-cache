@@ -1,6 +1,6 @@
 {
     "license": "GPL-3.0-or-later",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "name": "@luis.bs/obsidian-attachments-cache",
     "description": "Plugin to cache attachments",
     "keywords": [
