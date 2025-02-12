@@ -1,6 +1,6 @@
 /*!
  * @copyright Copyright (c) 2022-present Luis Brayan
- * @license @luis.bs/obsidian-attachments-cache@0.4.3 is released under the GPL-3.0-or-later license
+ * @license @luis.bs/obsidian-attachments-cache@0.4.4 is released under the GPL-3.0-or-later license
  * @source https://github.com/luisbs/obsidian-attachments-cache
  */
 "use strict";const S=require("obsidian");/*!
