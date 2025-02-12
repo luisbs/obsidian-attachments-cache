@@ -1,5 +1,11 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.4.3
+
+### Patch Changes
+
+- d661319: Test on Github Release
+
 ## 0.4.2
 
 ### Patch Changes
