@@ -44,7 +44,7 @@ jobs:
 
       - name: Create Release Pull Request or Publish to NPM
         # fork to correctly handle `changeset publish --no-git-tag`
-        uses: luisbs/changesets-action@main
+        uses: luisbs/changesets-action@v1
         id: changesets
         with:
           title: "chore: release @luis.bs/obsidian-attachments-cache"
