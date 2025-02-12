@@ -17,11 +17,11 @@ export default defineConfig({
         }),
     ],
 
-    esbuild: { drop: ['debugger'] },
     build: {
-        outDir: 'dist',
+        emptyOutDir: false,
+        outDir: 'demo/.obsidian/plugins/attachments-cache',
         target: 'es2022',
-        sourcemap: false,
+        sourcemap: true,
         rollupOptions: rollupOptions(),
         lib: {
             formats: ['cjs'],

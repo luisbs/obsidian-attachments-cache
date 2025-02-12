@@ -15,10 +15,9 @@ During the Obsidian render process, when an `img` is found:
 There already exists similar plugins, like:
 
 - [niekcandaele/obsidian-local-images](https://github.com/niekcandaele/obsidian-local-images) doesn't have explicit support for Obsidian v1.0+
-- _fork_ [aleksey-rezvov/obsidian-local-images](https://github.com/aleksey-rezvov/obsidian-local-images) doesn't have explicit support for Obsidian v1.0+
-- [Sergei-Korneev/obsidian-local-images-plus](https://github.com/Sergei-Korneev/obsidian-local-images-plus) doesn't have explicit support for Obsidian v1.0+ and includes other features
+- [Sergei-Korneev/obsidian-local-images-plus](https://github.com/Sergei-Korneev/obsidian-local-images-plus)
 
-But the main difference is that they modify the base note, this plugin avoids that.The intentation is to keep possible to delete the caches or copy the note content and it should still work (with the remote urls).
+But the main difference is that they modify the base note, this plugin avoids that. The intentation is to keep the posibility to delete the caches or copy the note content and it should still work (with the remote urls).
 
 ## Features
 
@@ -106,4 +105,5 @@ When this setting is disabled any non-standard character is replaced with an und
 ### `URL Param Cache` & `URL Param Ignore`
 
 > This Settings work if the **Note** has already matched an _enabled path_.
+
 URL param, overrides standar cache rules on a per-link basis, and caches/ignores the attachment.
