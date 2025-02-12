@@ -1,5 +1,11 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.4.2
+
+### Patch Changes
+
+- 5bf2b9a: Testing changeset/action fork
+
 ## 0.4.1
 
 ### Patch Changes
