@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs'
+import { copyFileSync, readFileSync, writeFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
 const run = (command) => console.log(execSync(command).toString('utf8'))
@@ -9,6 +9,11 @@ const NEW_VERSION = process.env.npm_package_version
 const manifest = JSON.parse(readFileSync('manifest.json', 'utf8'))
 manifest.version = NEW_VERSION
 writeFileSync('manifest.json', JSON.stringify(manifest, null, '\t'))
+// update manifest.json on the demo
+copyFileSync(
+    'manifest.json',
+    'demo/.obsidian/plugins/attachments-cache/manifest.json',
+)
 
 // update versions.json with target version and minAppVersion
 const versions = JSON.parse(readFileSync('versions.json', 'utf8'))
