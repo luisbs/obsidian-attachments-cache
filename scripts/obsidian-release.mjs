@@ -11,7 +11,7 @@ const changelog = readFileSync('CHANGELOG.md', 'utf8')
 // try to match a section headed by `## 1.4.2`
 const header = `## ${NEW_VERSION}`
 const start = changelog.indexOf(header)
-const end = changelog.indexOf('## ', start + header.length)
+const end = changelog.indexOf('\n## ', start + header.length)
 const section = changelog.substring(start, end)
 
 // prepare release notes
@@ -22,8 +22,7 @@ writeFileSync('release-notes.md', section)
 // create release
 console.log('Creating Release')
 run(
-    `gh release create "${NEW_VERSION}"` +
-        ' dist/main.js styles.css manifest.json' +
+    `gh release create "${NEW_VERSION}" dist/*` +
         ' --notes-file release-notes.md' +
         ` --title "${NEW_VERSION}"`,
 )
