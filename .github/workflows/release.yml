@@ -57,9 +57,10 @@ jobs:
           GITHUB_TOKEN: ${{ steps.access.outputs.token }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - run: npm run
+      - run: npm run | tee -a "$GITHUB_OUTPUT"
+
       - name: Create GitHub Release
         if: steps.changesets.outputs.published == 'true'
-        run: pnpm run ci:obsidian
+        run: pwd && pnpm run ci:obsidian
         # env:
         #   GITHUB_TOKEN: ${{ steps.access.outputs.token }}
