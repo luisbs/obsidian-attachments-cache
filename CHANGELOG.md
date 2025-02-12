@@ -1,5 +1,11 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.4.4
+
+### Patch Changes
+
+- f0bfe15: Fixed automated release missing GH_TOKEN
+
 ## 0.4.3
 
 ### Patch Changes
