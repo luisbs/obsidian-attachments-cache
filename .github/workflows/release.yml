@@ -63,5 +63,5 @@ jobs:
         run: |
           git reset --hard HEAD
           pnpm run ci:obsidian
-        # env:
-        #   GITHUB_TOKEN: ${{ steps.access.outputs.token }}
+        env:
+          GH_TOKEN: ${{ steps.access.outputs.token }}
