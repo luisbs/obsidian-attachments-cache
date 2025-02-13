@@ -1,22 +1,11 @@
 import { resolve } from 'path'
 import { defineConfig } from 'vite'
-import { viteStaticCopy } from 'vite-plugin-static-copy'
-import { packageBanner, rollupOptions } from './vite.config.lib.mjs'
+import { packageBanner, packageStatic, rollupOptions } from './vite.share.mjs'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+    plugins: [packageBanner(), packageStatic(['manifest.json', 'styles.css'])],
     resolve: { alias: { '@': resolve(__dirname, '../src') } },
-
-    plugins: [
-        packageBanner(),
-        viteStaticCopy({
-            targets: [
-                { src: 'manifest.json', dest: './' },
-                { src: 'src/styles.css', dest: './' },
-            ],
-        }),
-    ],
-
     esbuild: { drop: ['debugger'] },
     build: {
         outDir: 'dist',
