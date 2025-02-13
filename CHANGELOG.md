@@ -1,5 +1,16 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.5.0
+
+### Minor Changes
+
+- 170c7ef: Add customization of postprocessor sortOrder
+- a4dcbb6: Added support for per-note overrides
+
+### Patch Changes
+
+- 29b84d7: Isolated Settings details into derived file
+
 ## 0.4.4
 
 ### Patch Changes
