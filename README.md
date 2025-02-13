@@ -2,6 +2,8 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](https://opensource.org/licenses/gpl-3)
 
+If you search help about the **Settings** you can check the [documentation](./docs/settings.md).
+
 ## Summary
 
 During the Obsidian render process, when an `img` is found:
@@ -93,17 +95,3 @@ declare namespace AttachmentsCache {
   function cache(notepath: string, remote: string): Promise<string | undefined>
 }
 ```
-
-## Settings
-
-The next section explains the supported Settings.
-
-### `Keep Special Characters`
-
-When this setting is disabled any non-standard character is replaced with an underscore, to prevent problems on a paths.
-
-### `URL Param Cache` & `URL Param Ignore`
-
-> This Settings work if the **Note** has already matched an _enabled path_.
-
-URL param, overrides standar cache rules on a per-link basis, and caches/ignores the attachment.
