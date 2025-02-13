@@ -6,7 +6,8 @@
 - [x] Support per-path URL lists.
 - [x] Support glob patterns on Vault paths.
 - [x] Whitelist/blacklist remote URLs to cache.
-- [x] Support per-link overrides to cache/ignore and individual attachment.
+- [x] Support per-link overrides to cache/ignore an individual attachment.
+- [x] Support per-note overrides to cache/ignore notes attachments.
 - [x] For listed Vault paths allow defining where to store the files.
 - [x] For listed remote URLs allows path especificity ej: `example.com/images`
 - [x] Expose API for thrid-party integration.
@@ -14,7 +15,6 @@
 
 ## Behavior settings
 
-- [ ] Support per-file overwriting with YAML params like `attach_from`/`attach_unless`
 - [ ] Define a cache time limit (auto-clean old or unused attachments, to reduce vault size)
 - [ ] Allow image resizing if possible, like:
 

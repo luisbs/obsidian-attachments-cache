@@ -102,34 +102,44 @@ export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
         return
     }
 
-    #findCacheRule(v: RemoteDef, log?: Logger): CacheMatcher | undefined {
-        log?.debug('searching an active cache rule')
+    #findCacheRule(v: RemoteDef, log: Logger): CacheMatcher | undefined {
+        log.debug('searching an active cache rule')
         const matcher = this.#plugin.state.cache_matchers //
             .find((matcher) => matcher.testPath(v.notepath))
 
         // not-found or disabled paths
         if (!matcher?.isEnabled()) {
-            log?.debug('notepath does not match and active rule')
+            log.debug('notepath does not match and active rule')
             return
         }
 
-        // per-link overrides
+        // URL overrides
         if (this.#plugin.state.url_ignore_matcher(v.remote)) {
-            log?.debug('remote is marked to be ignored')
+            log.debug('remote has to be ignored (URL param)')
             return
         }
         if (this.#plugin.state.url_cache_matcher(v.remote)) {
-            log?.debug('remote is marked to be cached')
+            log.debug('remote has to be cached (URL param)')
+            return matcher
+        }
+
+        // Frontmatter overrides
+        if (this.#plugin.state.note_ignore_matcher(v.notepath, v.remote)) {
+            log.debug('remote has to be ignored (Frontmatter param)')
+            return
+        }
+        if (this.#plugin.state.note_cache_matcher(v.notepath, v.remote)) {
+            log.debug('remote has to be cached (Frontmatter param)')
             return matcher
         }
 
         // standard behavior
         if (matcher.testRemote(v.remote)) {
-            log?.debug('remote matches an active rule')
+            log.debug('remote matches an active rule')
             return matcher
         }
 
-        log?.debug('remote does not match and active rule')
+        log.debug('remote does not match and active rule')
         return undefined
     }
 

@@ -46,8 +46,33 @@ This mode will expand `'NORMAL'` and try to cache most attachments, it may only 
 
 When this setting is disabled any non-standard character is replaced with an underscore, to prevent problems on a paths.
 
-### `URL Param Cache` & `URL Param Ignore`
+### `URL Param Ignore` & `URL Param Cache`
 
 > This Settings work if the **Note** has already matched an _enabled path_.
 
-URL param, overrides standar cache rules on a per-link basis, and caches/ignores the attachment.
+Overrides standar cache rules on a per-link basis, and caches/ignores the attachment.
+
+Both **URL params** can be changed on the **Plugin Settings** by default they are `ignore_file` and `cache_file`, e.g.:
+
+```md
+<!-- ignores the next image -->
+![](https://example.com/image1.jpg?ignore_file)
+<!-- caches the next image -->
+![](https://example.com/image2.jpg?cache_file)
+```
+
+### `Note Frontmatter Param Ignore` & `Note Frontmatter Param Cache`
+
+> This Settings work if the **Note** has already matched an _enabled path_.
+
+Overrides standar cache rules on a per-note basis, and caches/ignores the note's attachments.
+
+Both **Frontmatter params** can be changed on the **Plugin Settings** by default they are `cache_unless` and `cache_from`, e.g.:
+
+```yml
+# this params correspond to the Note's Frontmatter
+# strings are supported
+cache_unless: example.com/images
+# arrays are also supported
+cache_from: [example.com/photos, images.net/assets]
+```

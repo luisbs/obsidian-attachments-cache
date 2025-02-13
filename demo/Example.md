@@ -1,3 +1,8 @@
+---
+cache_unless: images.pexels.com/photos
+cache_from: 4kwallpapers.com/images
+---
+
 # Caching Examples
 
 To test this examples:
@@ -5,7 +10,9 @@ To test this examples:
 1. Ensure the `Remotes List` setting is the next one.
 
 ```txt
+b 4kwallpapers.com/images
 w github.com/elementary/wallpapers
+w images.pexels.com/photos
 b *
 ```
 
@@ -40,23 +47,11 @@ The next example is ignored based on the `Remotes List`.
 
 ---
 
-## Per-file Overrides
-
-### Blacklisted URL uses _URL Param Cache_
-
-The next example is cached base on URL param `cache_file`.
-
-> Remote
-> ![](https://wallpaperaccess.com/full/2130189.jpg?cache_file)
-
-> Local Cache (should be present)
-> ![[2130189.jpg]]
-
----
+## Per-URL Overrides
 
 ### Whitelisted URL uses _URL Param Ignore_
 
-The next example is ignored base on URL param `ignore_file`.
+The next example is ignored based on the URL's param `ignore_file`.
 
 > Remote
 > ![](https://github.com/elementary/wallpapers/blob/main/backgrounds/A%20Trail%20of%20Footprints%20In%20The%20Sand.jpg?raw=true&ignore_file)
@@ -66,12 +61,38 @@ The next example is ignored base on URL param `ignore_file`.
 
 ---
 
-<!--
-### Other case
+### Blacklisted URL uses _URL Param Cache_
+
+The next example is cached based on the URL's param `cache_file`.
 
 > Remote
-> ![](https://github.com/elementary/wallpapers/blob/main/backgrounds/Ashim%20DSilva.jpg?raw=true)
+> ![](https://wallpaperaccess.com/full/2130189.jpg?cache_file)
 
 > Local Cache (should be present)
-> ![[Ashim_20DSilva.jpg]]
--->
+> ![[2130189.jpg]]
+
+---
+
+## Per-Note Overrides
+
+### Whitelisted URL uses _Note Param Ignore_
+
+The next example is ignored based on the Note's Frontmatter param `cache_unless`
+
+> Remote
+> ![](https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)
+
+> Local Cache (should be missing)
+> ![[fall-autumn-red-season.jpg]]
+
+---
+
+### Blacklisted URL uses _Note Param Cache_
+
+The next example is cached based on the Note's Frontmatter param `cache_from`
+
+> Remote
+> ![](https://4kwallpapers.com/images/walls/thumbs_3t/21150.jpg)
+
+> Local Cache (should be present)
+> ![[21150.jpg]]

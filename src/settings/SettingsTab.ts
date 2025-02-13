@@ -83,21 +83,36 @@ export class SettingsTab extends PluginSettingTab {
         })
 
         //#region URL params
-        const urlcacheSetting = new Setting(this.containerEl)
-        urlcacheSetting.setName('URL Param Cache')
-        urlcacheSetting.setDesc('Overrides standard rules and stores the file.')
-        urlcacheSetting.addText((input) => {
+        const urlignore = new Setting(this.containerEl)
+        urlignore.setName('URL Param Ignore')
+        urlignore.setDesc('Overrides rules and ignores the attachment.')
+        urlignore.addText((input) => {
+            input.setValue(this.#settings.url_param_ignore)
+            input.onChange(this.#handle.bind(this, 'url_param_ignore'))
+        })
+        const urlcache = new Setting(this.containerEl)
+        urlcache.setName('URL Param Cache')
+        urlcache.setDesc('Overrides rules and caches the attachment.')
+        urlcache.addText((input) => {
             input.setValue(this.#settings.url_param_cache)
             input.onChange(this.#handle.bind(this, 'url_param_cache'))
         })
-        const urlignoreSetting = new Setting(this.containerEl)
-        urlignoreSetting.setName('URL Param Ignore')
-        urlignoreSetting.setDesc(
-            'Overrides standard rules and ignores the file.',
-        )
-        urlignoreSetting.addText((input) => {
-            input.setValue(this.#settings.url_param_ignore)
-            input.onChange(this.#handle.bind(this, 'url_param_ignore'))
+        //#endregion
+
+        //#region Note params
+        const noteignore = new Setting(this.containerEl)
+        noteignore.setName('Note Frontmatter Param Ignore')
+        noteignore.setDesc('Overrides rules and ignores the Note attachments.')
+        noteignore.addText((input) => {
+            input.setValue(this.#settings.note_param_ignore)
+            input.onChange(this.#handle.bind(this, 'note_param_ignore'))
+        })
+        const notecache = new Setting(this.containerEl)
+        notecache.setName('Note Frontmatter Param Cache')
+        notecache.setDesc('Overrides rules and caches the Note attachments.')
+        notecache.addText((input) => {
+            input.setValue(this.#settings.note_param_cache)
+            input.onChange(this.#handle.bind(this, 'note_param_cache'))
         })
         //#endregion
     }

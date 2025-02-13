@@ -1,11 +1,7 @@
 import type { PluginSettings, PluginState } from '@/types'
 import { App, Plugin, PluginManifest } from 'obsidian'
 import { Logger, LogLevel } from '@luis.bs/obsidian-fnc'
-import {
-    prepareConfigs,
-    prepareConfigMatchers,
-    prepareRemoteMatcher,
-} from './utility'
+import { prepareConfigs, prepareState } from './utility'
 import { SettingsTab } from './settings/SettingsTab'
 import { MarkdownHandler } from './filesystem/MarkdownHandler'
 import { AttachmentsCacheAPI } from './AttachmentsCacheAPI'
@@ -21,6 +17,8 @@ const DEFAULT_SETTINGS: PluginSettings = {
     allow_characters: false,
     url_param_cache: 'cache_file',
     url_param_ignore: 'ignore_file',
+    note_param_cache: 'cache_from',
+    note_param_ignore: 'cache_unless',
     cache_configs: [
         {
             pattern: '*',
@@ -107,16 +105,6 @@ export default class AttachmentsCachePlugin extends Plugin {
         // change Plugin behavior based on user input
         this.log.setLevel(LogLevel[this.settings.plugin_level])
         this.markdown.syncPriority()
-
-        // rules matchers
-        this.state = {
-            cache_matchers: prepareConfigMatchers(this.settings.cache_configs),
-            url_cache_matcher: prepareRemoteMatcher(
-                this.settings.url_param_cache,
-            ),
-            url_ignore_matcher: prepareRemoteMatcher(
-                this.settings.url_param_ignore,
-            ),
-        }
+        this.state = prepareState(this)
     }
 }

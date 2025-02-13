@@ -1,8 +1,5 @@
-import type { CacheRemote, RemoteMatcher } from '@/types'
-import { requestUrl } from 'obsidian'
-import { Logger, URL } from '@luis.bs/obsidian-fnc'
-import { AttachmentError } from './AttachmentError'
-import { compareBySpecificity, getMimeExt } from './strings'
+import type { CacheRemote } from '@/types'
+import { compareBySpecificity } from './strings'
 
 /** Ensures uniqueness and order of a list of remotes. */
 export function prepareRemotes(remotes: CacheRemote[]): CacheRemote[] {
@@ -126,53 +123,4 @@ export function checkRemotes(sources: string): string[] {
     if (!hasFallback) problems.unshift("should include a fallback '*'")
 
     return problems
-}
-
-/** Generates a matcher, that detects the presence of an URL param. */
-export function prepareRemoteMatcher(
-    url_param = 'fallback_param',
-): RemoteMatcher {
-    const regex = new RegExp('[?&]' + url_param + '([&=\\s]|$)', 'i')
-    return (remote: string) => regex.test(remote)
-}
-
-/**
- * Request the metadata of a file, to determine the file extension.
- * @throws {AttachmentError}
- */
-export async function getRemoteExt(url: string, log: Logger): Promise<string> {
-    log.debug(`Resolving extension for ${url}`)
-
-    const referer = URL.getOrigin(url)
-    const response = await requestUrl({
-        url: url,
-        throw: false,
-        method: 'HEAD',
-        headers: { Referer: referer ? referer + '/' : '' },
-    })
-
-    AttachmentError.assertResponse(url, response, 'url-request-head')
-    return getMimeExt(response.headers['content-type'])
-}
-
-/**
- * Downloads the content of a file.
- * @throws {AttachmentError}
- */
-export async function getRemoteContent(
-    url: string,
-    log: Logger,
-): Promise<ArrayBuffer> {
-    log.debug(`Downloading ${url}`)
-
-    const referer = URL.getOrigin(url)
-    const response = await requestUrl({
-        url: url,
-        throw: false,
-        method: 'GET',
-        headers: { Referer: referer ? referer + '/' : '' },
-    })
-
-    AttachmentError.assertResponse(url, response, 'url-request-get')
-    return response.arrayBuffer
 }

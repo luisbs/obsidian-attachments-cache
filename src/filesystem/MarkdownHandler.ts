@@ -1,5 +1,8 @@
 import type { AttachmentsCachePlugin } from '@/types'
-import type { MarkdownPostProcessor } from 'obsidian'
+import type {
+    MarkdownPostProcessor,
+    MarkdownPostProcessorContext,
+} from 'obsidian'
 import { PRIORITY } from '@/settings/values'
 
 export class MarkdownHandler {
@@ -25,14 +28,21 @@ export class MarkdownHandler {
     }
 
     public registerMarkdownProcessor(): void {
-        this.#mpp = this.plugin.registerMarkdownPostProcessor((el, ctx) => {
-            el.querySelectorAll('img') //
-                .forEach((e) => void this.#image(e, ctx.sourcePath))
-        }, PRIORITY[this.plugin.settings.plugin_priority])
+        this.#mpp = this.plugin.registerMarkdownPostProcessor(
+            this.#handle.bind(this),
+            PRIORITY[this.plugin.settings.plugin_priority],
+        )
     }
 
-    async #image(el: HTMLImageElement, sourcePath: string): Promise<void> {
-        const resolved = await this.plugin.api.cache(sourcePath, el.src)
-        if (resolved) el.src = resolved
+    async #handle(
+        element: HTMLElement,
+        { sourcePath }: MarkdownPostProcessorContext,
+    ): Promise<void> {
+        for (const el of Array.from(element.querySelectorAll('img'))) {
+            const resolved = await this.plugin.api.cache(sourcePath, el.src)
+            if (resolved) el.src = resolved
+        }
+
+        // TODO: add support for other types of attachments
     }
 }

@@ -4,12 +4,22 @@
   "allow_characters": false,
   "url_param_cache": "cache_file",
   "url_param_ignore": "ignore_file",
+  "note_param_cache": "cache_from",
+  "note_param_ignore": "cache_unless",
   "cache_configs": [
     {
       "pattern": "*",
       "remotes": [
         {
+          "pattern": "4kwallpapers.com/images",
+          "whitelisted": false
+        },
+        {
           "pattern": "github.com/elementary/wallpapers",
+          "whitelisted": true
+        },
+        {
+          "pattern": "images.pexels.com/photos",
           "whitelisted": true
         },
         {
