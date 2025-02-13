@@ -1,6 +1,4 @@
-import { LogLevel } from '@luis.bs/obsidian-fnc'
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { AttachmentError } from './utility'
+import { CacheMode, PluginLevel, PluginPriority } from './settings/values'
 
 export { default as AttachmentsCachePlugin } from './main'
 
@@ -17,7 +15,9 @@ export interface PluginState {
 }
 export interface PluginSettings {
     /** Defines the minimun level to log while running. */
-    log_level: keyof typeof LogLevel
+    plugin_level: PluginLevel
+    /** Defines the **CachePostProcessor** priority.  */
+    plugin_priority: PluginPriority
     /** Stores the user preference over `UTF-8` characters. */
     allow_characters: boolean
     /** User defined URL-param to cache, overrides standard rules. */
@@ -65,17 +65,3 @@ export interface CacheRemote {
     /** Remote pattern to match against. */
     pattern: string
 }
-/**
- * Mode to store the values:
- * - `'NOTE'` alongside the note. (doesn't use target)
- * - `'NOTE-FOLDER'` alongside the note in a subfolder with the target as name.
- * - `'TARGET'` directly inside target path.
- * - `'TARGET-NOTE'` inside target path in a subfolder with the note-name.
- * - `'TARGET-PATH'` inside target path replicating note-path
- */
-export type CacheMode =
-    | 'NOTE'
-    | 'NOTE-FOLDER'
-    | 'TARGET'
-    | 'TARGET-NOTE'
-    | 'TARGET-PATH'

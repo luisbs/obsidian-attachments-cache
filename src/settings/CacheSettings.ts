@@ -1,35 +1,9 @@
-import type { CacheConfig, CacheMode, CacheRemote } from '@/types'
+import type { CacheConfig, CacheRemote } from '@/types'
 import { Setting, TextAreaComponent, TextComponent } from 'obsidian'
 import { checkRemotes, parseRemotes, serializeRemotes } from '@/utility'
+import { CacheMode, MODE_DESC, MODE_LABELS, modeExample } from './values'
 
 type EventCallback = (cache: CacheConfig) => void
-
-// prettier-ignore
-const MODES_NAME: Record<CacheMode, string> = {
-    'NOTE': /*  */ 'Attachments next to the Note',
-    'NOTE-FOLDER': 'Attachments on Subfolder',
-    'TARGET': /**/ 'Attachments on Cache Folder',
-    'TARGET-NOTE': 'Attachments on Cache Note Folder',
-    'TARGET-PATH': 'Attachments on Cache Note Path',
-}
-// prettier-ignore
-const MODES_DESC: Record<CacheMode, string> = {
-    'NOTE': /*  */ 'Store in the same folder as the note',
-    'NOTE-FOLDER': 'Store next to the note in subfolder ',
-    'TARGET': /**/ 'Store in folder ',
-    'TARGET-NOTE': 'Store in subfolder with the note-name under ',
-    'TARGET-PATH': 'Store in a replated note-path under ',
-}
-// prettier-ignore
-const modesEx = ({ mode, target }: CacheConfig) => {
-    switch (mode) {
-        case 'NOTE': /*  */ return 'folder/img1.jpg'
-        case 'NOTE-FOLDER': return `folder/${target}/img1.jpg`
-        case 'TARGET': /**/ return `${target}/img1.jpg`
-        case 'TARGET-NOTE': return `${target}/note1/img1.jpg`
-        case 'TARGET-PATH': return `${target}/folder/note1/img1.jpg`
-    }
-}
 
 export class CacheSettings {
     #cache: CacheConfig
@@ -60,9 +34,9 @@ export class CacheSettings {
         })
     }
     #cacheDesc(): DocumentFragment | string {
-        if (this.#cache.mode === 'NOTE') return MODES_DESC.NOTE
+        if (this.#cache.mode === 'NOTE') return MODE_DESC.NOTE
         return createFragment((div) => {
-            div.append(MODES_DESC[this.#cache.mode])
+            div.append(MODE_DESC[this.#cache.mode])
             div.createEl('code').appendText(this.#cache.target)
         })
     }
@@ -122,9 +96,7 @@ export class CacheSettings {
 
             const attachment = ul.createEl('li')
             attachment.append("Attachment: '")
-            const b = attachment.createEl('b')
-
-            b.appendText(modesEx(this.#cache))
+            attachment.createEl('b').appendText(modeExample(this.#cache))
             attachment.append("'")
         })
     }
@@ -135,7 +107,7 @@ export class CacheSettings {
         cacheSetting.setName('Attachments Storage')
         cacheSetting.setDesc(this.#targetDesc())
         cacheSetting.addDropdown((dropdown) => {
-            dropdown.addOptions(MODES_NAME)
+            dropdown.addOptions(MODE_LABELS)
             dropdown.setValue(this.#cache.mode)
             dropdown.onChange((value) => {
                 this.#cache.mode = value as CacheMode

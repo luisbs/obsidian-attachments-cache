@@ -10,9 +10,20 @@ import {
     Setting,
     TextComponent,
 } from 'obsidian'
-import {} from '@luis.bs/obsidian-fnc'
-import { checkPattern, prepareConfigs } from '@/utility'
+import { checkPattern, prepareConfigs, prepareHash } from '@/utility'
 import { CacheSettings } from './CacheSettings'
+import { LEVEL_LABELS, PRIORITY_LABELS } from './values'
+
+export function docs(name: string, desc: string): DocumentFragment {
+    return createFragment((div) => {
+        div.appendText(desc + '. Check the ')
+        div.createEl('a', {
+            text: 'Docs',
+            href: `https://github.com/luisbs/obsidian-attachments-cache/blob/main/docs/settings.md#${prepareHash(name)}`,
+        })
+        div.appendText('.')
+    })
+}
 
 export class SettingsTab extends PluginSettingTab {
     #plugin: AttachmentsCachePlugin
@@ -24,10 +35,6 @@ export class SettingsTab extends PluginSettingTab {
         super(plugin.app, plugin)
         this.#plugin = plugin
         this.#settings = plugin.settings
-    }
-
-    hide() {
-        // TODO: persist data
     }
 
     display(): void {
@@ -44,15 +51,25 @@ export class SettingsTab extends PluginSettingTab {
 
     #displayGeneralSettings(): void {
         const levelSetting = new Setting(this.containerEl)
-        levelSetting.setName('Plugging Log Level')
+        levelSetting.setName('Plugging LogLevel')
+        levelSetting.setDesc(
+            docs('Plugging LogLevel', 'To check the plugin logs'),
+        )
         levelSetting.addDropdown((dropdown) => {
-            dropdown.addOption('ERROR', 'ERROR')
-            dropdown.addOption('WARN', ' WARN')
-            dropdown.addOption('INFO', ' INFO')
-            dropdown.addOption('DEBUG', 'DEBUG')
-            dropdown.addOption('TRACE', 'TRACE')
-            dropdown.setValue(this.#settings.log_level)
-            dropdown.onChange(this.#handle.bind(this, 'log_level'))
+            dropdown.addOptions(LEVEL_LABELS)
+            dropdown.setValue(this.#settings.plugin_level)
+            dropdown.onChange(this.#handle.bind(this, 'plugin_level'))
+        })
+
+        const prioritySetting = new Setting(this.containerEl)
+        prioritySetting.setName('Plugin Priority')
+        prioritySetting.setDesc(
+            docs('Plugin Priority', 'Affects the attachments been cached'),
+        )
+        prioritySetting.addDropdown((dropdown) => {
+            dropdown.addOptions(PRIORITY_LABELS)
+            dropdown.setValue(this.#settings.plugin_priority)
+            dropdown.onChange(this.#handle.bind(this, 'plugin_priority'))
         })
 
         const charsSetting = new Setting(this.containerEl)

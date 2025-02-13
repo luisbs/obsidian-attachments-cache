@@ -11,9 +11,13 @@ import { MarkdownHandler } from './filesystem/MarkdownHandler'
 import { AttachmentsCacheAPI } from './AttachmentsCacheAPI'
 
 const DEFAULT_SETTINGS: PluginSettings = {
-    // * WARN level to force the user to choose a lower level when is required
+    // * 'WARN' level to force the user to choose a lower level when is required
     // * this decition, prevents the console from been overpopulated by default
-    log_level: 'WARN',
+    plugin_level: 'WARN',
+    // * 'NORMAL' priority to cache user-written markdown
+    // * and PostProcessors with default priority
+    plugin_priority: 'NORMAL',
+    //
     allow_characters: false,
     url_param_cache: 'cache_file',
     url_param_ignore: 'ignore_file',
@@ -100,8 +104,11 @@ export default class AttachmentsCachePlugin extends Plugin {
     #prepareState(log: Logger): void {
         log.info('Preparing state')
 
-        // * changes log level based on user input
-        this.log.setLevel(LogLevel[this.settings.log_level])
+        // change Plugin behavior based on user input
+        this.log.setLevel(LogLevel[this.settings.plugin_level])
+        this.markdown.syncPriority()
+
+        // rules matchers
         this.state = {
             cache_matchers: prepareConfigMatchers(this.settings.cache_configs),
             url_cache_matcher: prepareRemoteMatcher(

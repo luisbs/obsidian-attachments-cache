@@ -10,6 +10,7 @@
 - [x] For listed Vault paths allow defining where to store the files.
 - [x] For listed remote URLs allows path especificity ej: `example.com/images`
 - [x] Expose API for thrid-party integration.
+- [x] Established PostProcess priority.
 
 ## Behavior settings
 

@@ -1,3 +1,10 @@
+export function prepareHash(source: string): string {
+    return source
+        .replaceAll(' ', '-')
+        .replaceAll(/[^\w-]/gi, '')
+        .toLowerCase()
+}
+
 export function compareBySpecificity(a: string, b: string): number {
     //[
     //  '*',
