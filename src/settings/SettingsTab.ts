@@ -27,20 +27,19 @@ export function docs(name: string, desc: string): DocumentFragment {
 
 export class SettingsTab extends PluginSettingTab {
     #plugin: AttachmentsCachePlugin
-    #settings: PluginSettings
 
     #configsList?: HTMLDivElement
 
     constructor(plugin: AttachmentsCachePlugin) {
         super(plugin.app, plugin)
         this.#plugin = plugin
-        this.#settings = plugin.settings
     }
 
     display(): void {
         this.containerEl.empty()
         this.containerEl.addClass('attachments-cache-settings')
 
+        new Setting(this.containerEl).setName('Plugin Settings').setHeading()
         this.#displayGeneralSettings()
 
         new Setting(this.containerEl).setName('Paths Settings').setHeading()
@@ -57,7 +56,7 @@ export class SettingsTab extends PluginSettingTab {
         )
         levelSetting.addDropdown((dropdown) => {
             dropdown.addOptions(LEVEL_LABELS)
-            dropdown.setValue(this.#settings.plugin_level)
+            dropdown.setValue(this.#plugin.settings.plugin_level)
             dropdown.onChange(this.#handle.bind(this, 'plugin_level'))
         })
 
@@ -68,7 +67,7 @@ export class SettingsTab extends PluginSettingTab {
         )
         prioritySetting.addDropdown((dropdown) => {
             dropdown.addOptions(PRIORITY_LABELS)
-            dropdown.setValue(this.#settings.plugin_priority)
+            dropdown.setValue(this.#plugin.settings.plugin_priority)
             dropdown.onChange(this.#handle.bind(this, 'plugin_priority'))
         })
 
@@ -78,7 +77,7 @@ export class SettingsTab extends PluginSettingTab {
             'If you are having problems with special characters on paths, disable this setting.',
         )
         charsSetting.addToggle((toggle) => {
-            toggle.setValue(this.#settings.allow_characters)
+            toggle.setValue(this.#plugin.settings.allow_characters)
             toggle.onChange(this.#handle.bind(this, 'allow_characters'))
         })
 
@@ -87,14 +86,14 @@ export class SettingsTab extends PluginSettingTab {
         urlignore.setName('URL Param Ignore')
         urlignore.setDesc('Overrides rules and ignores the attachment.')
         urlignore.addText((input) => {
-            input.setValue(this.#settings.url_param_ignore)
+            input.setValue(this.#plugin.settings.url_param_ignore)
             input.onChange(this.#handle.bind(this, 'url_param_ignore'))
         })
         const urlcache = new Setting(this.containerEl)
         urlcache.setName('URL Param Cache')
         urlcache.setDesc('Overrides rules and caches the attachment.')
         urlcache.addText((input) => {
-            input.setValue(this.#settings.url_param_cache)
+            input.setValue(this.#plugin.settings.url_param_cache)
             input.onChange(this.#handle.bind(this, 'url_param_cache'))
         })
         //#endregion
@@ -104,14 +103,14 @@ export class SettingsTab extends PluginSettingTab {
         noteignore.setName('Note Frontmatter Param Ignore')
         noteignore.setDesc('Overrides rules and ignores the Note attachments.')
         noteignore.addText((input) => {
-            input.setValue(this.#settings.note_param_ignore)
+            input.setValue(this.#plugin.settings.note_param_ignore)
             input.onChange(this.#handle.bind(this, 'note_param_ignore'))
         })
         const notecache = new Setting(this.containerEl)
         notecache.setName('Note Frontmatter Param Cache')
         notecache.setDesc('Overrides rules and caches the Note attachments.')
         notecache.addText((input) => {
-            input.setValue(this.#settings.note_param_cache)
+            input.setValue(this.#plugin.settings.note_param_cache)
             input.onChange(this.#handle.bind(this, 'note_param_cache'))
         })
         //#endregion
@@ -141,7 +140,7 @@ export class SettingsTab extends PluginSettingTab {
 
                 // handle validation
                 const problems = checkPattern(
-                    this.#settings.cache_configs,
+                    this.#plugin.settings.cache_configs,
                     value,
                 )
                 if (problems.length > 0) {
@@ -156,7 +155,7 @@ export class SettingsTab extends PluginSettingTab {
         headerEl.addDropdown((dropdown) => {
             sourceDropdown = dropdown
             dropdown.setValue('*')
-            for (const config of this.#settings.cache_configs) {
+            for (const config of this.#plugin.settings.cache_configs) {
                 dropdown.addOption(config.pattern, config.pattern)
             }
         })
@@ -168,7 +167,7 @@ export class SettingsTab extends PluginSettingTab {
                 const match = patternInput?.getValue()
                 const ref = sourceDropdown?.getValue() ?? '*'
 
-                const src = this.#settings.cache_configs.find(
+                const src = this.#plugin.settings.cache_configs.find(
                     (i) => i.pattern === ref,
                 )
                 if (!match || !src) {
@@ -176,7 +175,7 @@ export class SettingsTab extends PluginSettingTab {
                     return
                 }
 
-                const configs = this.#settings.cache_configs
+                const configs = this.#plugin.settings.cache_configs
                 configs.push({
                     pattern: match,
                     remotes: src.remotes,
@@ -193,17 +192,17 @@ export class SettingsTab extends PluginSettingTab {
         if (!this.#configsList) return
         this.#configsList.empty()
 
-        for (const cache of this.#settings.cache_configs) {
+        for (const cache of this.#plugin.settings.cache_configs) {
             const setting = new CacheSettings(this.#configsList, cache)
             setting.onChange((_cache) => {
                 // re-render is already handle
-                const configs = this.#settings.cache_configs //
+                const configs = this.#plugin.settings.cache_configs //
                     .map((c) => (c.pattern === _cache.pattern ? _cache : c))
                 this.#updateConfigs(configs)
             })
             setting.onRemove((_cache) => {
                 // clean up of reder is already handle
-                const configs = this.#settings.cache_configs //
+                const configs = this.#plugin.settings.cache_configs //
                     .filter((c) => c.pattern !== _cache.pattern)
                 this.#updateConfigs(configs)
             })
@@ -212,11 +211,11 @@ export class SettingsTab extends PluginSettingTab {
 
     #handle(key: keyof PluginSettings, value: unknown): void {
         // @ts-expect-error dynamic assignment
-        this.#settings[key] = value
+        this.#plugin.settings[key] = value
         void this.#plugin.saveSettings()
     }
     #updateConfigs(config: CacheConfig[]): void {
-        this.#settings.cache_configs = prepareConfigs(config)
+        this.#plugin.settings.cache_configs = prepareConfigs(config)
         void this.#plugin.saveSettings()
     }
 }

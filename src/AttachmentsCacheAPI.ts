@@ -10,21 +10,20 @@ interface RemoteDef {
 }
 
 export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
-    public log: Logger
-
+    #log: Logger
     #vault: Vault
     #plugin: AttachmentsCachePlugin
 
     #memo = new Map<string, string | undefined>()
 
     constructor(plugin: AttachmentsCachePlugin) {
-        this.log = plugin.log.make(AttachmentsCacheAPI.name)
+        this.#log = plugin.log.make(AttachmentsCacheAPI.name)
         this.#vault = plugin.app.vault
         this.#plugin = plugin
     }
 
     mayCache(notepath: string, remote: string): boolean {
-        return !!this.#findCacheRule({ notepath, remote }, this.log)
+        return !!this.#findCacheRule({ notepath, remote }, this.#log)
     }
 
     async isCached(notepath: string, remote: string): Promise<boolean> {
@@ -47,7 +46,7 @@ export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
         notepath: string,
         remote: string,
     ): Promise<string | undefined> {
-        const group = this.log.group()
+        const group = this.#log.group()
 
         try {
             group.debug('Resolving', { notepath, remote })
@@ -65,7 +64,7 @@ export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
     }
 
     async cache(notepath: string, remote: string): Promise<string | undefined> {
-        const group = this.log.group()
+        const group = this.#log.group()
 
         try {
             group.debug('Caching', { notepath, remote })

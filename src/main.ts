@@ -46,6 +46,7 @@ export default class AttachmentsCachePlugin extends Plugin {
         // * after that, the user-defined level is used
         this.log.setLevel(LogLevel.DEBUG)
         this.log.setFormat('[hh:mm:ss.ms] level:')
+
         this.api = new AttachmentsCacheAPI(this)
         this.markdown = new MarkdownHandler(this)
 
