@@ -2,7 +2,7 @@
     "license": "GPL-3.0-or-later",
     "version": "0.5.1",
     "name": "@luis.bs/obsidian-attachments-cache",
-    "description": "Plugin to cache attachments",
+    "description": "Store images and other attachments on the vault",
     "keywords": [
         "obsidian",
         "attachments",
