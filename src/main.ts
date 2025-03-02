@@ -58,13 +58,13 @@ export default class AttachmentsCachePlugin extends Plugin {
     async onload(): Promise<void> {
         await this.loadSettings()
         this.addSettingTab(new SettingsTab(this))
-
         this.markdown.registerMarkdownProcessor()
     }
 
-    // async onunload(): Promise<void> {
-    //     // TODO
-    // }
+    onunload(): void {
+        // @ts-expect-error non-standard API
+        delete window.AttachmentsCache
+    }
 
     async loadSettings(): Promise<void> {
         const group = this.log.group('Loading Settings')

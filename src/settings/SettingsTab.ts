@@ -39,10 +39,12 @@ export class SettingsTab extends PluginSettingTab {
         this.containerEl.empty()
         this.containerEl.addClass('attachments-cache-settings')
 
-        new Setting(this.containerEl).setName('Plugin Settings').setHeading()
         this.#displayGeneralSettings()
 
-        new Setting(this.containerEl).setName('Paths Settings').setHeading()
+        new Setting(this.containerEl).setName('Overrides').setHeading()
+        this.#displayOverrideSettings()
+
+        new Setting(this.containerEl).setName('Rules').setHeading()
         this.#displayConfigsHeader()
         this.#configsList = this.containerEl.createDiv('configs-list')
         this.#displayConfigsList()
@@ -50,10 +52,8 @@ export class SettingsTab extends PluginSettingTab {
 
     #displayGeneralSettings(): void {
         const levelSetting = new Setting(this.containerEl)
-        levelSetting.setName('Plugging LogLevel')
-        levelSetting.setDesc(
-            docs('Plugging LogLevel', 'To check the plugin logs'),
-        )
+        levelSetting.setName('Log level')
+        levelSetting.setDesc(docs('Log level', 'To check the plugin logs'))
         levelSetting.addDropdown((dropdown) => {
             dropdown.addOptions(LEVEL_LABELS)
             dropdown.setValue(this.#plugin.settings.plugin_level)
@@ -61,9 +61,9 @@ export class SettingsTab extends PluginSettingTab {
         })
 
         const prioritySetting = new Setting(this.containerEl)
-        prioritySetting.setName('Plugin Priority')
+        prioritySetting.setName('Cache priority')
         prioritySetting.setDesc(
-            docs('Plugin Priority', 'Affects the attachments been cached'),
+            docs('Cache priority', 'Affects the attachments been cached'),
         )
         prioritySetting.addDropdown((dropdown) => {
             dropdown.addOptions(PRIORITY_LABELS)
@@ -72,7 +72,7 @@ export class SettingsTab extends PluginSettingTab {
         })
 
         const charsSetting = new Setting(this.containerEl)
-        charsSetting.setName('Keep Special Characters')
+        charsSetting.setName('Keep special characters')
         charsSetting.setDesc(
             'If you are having problems with special characters on paths, disable this setting.',
         )
@@ -80,40 +80,38 @@ export class SettingsTab extends PluginSettingTab {
             toggle.setValue(this.#plugin.settings.allow_characters)
             toggle.onChange(this.#handle.bind(this, 'allow_characters'))
         })
+    }
 
-        //#region URL params
+    #displayOverrideSettings(): void {
         const urlignore = new Setting(this.containerEl)
-        urlignore.setName('URL Param Ignore')
+        urlignore.setName("URL's ignore param")
         urlignore.setDesc('Overrides rules and ignores the attachment.')
         urlignore.addText((input) => {
             input.setValue(this.#plugin.settings.url_param_ignore)
             input.onChange(this.#handle.bind(this, 'url_param_ignore'))
         })
         const urlcache = new Setting(this.containerEl)
-        urlcache.setName('URL Param Cache')
+        urlcache.setName("URL's cache param")
         urlcache.setDesc('Overrides rules and caches the attachment.')
         urlcache.addText((input) => {
             input.setValue(this.#plugin.settings.url_param_cache)
             input.onChange(this.#handle.bind(this, 'url_param_cache'))
         })
-        //#endregion
 
-        //#region Note params
         const noteignore = new Setting(this.containerEl)
-        noteignore.setName('Note Frontmatter Param Ignore')
+        noteignore.setName("Note's ignore frontmatter attribute")
         noteignore.setDesc('Overrides rules and ignores the Note attachments.')
         noteignore.addText((input) => {
             input.setValue(this.#plugin.settings.note_param_ignore)
             input.onChange(this.#handle.bind(this, 'note_param_ignore'))
         })
         const notecache = new Setting(this.containerEl)
-        notecache.setName('Note Frontmatter Param Cache')
+        notecache.setName("Note's cache frontmatter attribute")
         notecache.setDesc('Overrides rules and caches the Note attachments.')
         notecache.addText((input) => {
             input.setValue(this.#plugin.settings.note_param_cache)
             input.onChange(this.#handle.bind(this, 'note_param_cache'))
         })
-        //#endregion
     }
 
     #displayConfigsHeader(): void {
@@ -126,8 +124,15 @@ export class SettingsTab extends PluginSettingTab {
 
         const headerEl = new Setting(this.containerEl)
         headerEl.setClass('configs-header')
-        headerEl.setName('Duplicate Vault Path')
+        headerEl.setName('Duplicate cache rule')
         headerEl.setDesc(headerDesc)
+        headerEl.addDropdown((dropdown) => {
+            sourceDropdown = dropdown
+            dropdown.setValue('*')
+            for (const config of this.#plugin.settings.cache_configs) {
+                dropdown.addOption(config.pattern, config.pattern)
+            }
+        })
         headerEl.addText((input) => {
             patternInput = input
             input.setPlaceholder('glob: **/*.md')
@@ -151,13 +156,6 @@ export class SettingsTab extends PluginSettingTab {
                 }
                 duplicateButton?.setDisabled(problems.length > 0)
             })
-        })
-        headerEl.addDropdown((dropdown) => {
-            sourceDropdown = dropdown
-            dropdown.setValue('*')
-            for (const config of this.#plugin.settings.cache_configs) {
-                dropdown.addOption(config.pattern, config.pattern)
-            }
         })
         headerEl.addButton((button) => {
             duplicateButton = button

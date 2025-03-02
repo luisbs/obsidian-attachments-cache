@@ -28,7 +28,7 @@ export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
 
     async isCached(notepath: string, remote: string): Promise<boolean> {
         const localPath = await this.resolve(notepath, remote)
-        return localPath ? await this.#vault.adapter.exists(localPath) : false
+        return !!localPath && !!this.#vault.getAbstractFileByPath(localPath)
     }
 
     async resource(
@@ -88,8 +88,9 @@ export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
 
             // download file
             const content = await getRemoteContent(remote, group)
+            // createBinary fails if parent dir is missing
             await this.#vault.adapter.mkdir(URI.getParent(localPath))
-            await this.#vault.adapter.writeBinary(localPath, content)
+            await this.#vault.createBinary(localPath, content)
 
             // check result
             const downloadedFile = this.#vault.getFileByPath(localPath)

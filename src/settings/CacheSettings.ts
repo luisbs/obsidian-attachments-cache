@@ -104,7 +104,7 @@ export class CacheSettings {
         let targetInput: TextComponent | undefined = undefined
 
         const cacheSetting = new Setting(this.#cacheDetails)
-        cacheSetting.setName('Attachments Storage')
+        cacheSetting.setName('Storage')
         cacheSetting.setDesc(this.#targetDesc())
         cacheSetting.addDropdown((dropdown) => {
             dropdown.addOptions(MODE_LABELS)
@@ -139,7 +139,7 @@ export class CacheSettings {
         const remotesDescUl = remotesDesc.createEl('ul')
         const remotesSetting = new Setting(this.#cacheDetails)
         remotesSetting.setClass('remotes-input')
-        remotesSetting.setName('Remotes List')
+        remotesSetting.setName('Remotes')
         remotesSetting.setDesc(remotesDesc)
         remotesSetting.addTextArea((textarea) => {
             this.#remotesText = textarea

@@ -102,9 +102,9 @@ declare namespace AttachmentsCache {
 
 Plugins use [Markdown post processing](https://docs.obsidian.md/Plugins/Editor/Markdown+post+processing) to change the rendered view of the note.
 
-By default any image rendered by a plugin may be cached, dependening on the [Plugin Priority](./docs/settings.md#plugin-priority).
+By default any image rendered by a plugin may be cached, dependening on the [Cache priority](./docs/settings.md#cache-priority).
 
-But if the plugin uses _**async functions**_ the order defined by **Plugin Priority** is not enforced, in that situations this plugin runs before the thrid-party plugin has ended and the added images avoid been cached.
+But if the plugin uses _**async functions**_ the order defined by **Cache priority** is not enforced, in that situations this plugin runs before the thrid-party plugin has ended and the added images avoid been cached.
 
 To prevent that situation on `'NORMAL'` priority 2 second is awaited before the cache is executed.
 On `'HIGHER'` priority 10 seconds are awaited.

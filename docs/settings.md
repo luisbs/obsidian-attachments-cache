@@ -2,15 +2,15 @@
 
 The next section explains the supported Settings.
 
-### `Plugging LogLevel`
+### `Log level`
 
-By default **LogLevel** is set to `'WARN'` this prevents the package from over-logging into the user console.
+By default **Log level** is set to `'WARN'` this prevents the package from over-logging into the user console.
 
-Changing the **LogLevel** to `'INFO'` or `'DEBUG'` will print to the console valuable information of the inner-workings of the plugging, details about why an URL is/isn't cached, etc.
+Changing the **Log level** to `'INFO'` or `'DEBUG'` will print to the console valuable information of the inner-workings of the plugging, details about why an URL is/isn't cached, etc.
 
 ---
 
-### `Plugin Priority`
+### `Cache priority`
 
 The priority affects when the plugin will run in relation to other plugins, by default **Priority** is set to `'NORMAL'`.
 
@@ -42,13 +42,13 @@ This mode will expand `'NORMAL'` and try to cache most attachments, it may only 
 
 ---
 
-### `Keep Special Characters`
+### `Keep special characters`
 
 When this setting is disabled any non-standard character is replaced with an underscore, to prevent problems on a paths.
 
-### `URL Param Ignore` & `URL Param Cache`
+### `URL's ignore param` & `URL's cache param`
 
-> This Settings work if the **Note** has already matched an _enabled path_.
+> This Settings work if the **Note** has already matched an _enabled cache rule_.
 
 Overrides standar cache rules on a per-link basis, and caches/ignores the attachment.
 
@@ -61,13 +61,13 @@ Both **URL params** can be changed on the **Plugin Settings** by default they ar
 ![](https://example.com/image2.jpg?cache_file)
 ```
 
-### `Note Frontmatter Param Ignore` & `Note Frontmatter Param Cache`
+### `Note's ignore frontmatter attribute` & `Note's cache frontmatter attribute`
 
-> This Settings work if the **Note** has already matched an _enabled path_.
+> This Settings work if the **Note** has already matched an _enabled cache rule_.
 
 Overrides standar cache rules on a per-note basis, and caches/ignores the note's attachments.
 
-Both **Frontmatter params** can be changed on the **Plugin Settings** by default they are `cache_unless` and `cache_from`, e.g.:
+Both **Frontmatter attributes** can be changed on the **Plugin Settings** by default they are `cache_unless` and `cache_from`, e.g.:
 
 ```yml
 # this params correspond to the Note's Frontmatter
