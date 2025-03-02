@@ -1,5 +1,11 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.5.1
+
+### Patch Changes
+
+- c7d879c: Defined behavior with async PostProcess
+
 ## 0.5.0
 
 ### Minor Changes
