@@ -1,9 +1,9 @@
 {
 	"id": "attachments-cache",
 	"name": "Attachments Cache",
-	"version": "0.5.1",
+	"version": "0.5.2",
 	"minAppVersion": "1.8.4",
-	"description": "Plugin to cache attachments",
+	"description": "Store images and other attachments on the vault",
 	"author": "luisbs",
 	"authorUrl": "https://github.com/luisbs",
 	"fundingUrl": "https://www.buymeacoffee.com/luisbs",
