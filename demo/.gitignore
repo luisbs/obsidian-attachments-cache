@@ -1,8 +1,10 @@
 __cache/
 
-.obsidian/workspace.json
+.obsidian/
+!.obsidian/core-plugins.json
+!.obsidian/community-plugins.json
 
 # plugins
-.obsidian/plugins/obsidian-attachments-cache/*
-!.obsidian/plugins/obsidian-attachments-cache/.hotreload
-!.obsidian/plugins/obsidian-attachments-cache/data.json
+.obsidian/plugins/attachments-cache/
+!.obsidian/plugins/attachments-cache/.hotreload
+!.obsidian/plugins/attachments-cache/data.json
