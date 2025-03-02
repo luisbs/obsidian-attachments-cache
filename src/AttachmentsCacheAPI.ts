@@ -64,8 +64,12 @@ export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
     }
 
     async cache(notepath: string, remote: string): Promise<string | undefined> {
-        const group = this.#log.group()
+        if (!remote.startsWith('http')) {
+            this.#log.debug('remotes should at least start with http')
+            return remote
+        }
 
+        const group = this.#log.group()
         try {
             group.debug('Caching', { notepath, remote })
             const localPath = await this.#resolve({ notepath, remote }, group)
