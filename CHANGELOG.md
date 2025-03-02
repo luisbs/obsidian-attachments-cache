@@ -1,5 +1,11 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.5.2
+
+### Patch Changes
+
+- 72ecdfc: Follow Obsidian's plugin guidelines whenever possible
+
 ## 0.5.1
 
 ### Patch Changes
