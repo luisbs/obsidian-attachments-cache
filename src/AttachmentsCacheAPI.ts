@@ -89,7 +89,7 @@ export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
             // download file
             const content = await getRemoteContent(remote, group)
             // createBinary fails if parent dir is missing
-            await this.#vault.adapter.mkdir(URI.getParent(localPath))
+            await this.#vault.adapter.mkdir(URI.getParent(localPath) ?? '/')
             await this.#vault.createBinary(localPath, content)
 
             // check result
@@ -129,11 +129,11 @@ export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
 
         // Frontmatter overrides
         if (this.#plugin.state.note_ignore_matcher(v.notepath, v.remote)) {
-            log.debug('remote has to be ignored (Frontmatter param)')
+            log.debug('remote has to be ignored (Frontmatter attribute)')
             return
         }
         if (this.#plugin.state.note_cache_matcher(v.notepath, v.remote)) {
-            log.debug('remote has to be cached (Frontmatter param)')
+            log.debug('remote has to be cached (Frontmatter attribute)')
             return matcher
         }
 

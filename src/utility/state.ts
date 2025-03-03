@@ -67,7 +67,9 @@ function remoteMatcher(url_param = 'fallback_param'): RemoteMatcher {
 function configMatchers(configs: CacheConfig[]): CacheMatcher[] {
     return configs.map((config) => {
         // default: alongside the note
-        let resolve = (_path: string) => URI.getParent(_path)
+        // the prefix '/' is used to force the path inside the vault
+        let resolve = (_path: string) => URI.getParent(_path) ?? '/'
+
         switch (config.mode) {
             case 'NOTE-FOLDER': // alongside the note in a subfolder with the targetPath as name
                 resolve = (_path: string) =>
