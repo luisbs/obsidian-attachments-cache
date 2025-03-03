@@ -1,5 +1,11 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.5.3
+
+### Patch Changes
+
+- cecd0ac: Dropped node packages
+
 ## 0.5.2
 
 ### Patch Changes
