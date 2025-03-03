@@ -1,9 +1,5 @@
 import type { AttachmentsCachePlugin } from '@/types'
-import type {
-    MarkdownPostProcessor,
-    MarkdownPostProcessorContext,
-} from 'obsidian'
-import { setTimeout } from 'timers/promises'
+import type { MarkdownPostProcessor } from 'obsidian'
 import { PRIORITY } from '@/settings/values'
 
 export class MarkdownHandler {
@@ -32,23 +28,25 @@ export class MarkdownHandler {
 
     public registerMarkdownProcessor(): void {
         this.#mpp = this.plugin.registerMarkdownPostProcessor(
-            this.#handle.bind(this),
-            PRIORITY[this.plugin.settings.plugin_priority],
+            (element, { sourcePath }) => {
+                // imidiate execution
+                if (this.plugin.settings.plugin_priority === 'LOWER') {
+                    void this.#handle(element, sourcePath)
+                    return
+                }
+
+                // for plugins that use async PostProcessors await some seconds
+                const millis =
+                    this.plugin.settings.plugin_priority === 'HIGHER'
+                        ? 10000
+                        : 2000
+                setTimeout(() => void this.#handle(element, sourcePath), millis)
+            },
         )
+        this.syncPriority()
     }
 
-    async #handle(
-        element: HTMLElement,
-        { sourcePath }: MarkdownPostProcessorContext,
-    ): Promise<void> {
-        if (this.plugin.settings.plugin_priority === 'HIGHER') {
-            // await 10s for plugins that use async PostProcessors
-            await setTimeout(10000)
-        } else if (this.plugin.settings.plugin_priority === 'NORMAL') {
-            // await 2s for plugins that use async PostProcessors
-            await setTimeout(2000)
-        }
-
+    async #handle(element: HTMLElement, sourcePath: string): Promise<void> {
         for (const el of Array.from(element.querySelectorAll('img'))) {
             const resolved = await this.plugin.api.cache(sourcePath, el.src)
             if (resolved) el.src = resolved
