@@ -1,5 +1,11 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.5.4
+
+### Patch Changes
+
+- 98c5f57: Changed README to extend the plugin behavior
+
 ## 0.5.3
 
 ### Patch Changes
