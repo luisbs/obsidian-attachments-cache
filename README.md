@@ -1,4 +1,4 @@
-# [obsidian-attachments-cache](https://github.com/luisbs/obsidian-attachments-cache)
+# Attachments Cache
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](https://opensource.org/licenses/gpl-3)
 
@@ -6,13 +6,19 @@ If you search help about the **Settings** you can check the [documentation](./do
 
 ## Summary
 
-During the Obsidian render process, when an `img` is found:
+This plugin for Obsidian stores attachments (currently only images) locally inside the vault.
 
-1. Checks if the image is cached/should be cached.
+The note is **NOT** modified, that way if the note content is exported any URL present still works outside the vault.
+
+When the attachment is rendered in a note, the local version is used instead of the remote working as a local cache.
+
+> The cached images can be deleted any time to free up disk space.
+
+In detail, during the Obsidian render process, when an `img` is found:
+
+1. The plugin checks if the image is cached/should be cached.
 2. Download the image into a vault folder if is not cached.
-3. Modify the `img` element to use a the vault file.
-
-> Note: the original note is not modified.
+3. Modify the `img` element to use the cached file inside the vault.
 
 There already exists similar plugins, like:
 
