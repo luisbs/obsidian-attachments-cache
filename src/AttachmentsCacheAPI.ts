@@ -88,8 +88,11 @@ export class AttachmentsCacheAPI implements AttachmentsCachePluginAPI {
 
             // download file
             const content = await getRemoteContent(remote, group)
-            // createBinary fails if parent dir is missing
-            await this.#vault.createFolder(URI.getParent(localPath) ?? '/')
+            const parentpath = URI.getParent(localPath) ?? '/'
+            if (!this.#vault.getFolderByPath(parentpath)) {
+                // createBinary fails if parent dir is missing
+                await this.#vault.createFolder(parentpath)
+            }
             await this.#vault.createBinary(localPath, content)
 
             // check result
