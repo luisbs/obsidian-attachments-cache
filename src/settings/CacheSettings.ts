@@ -27,14 +27,18 @@ export class CacheSettings {
         this.#displayCacheRemotes()
     }
 
+    #useStaticMode() {
+        return ['ROOT', 'FILE'].includes(this.#cache.mode)
+    }
+
     #cacheName(): DocumentFragment {
         return createFragment((div) => {
-            div.append(`${this.#cache.enabled ? 'Enabled' : 'Disabled'} path: `)
+            div.append(`Notes at: `)
             div.createEl('code').appendText(this.#cache.pattern)
         })
     }
     #cacheDesc(): DocumentFragment | string {
-        if (this.#cache.mode === 'NOTE') return MODE_DESC.NOTE
+        if (this.#useStaticMode()) return MODE_DESC[this.#cache.mode]
         return createFragment((div) => {
             div.append(MODE_DESC[this.#cache.mode])
             div.createEl('code').appendText(this.#cache.target)
@@ -91,7 +95,7 @@ export class CacheSettings {
             const ul = div.createEl('ul')
             const note = ul.createEl('li')
             note.append("Note: '")
-            note.createEl('b').appendText('folder/note1.md')
+            note.createEl('b').appendText('a/b/c/note1.md')
             note.append("'")
 
             const attachment = ul.createEl('li')
@@ -104,7 +108,7 @@ export class CacheSettings {
         let targetInput: TextComponent | undefined = undefined
 
         const cacheSetting = new Setting(this.#cacheDetails)
-        cacheSetting.setName('Storage')
+        cacheSetting.setName('Attachments storage')
         cacheSetting.setDesc(this.#targetDesc())
         cacheSetting.addDropdown((dropdown) => {
             dropdown.addOptions(MODE_LABELS)
@@ -114,7 +118,7 @@ export class CacheSettings {
                 this.#invokeChange()
 
                 cacheSetting.setDesc(this.#targetDesc())
-                if (this.#cache.mode === 'NOTE') {
+                if (this.#useStaticMode()) {
                     targetInput?.setDisabled(true)
                     targetInput?.setValue('')
                 } else {
@@ -125,7 +129,7 @@ export class CacheSettings {
         })
         cacheSetting.addText((input) => {
             targetInput = input
-            if (this.#cache.mode === 'NOTE') input.setDisabled(true)
+            if (this.#useStaticMode()) input.setDisabled(true)
             else input.setValue(this.#cache.target)
             input.onChange((value) => {
                 this.#cache.target = value

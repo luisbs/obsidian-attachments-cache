@@ -66,28 +66,6 @@ function remoteMatcher(url_param = 'fallback_param'): RemoteMatcher {
 
 function configMatchers(configs: CacheConfig[]): CacheMatcher[] {
     return configs.map((config) => {
-        // default: alongside the note
-        // the prefix '/' is used to force the path inside the vault
-        let resolve = (_path: string) => URI.getParent(_path) ?? '/'
-
-        switch (config.mode) {
-            case 'NOTE-FOLDER': // alongside the note in a subfolder with the targetPath as name
-                resolve = (_path: string) =>
-                    URI.join(URI.getParent(_path), config.target)
-                break
-            case 'TARGET-PATH': // inside the targetPath replating the note-path, without `.md`
-                resolve = (_path: string) =>
-                    URI.join(config.target, URI.removeExt(_path))
-                break
-            case 'TARGET-NOTE': // inside the targetPath in a folder named as the note, without `.md`
-                resolve = (_path: string) =>
-                    URI.join(config.target, URI.getBasename(_path))
-                break
-            case 'TARGET': // directly inside the targetPath
-                resolve = () => config.target
-                break
-        }
-
         const testPath =
             config.pattern !== '*'
                 ? (_notepath: string) => minimatch(_notepath, config.pattern)
@@ -101,13 +79,27 @@ function configMatchers(configs: CacheConfig[]): CacheMatcher[] {
         }
 
         return {
-            source: Object.freeze(config),
             isEnabled: () => config.enabled,
-            testRemote,
+            source: Object.freeze(config),
+            resolve: prepareResolver(config),
             testPath,
-            resolve,
+            testRemote,
         }
     })
+}
+
+function prepareResolver(config: CacheConfig): CacheMatcher['resolve'] {
+    // prettier-ignore
+    switch (config.mode) {
+        // adds the attachments to the root of the vault
+        case 'ROOT': return () => '/'
+        // adds the attachments to a specified folder
+        case 'PATH': return () => config.target
+        // adds the attachments to the same folder as the note
+        case 'FILE': return (_path: string) => URI.getParent(_path) ?? '/'
+        // adds the attachments to a specified folder next to the note
+        case 'FOLDER': return (_path: string) => URI.join(URI.getParent(_path), config.target)
+    }
 }
 
 /**

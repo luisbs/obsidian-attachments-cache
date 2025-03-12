@@ -76,3 +76,16 @@ cache_unless: example.com/images
 # arrays are also supported
 cache_from: [example.com/photos, images.net/assets]
 ```
+
+---
+
+### Attachments storage
+
+By default, attachments are added to the root of your vault.
+
+You can change the attachment location of each vault path individually.
+
+- **Vault folder** adds the attachment to the root of your vault.
+- **In the folder specified below** adds the attachment to a specified folder.
+- **Same folder as current file** adds the attachment to the same folder as the note you added it to.
+- **In subfolder under current folder** adds attachments to a specified folder next to the note you added the attachment to. If it doesn't exist, it's created when you add an attachment.

@@ -35,45 +35,37 @@ export const PRIORITY_LABELS: Record<PluginPriority, string> = {
 //#region Modes
 /**
  * Mode to store the values:
- * - `'NOTE'` alongside the note. (doesn't use target)
- * - `'NOTE-FOLDER'` alongside the note in a subfolder with the target as name.
- * - `'TARGET'` directly inside target path.
- * - `'TARGET-NOTE'` inside target path in a subfolder with the note-name.
- * - `'TARGET-PATH'` inside target path replicating note-path
+ * - `'ROOT'` adds the attachments to the root of the vault
+ * - `'PATH'` adds the attachments to a specified folder
+ * - `'FILE'` adds the attachments to the same folder as the note
+ * - `'FOLDER'` adds the attachments to a specified folder next to the note
  */
-export type CacheMode =
-    | 'NOTE'
-    | 'NOTE-FOLDER'
-    | 'TARGET'
-    | 'TARGET-NOTE'
-    | 'TARGET-PATH'
+export type CacheMode = 'ROOT' | 'PATH' | 'FILE' | 'FOLDER'
 interface ModeExampleDetails {
     mode: CacheMode
     target: string
 }
 
 export const MODE_LABELS: Record<CacheMode, string> = {
-    NOTE: /*    */ 'Attachments next to the note',
-    'NOTE-FOLDER': 'Attachments on subfolder',
-    TARGET: /*  */ 'Attachments on cache folder',
-    'TARGET-NOTE': 'Attachments on cache note folder',
-    'TARGET-PATH': 'Attachments on cache note path',
+    ROOT: 'Vault folder',
+    PATH: 'In the folder specified below',
+    FILE: 'Same folder as current file',
+    FOLDER: 'In subfolder under current folder',
 }
 export const MODE_DESC: Record<CacheMode, string> = {
-    NOTE: /*    */ 'Store in the same folder as the note',
-    'NOTE-FOLDER': 'Store next to the note in subfolder',
-    TARGET: /*  */ 'Store in folder',
-    'TARGET-NOTE': 'Store in subfolder with the note-name under',
-    'TARGET-PATH': 'Store in a replated note-path under',
+    ROOT: 'Stores the attachments to the root of your vault',
+    PATH: 'Stores the attachments to a specified folder',
+    FILE: 'Stores the attachments to the same folder as the note',
+    FOLDER: 'Stores the attachments to a specified folder next to the note',
 }
 export const modeExample = ({ mode, target }: ModeExampleDetails) => {
+    // paths resolved from note: 'a/b/c/note1.md'
     // prettier-ignore
     switch (mode) {
-        case 'NOTE': /*  */ return 'folder/img1.jpg'
-        case 'NOTE-FOLDER': return `folder/${target}/img1.jpg`
-        case 'TARGET': /**/ return `${target}/img1.jpg`
-        case 'TARGET-NOTE': return `${target}/note1/img1.jpg`
-        case 'TARGET-PATH': return `${target}/folder/note1/img1.jpg`
+        case 'ROOT': return 'img1.jpg'
+        case 'PATH': return `${target}/img1.jpg`
+        case 'FILE': return `a/b/c/img1.jpg`
+        case 'FOLDER': return `a/b/c/${target}/img1.jpg`
     }
 }
 //#endregion Modes

@@ -25,7 +25,7 @@ const DEFAULT_SETTINGS: PluginSettings = {
             remotes: [{ whitelisted: false, pattern: '*' }],
             enabled: false,
             target: '',
-            mode: 'NOTE',
+            mode: 'ROOT',
         },
     ],
 }
