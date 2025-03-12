@@ -53,11 +53,11 @@ interface ModeExampleDetails {
 }
 
 export const MODE_LABELS: Record<CacheMode, string> = {
-    NOTE: /*    */ 'Attachments next to the Note',
-    'NOTE-FOLDER': 'Attachments on Subfolder',
-    TARGET: /*  */ 'Attachments on Cache Folder',
-    'TARGET-NOTE': 'Attachments on Cache Note Folder',
-    'TARGET-PATH': 'Attachments on Cache Note Path',
+    NOTE: /*    */ 'Attachments next to the note',
+    'NOTE-FOLDER': 'Attachments on subfolder',
+    TARGET: /*  */ 'Attachments on cache folder',
+    'TARGET-NOTE': 'Attachments on cache note folder',
+    'TARGET-PATH': 'Attachments on cache note path',
 }
 export const MODE_DESC: Record<CacheMode, string> = {
     NOTE: /*    */ 'Store in the same folder as the note',
