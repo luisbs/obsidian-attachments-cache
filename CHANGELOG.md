@@ -1,5 +1,11 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.5.5
+
+### Patch Changes
+
+- e25b75b: Use sentence case on Settings UI
+
 ## 0.5.4
 
 ### Patch Changes
