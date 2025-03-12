@@ -1,5 +1,13 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.5.6
+
+### Patch Changes
+
+- cf5a745: Simplify attachment storage UI
+- 3419604: Support path variables on **Attachments storage** setting inspired from [Attachment Management](https://github.com/trganda/obsidian-attachment-management) plugin
+- a1759da: Use _attachments storage modes_ similar to standard Obsidian attachments setting.
+
 ## 0.5.5
 
 ### Patch Changes
