@@ -93,13 +93,37 @@ function prepareResolver(config: CacheConfig): CacheMatcher['resolve'] {
     switch (config.mode) {
         // adds the attachments to the root of the vault
         case 'ROOT': return () => '/'
-        // adds the attachments to a specified folder
-        case 'PATH': return () => config.target
         // adds the attachments to the same folder as the note
-        case 'FILE': return (_path: string) => URI.getParent(_path) ?? '/'
+        case 'FILE': return (p: string) => URI.getParent(p) ?? '/'
         // adds the attachments to a specified folder next to the note
-        case 'FOLDER': return (_path: string) => URI.join(URI.getParent(_path), config.target)
+        case 'FOLDER': return (p: string) => URI.join(URI.getParent(p), config.target)
     }
+
+    // adds the attachments to a specified static folder
+    if (/[{}]/gi.test(config.target)) return () => config.target
+
+    // adds the attachments to a specified dynamic folder
+    return (n: string) => {
+        return pathReplacer(config.target, [
+            ['{notepath}', () => URI.removeExt(n)],
+            ['{notename}', () => URI.getBasename(n)],
+            ['{folderpath}', () => URI.getParent(n)],
+            ['{foldername}', () => URI.getBasename(URI.getParent(n) ?? '')],
+        ])
+    }
+}
+
+/** Values are only loaded when required */
+export function pathReplacer(
+    path: string,
+    rules: Array<[string, () => string | undefined]>,
+): string {
+    let result = path
+    for (const rule of rules) {
+        if (result.includes(rule[0]))
+            result = result.replaceAll(rule[0], rule[1]() ?? '/')
+    }
+    return result
 }
 
 /**

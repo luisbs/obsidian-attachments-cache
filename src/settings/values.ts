@@ -63,9 +63,17 @@ export const modeExample = ({ mode, target }: ModeExampleDetails) => {
     // prettier-ignore
     switch (mode) {
         case 'ROOT': return 'img1.jpg'
-        case 'PATH': return `${target}/img1.jpg`
         case 'FILE': return `a/b/c/img1.jpg`
         case 'FOLDER': return `a/b/c/${target}/img1.jpg`
     }
+
+    // keep isolated from actual implementation
+    const folder = target
+        .replaceAll('{notepath}', 'a/b/c/note1')
+        .replaceAll('{notename}', 'note1')
+        .replaceAll('{folderpath}', 'a/b/c')
+        .replaceAll('{foldername}', 'c')
+
+    return `${folder}/img1.jpg`
 }
 //#endregion Modes

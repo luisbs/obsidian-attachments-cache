@@ -89,3 +89,12 @@ You can change the attachment location of each vault path individually.
 - **In the folder specified below** adds the attachment to a specified folder.
 - **Same folder as current file** adds the attachment to the same folder as the note you added it to.
 - **In subfolder under current folder** adds attachments to a specified folder next to the note you added the attachment to. If it doesn't exist, it's created when you add an attachment.
+
+Option **In the folder specified below** allows the usage of variables in the path.
+
+From the note at `a/b/c/note1.md` the next variables are available:
+
+- `{notepath}` resolves `a/b/c/note1`
+- `{notename}` resolves `note1`
+- `{folderpath}` resolves `a/b/c`
+- `{foldername}` resolves `c`
