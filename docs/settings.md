@@ -83,18 +83,23 @@ cache_from: [example.com/photos, images.net/assets]
 
 By default, attachments are added to the root of your vault.
 
-You can change the attachment location of each vault path individually.
+You can change the attachment location of each vault path individually. The input allows the usage of variables in the path. For example:
 
-- **Vault folder** adds the attachment to the root of your vault.
-- **In the folder specified below** adds the attachment to a specified folder.
-- **Same folder as current file** adds the attachment to the same folder as the note you added it to.
-- **In subfolder under current folder** adds attachments to a specified folder next to the note you added the attachment to. If it doesn't exist, it's created when you add an attachment.
-
-Option **In the folder specified below** allows the usage of variables in the path.
-
-From the note at `a/b/c/note1.md` the next variables are available:
+From the note `a/b/c/note1.md` the next variables are available:
 
 - `{notepath}` resolves `a/b/c/note1`
 - `{notename}` resolves `note1`
 - `{folderpath}` resolves `a/b/c`
 - `{foldername}` resolves `c`
+
+Values equivalent to _Obsidian.md_ standard attachment location setting would be:
+
+- `/`: **Vault folder** adds the attachments to the root of your vault.
+- `attachments`: **In the folder specified below** adds the attachments to a specified folder.
+- `{folderpath}`: **Same folder as current file** adds the attachments to the same folder as the note you added it to.
+- `{folderpath}/attachments`: **In subfolder under current folder** adds attachments to a specified folder next to the note you added the attachment to. If it doesn't exist, it's created when you add an attachment.
+
+Other supported examples are:
+
+- `attachments/{notename}`: adds the attachments to the folder `attachments` under a folder with the note name.
+- `attachments/{notepath}`: adds the attachments to the folder `attachments` under folders replicating the note path.

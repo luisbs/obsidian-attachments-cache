@@ -81,34 +81,24 @@ function configMatchers(configs: CacheConfig[]): CacheMatcher[] {
         return {
             isEnabled: () => config.enabled,
             source: Object.freeze(config),
-            resolve: prepareResolver(config),
+            resolve: prepareResolver(config.target),
             testPath,
             testRemote,
         }
     })
 }
 
-function prepareResolver(config: CacheConfig): CacheMatcher['resolve'] {
-    // prettier-ignore
-    switch (config.mode) {
-        // adds the attachments to the root of the vault
-        case 'ROOT': return () => '/'
-        // adds the attachments to the same folder as the note
-        case 'FILE': return (p: string) => URI.getParent(p) ?? '/'
-        // adds the attachments to a specified folder next to the note
-        case 'FOLDER': return (p: string) => URI.join(URI.getParent(p), config.target)
-    }
+export function prepareResolver(target: string): CacheMatcher['resolve'] {
+    // adds the attachments to a static folder
+    if (!/[{}]/gi.test(target)) return () => target
 
-    // adds the attachments to a specified static folder
-    if (/[{}]/gi.test(config.target)) return () => config.target
-
-    // adds the attachments to a specified dynamic folder
-    return (n: string) => {
-        return pathReplacer(config.target, [
-            ['{notepath}', () => URI.removeExt(n)],
-            ['{notename}', () => URI.getBasename(n)],
-            ['{folderpath}', () => URI.getParent(n)],
-            ['{foldername}', () => URI.getBasename(URI.getParent(n) ?? '')],
+    // adds the attachments to a dynamic folder
+    return (note: string) => {
+        return pathReplacer(target, [
+            ['{notepath}', () => URI.removeExt(note)],
+            ['{notename}', () => URI.getBasename(note)],
+            ['{folderpath}', () => URI.getParent(note)],
+            ['{foldername}', () => URI.getBasename(URI.getParent(note) ?? '')],
         ])
     }
 }

@@ -1,7 +1,12 @@
 import type { CacheConfig, CacheRemote } from '@/types'
-import { Setting, TextAreaComponent, TextComponent } from 'obsidian'
-import { checkRemotes, parseRemotes, serializeRemotes } from '@/utility'
-import { CacheMode, MODE_DESC, MODE_LABELS, modeExample } from './values'
+import { normalizePath, Setting, TextAreaComponent } from 'obsidian'
+import {
+    checkRemotes,
+    parseRemotes,
+    prepareResolver,
+    serializeRemotes,
+} from '@/utility'
+import { docs } from './values'
 
 type EventCallback = (cache: CacheConfig) => void
 
@@ -27,10 +32,6 @@ export class CacheSettings {
         this.#displayCacheRemotes()
     }
 
-    #useStaticMode() {
-        return ['ROOT', 'FILE'].includes(this.#cache.mode)
-    }
-
     #cacheName(): DocumentFragment {
         return createFragment((div) => {
             div.append(`Notes at: `)
@@ -38,9 +39,8 @@ export class CacheSettings {
         })
     }
     #cacheDesc(): DocumentFragment | string {
-        if (this.#useStaticMode()) return MODE_DESC[this.#cache.mode]
         return createFragment((div) => {
-            div.append(MODE_DESC[this.#cache.mode])
+            div.append('Adds the attachment to:')
             div.createEl('code').appendText(this.#cache.target)
         })
     }
@@ -90,7 +90,11 @@ export class CacheSettings {
 
     #targetDesc(): DocumentFragment {
         return createFragment((div) => {
-            div.append('Attachments storage path, ex:')
+            div.appendText('For usage of variables like')
+            div.createEl('code', { text: '{folderpath}' })
+            div.appendText(' or ')
+            div.createEl('code', { text: '{notename}' })
+            docs('Attachments storage', div)
 
             const ul = div.createEl('ul')
             const note = ul.createEl('li')
@@ -98,39 +102,23 @@ export class CacheSettings {
             note.createEl('b').appendText('a/b/c/note1.md')
             note.append("'")
 
+            // prettier-ignore
+            const example = normalizePath(
+                prepareResolver(this.#cache.target)('a/b/c/note1.md') + '/img1.jpg',
+            )
+
             const attachment = ul.createEl('li')
             attachment.append("Attachment: '")
-            attachment.createEl('b').appendText(modeExample(this.#cache))
+            attachment.createEl('b').appendText(example)
             attachment.append("'")
         })
     }
     #displayCacheDetails(): void {
-        let targetInput: TextComponent | undefined = undefined
-
         const cacheSetting = new Setting(this.#cacheDetails)
         cacheSetting.setName('Attachments storage')
         cacheSetting.setDesc(this.#targetDesc())
-        cacheSetting.addDropdown((dropdown) => {
-            dropdown.addOptions(MODE_LABELS)
-            dropdown.setValue(this.#cache.mode)
-            dropdown.onChange((value) => {
-                this.#cache.mode = value as CacheMode
-                this.#invokeChange()
-
-                cacheSetting.setDesc(this.#targetDesc())
-                if (this.#useStaticMode()) {
-                    targetInput?.setDisabled(true)
-                    targetInput?.setValue('')
-                } else {
-                    targetInput?.setDisabled(false)
-                    targetInput?.setValue(this.#cache.target)
-                }
-            })
-        })
         cacheSetting.addText((input) => {
-            targetInput = input
-            if (this.#useStaticMode()) input.setDisabled(true)
-            else input.setValue(this.#cache.target)
+            input.setValue(this.#cache.target)
             input.onChange((value) => {
                 this.#cache.target = value
                 this.#invokeChange()

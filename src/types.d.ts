@@ -1,4 +1,4 @@
-import { CacheMode, PluginLevel, PluginPriority } from './settings/values'
+import { PluginLevel, PluginPriority } from './settings/values'
 
 export { default as AttachmentsCachePlugin } from './main'
 
@@ -62,8 +62,6 @@ export interface CacheConfig {
     enabled: boolean
     /** Used alongside **mode**. */
     target: string
-    /** Behavior of the cache rule. */
-    mode: CacheMode
 }
 export interface CacheRemote {
     /**

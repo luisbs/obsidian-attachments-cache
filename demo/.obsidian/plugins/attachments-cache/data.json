@@ -28,8 +28,7 @@
         }
       ],
       "enabled": true,
-      "target": "__cache",
-      "mode": "TARGET-PATH"
+      "target": "attachments/{notepath}"
     }
   ]
 }

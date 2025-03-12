@@ -10,20 +10,9 @@ import {
     Setting,
     TextComponent,
 } from 'obsidian'
-import { checkPattern, prepareConfigs, prepareHash } from '@/utility'
+import { checkPattern, prepareConfigs } from '@/utility'
 import { CacheSettings } from './CacheSettings'
-import { LEVEL_LABELS, PRIORITY_LABELS } from './values'
-
-export function docs(name: string, desc: string): DocumentFragment {
-    return createFragment((div) => {
-        div.appendText(desc + '. Check the ')
-        div.createEl('a', {
-            text: 'Docs',
-            href: `https://github.com/luisbs/obsidian-attachments-cache/blob/main/docs/settings.md#${prepareHash(name)}`,
-        })
-        div.appendText('.')
-    })
-}
+import { docs, LEVEL_LABELS, PRIORITY_LABELS } from './values'
 
 export class SettingsTab extends PluginSettingTab {
     #plugin: AttachmentsCachePlugin
@@ -179,7 +168,6 @@ export class SettingsTab extends PluginSettingTab {
                     remotes: src.remotes,
                     enabled: src.enabled,
                     target: src.target,
-                    mode: src.mode,
                 })
                 this.#updateConfigs(configs)
             })
