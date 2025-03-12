@@ -53,5 +53,6 @@ export class MarkdownHandler {
         }
 
         // TODO: add support for other types of attachments
+        // other attachments to support: https://help.obsidian.md/file-formats
     }
 }

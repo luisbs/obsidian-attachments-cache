@@ -6,13 +6,13 @@ If you search help about the **Settings** you can check the [documentation](./do
 
 ## Summary
 
-This plugin for Obsidian stores attachments (currently only images) locally inside the vault.
+This plugin for Obsidian, stores remote attachments (currently only images) locally inside the vault.
 
-The note is **NOT** modified, that way if the note content is exported any URL present still works outside the vault.
+The note is **NOT** modified, this way even outside of the vault the attachments keep working with the remotes URL.
 
 When the attachment is rendered in a note, the local version is used instead of the remote working as a local cache.
 
-> The cached images can be deleted any time to free up disk space.
+> The cached attachments can be deleted any time to free up disk space.
 
 In detail, during the Obsidian render process, when an `img` is found:
 
@@ -20,23 +20,32 @@ In detail, during the Obsidian render process, when an `img` is found:
 2. Download the image into a vault folder if is not cached.
 3. Modify the `img` element to use the cached file inside the vault.
 
-There already exists similar plugins, like:
-
-- [niekcandaele/obsidian-local-images](https://github.com/niekcandaele/obsidian-local-images) doesn't have explicit support for Obsidian v1.0+
-- [Sergei-Korneev/obsidian-local-images-plus](https://github.com/Sergei-Korneev/obsidian-local-images-plus)
-
-But the main difference is that they modify the base note, this plugin avoids that. The intentation is to keep the posibility to delete the caches or copy the note content and it should still work (with the remote urls).
-
 ## Features
 
 - [x] Exposed API for thrid-party integration.
-- [x] Whitelist/blacklist vault Vault paths to perform caching.
-- [x] Whitelist/blacklist vault remote paths to perform caching.
+- [x] Whitelist/blacklist vault vault paths to perform caching.
+- [x] Whitelist/blacklist vault remote URLs to perform caching.
 - [x] For listed Vault paths define where to store the attachments.
+- [x] Allows override of rules on individual notes or remotes.
 
 ---
 
 ## Instalation
+
+### From within Obsidian
+
+> I'm working ⚒️ on making this posible.
+
+From Obsidian v1.8+, you can activate this plugin within Obsidian by doing the following:
+
+- Open Settings > Third-party plugin
+- Make sure Safe mode is **off**
+- Click Browse community plugins
+- Search for "Attachments Cache"
+- Click Install
+- Once installed, enable the plugin
+- Then select "Attachments Cache" settings
+- Configure the vault paths and URL remotes that should be cached
 
 ### From source
 
@@ -44,22 +53,9 @@ You can activate this plugin, building from source by doing the following:
 
 - Clone the repository
 - Install the dependencies
-- Run `pnpm build` or `npm run build` from a cli
-- Copy the content of the repository `dist` folder to your vault, the path should look like `your-vault/.obsidian/plugins/obsidian-attachments-cache`
+- Run `pnpm build:dist`
+- Copy the content of the repository `dist` folder to your vault, the path should look like `your-vault/.obsidian/plugins/attachments-cache`
 - Open your vault in _Obsidian_ and activate the newly installed plugin
-
-### From within Obsidian
-
-> I'm working ⚒️ on making this posible.
-
-<!-- From Obsidian v1.1+, you can activate this plugin within Obsidian by doing the following:
-
-- Open Settings > Third-party plugin
-- Make sure Safe mode is **off**
-- Click Browse community plugins
-- Search for "Attachments Cache"
-- Click Install
-- Once installed, close the community plugins window and activate the newly installed plugin -->
 
 ---
 
