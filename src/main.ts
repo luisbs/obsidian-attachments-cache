@@ -68,7 +68,7 @@ export default class AttachmentsCachePlugin extends Plugin {
 
     async loadSettings(): Promise<void> {
         const group = this.log.group('Loading Settings')
-        const { cache_configs, ...primitives } = ((await this.loadData()) ||
+        const { cache_configs, ...primitives } = ((await this.loadData()) ??
             {}) as Partial<PluginSettings>
 
         // ensure a fallback value is present
