@@ -1,38 +1,19 @@
-import type { PluginSettings, PluginState } from '@/types'
 import { App, Plugin, PluginManifest } from 'obsidian'
 import { Logger, LogLevel } from '@luis.bs/obsidian-fnc'
-import { prepareConfigs, prepareState } from './utility'
-import { SettingsTab } from './settings/SettingsTab'
-import { MarkdownHandler } from './filesystem/MarkdownHandler'
-import { AttachmentsCacheAPI } from './AttachmentsCacheAPI'
-
-const DEFAULT_SETTINGS: PluginSettings = {
-    // * 'WARN' level to force the user to choose a lower level when is required
-    // * this decition, prevents the console from been overpopulated by default
-    plugin_level: 'WARN',
-    // * 'NORMAL' priority to cache user-written markdown
-    // * and PostProcessors with default priority
-    plugin_priority: 'NORMAL',
-    //
-    allow_characters: false,
-    url_param_cache: 'cache_file',
-    url_param_ignore: 'ignore_file',
-    note_param_cache: 'cache_from',
-    note_param_ignore: 'cache_unless',
-    cache_configs: [
-        {
-            pattern: '*',
-            remotes: [{ whitelisted: false, pattern: '*' }],
-            enabled: false,
-            target: '',
-        },
-    ],
-}
+import {
+    DEFAULT_SETTINGS,
+    type AttachmentsCacheSettings,
+} from '@/settings/values'
+import type { PluginState } from '@/types'
+import { prepareConfigs, prepareState } from '@/utility'
+import { AttachmentsCacheAPI } from '@/AttachmentsCacheAPI'
+import { SettingsTab } from '@/settings/SettingsTab'
+import { MarkdownHandler } from '@/filesystem/MarkdownHandler'
 
 export default class AttachmentsCachePlugin extends Plugin {
     public log = Logger.consoleLogger(AttachmentsCachePlugin.name)
 
-    public settings = {} as PluginSettings
+    public settings = {} as AttachmentsCacheSettings
     public state = {} as PluginState
 
     public api: AttachmentsCacheAPI
@@ -68,7 +49,7 @@ export default class AttachmentsCachePlugin extends Plugin {
     async loadSettings(): Promise<void> {
         const group = this.log.group('Loading Settings')
         const { cache_configs, ...primitives } = ((await this.loadData()) ??
-            {}) as Partial<PluginSettings>
+            {}) as Partial<AttachmentsCacheSettings>
 
         // ensure a fallback value is present
         // ensure order of configs and remotes

@@ -1,8 +1,4 @@
-import type {
-    AttachmentsCachePlugin,
-    CacheConfig,
-    PluginSettings,
-} from '@/types'
+import type { AttachmentsCachePlugin, CacheConfig } from '@/types'
 import {
     ButtonComponent,
     DropdownComponent,
@@ -12,7 +8,12 @@ import {
 } from 'obsidian'
 import { checkPattern, prepareConfigs } from '@/utility'
 import { CacheSettings } from './CacheSettings'
-import { docs, LEVEL_LABELS, PRIORITY_LABELS } from './values'
+import {
+    type AttachmentsCacheSettings,
+    docs,
+    LEVEL_LABELS,
+    PRIORITY_LABELS,
+} from './values'
 
 export class SettingsTab extends PluginSettingTab {
     #plugin: AttachmentsCachePlugin
@@ -195,7 +196,7 @@ export class SettingsTab extends PluginSettingTab {
         }
     }
 
-    #handle(key: keyof PluginSettings, value: unknown): void {
+    #handle(key: keyof AttachmentsCacheSettings, value: unknown): void {
         // @ts-expect-error dynamic assignment
         this.#plugin.settings[key] = value
         void this.#plugin.saveSettings()
