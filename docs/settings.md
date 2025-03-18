@@ -92,6 +92,14 @@ From the note `a/b/c/note1.md` the next variables are available:
 - `{folderpath}` resolves `a/b/c`
 - `{foldername}` resolves `c`
 
+<!--
+> An objective for later
+From the attachment added the next variables are available:
+
+- `{type}` like `images`, `audios` or `videos`
+- `{extension}` like `jpg`
+-->
+
 Values equivalent to _Obsidian.md_ standard attachment location setting would be:
 
 - `/`: **Vault folder** adds the attachments to the root of your vault.

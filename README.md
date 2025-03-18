@@ -28,6 +28,18 @@ In detail, during the Obsidian render process, when an `img` is found:
 - [x] For listed Vault paths define where to store the attachments.
 - [x] Allows override of rules on individual notes or remotes.
 
+## Supported attachments file-formats
+
+Based on the Obsidian supported [file-formats](https://help.obsidian.md/file-formats) the next attachments formats are been cached:
+
+- [x] Images: `.avif`, `.bmp`, `.gif`, `.jpeg`, `.jpg`, `.png`, `.svg`, `.webp`
+- [ ] Audio: `.flac`, `.m4a`, `.mp3`, `.ogg`, `.wav`, `.webm`, `.3gp`
+- [ ] Video: `.mkv`, `.mov`, `.mp4`, `.ogv`, `.webm`
+- [ ] PDF: `.pdf`
+
+> The unmarked formats are not cached currently.
+> Caching the missing files formats is a main objective for future releases.
+
 ---
 
 ## Instalation
