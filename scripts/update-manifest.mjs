@@ -9,10 +9,10 @@ const NEW_VERSION = process.env.npm_package_version
 const manifest = JSON.parse(readFileSync('manifest.json', 'utf8'))
 manifest.version = NEW_VERSION
 writeFileSync('manifest.json', JSON.stringify(manifest, null, '\t'))
-// update manifest.json on the demo
+// update manifest.json on the test-vault
 copyFileSync(
     'manifest.json',
-    'demo/.obsidian/plugins/attachments-cache/manifest.json',
+    'test-vault/.obsidian/plugins/attachments-cache/manifest.json',
 )
 
 // update versions.json with target version and minAppVersion
@@ -29,7 +29,7 @@ console.log('⧗  Committing changes')
 run('git config user.name "github-actions[bot]"')
 run('git config user.email "github-actions[bot]@users.noreply.github.com"')
 run(
-    'git commit demo/.obsidian/plugins/attachments-cache/* manifest.json versions.json -m"chore: sync plugin manifest"',
+    'git commit test-vault/.obsidian/plugins/attachments-cache/* manifest.json versions.json -m"chore: sync plugin manifest"',
 )
 
 // feedback

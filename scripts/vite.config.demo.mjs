@@ -8,7 +8,7 @@ export default defineConfig({
     resolve: { alias: { '@': resolve(__dirname, '../src') } },
     build: {
         emptyOutDir: false,
-        outDir: 'demo/.obsidian/plugins/attachments-cache',
+        outDir: 'test-vault/.obsidian/plugins/attachments-cache',
         target: 'es2022',
         sourcemap: 'inline',
         rollupOptions: rollupOptions(),

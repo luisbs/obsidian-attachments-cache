@@ -20,7 +20,7 @@ export interface PluginState {
 export interface PluginSettings {
     /** Defines the minimun level to log while running. */
     plugin_level: PluginLevel
-    /** Defines the **CachePostProcessor** priority.  */
+    /** Defines the **CachePostProcessor** priority. */
     plugin_priority: PluginPriority
     /** Stores the user preference over `UTF-8` characters. */
     allow_characters: boolean

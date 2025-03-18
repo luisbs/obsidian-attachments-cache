@@ -40,5 +40,5 @@ export default ts.config(
         files: ['*.config.mjs', 'scripts/**', 'tests/**'],
         extends: [ts.configs.disableTypeChecked],
     },
-    { ignores: ['demo/**', 'dist/**', 'lib/**'] },
+    { ignores: ['test-vault/**', 'dist/**', 'lib/**'] },
 )

@@ -15,9 +15,13 @@ yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
 
-# dotenv environment variable files
-.env
-.env.development.local
-.env.test.local
-.env.production.local
-.env.local
+# Obsidian artifacts
+test-vault/attachments/*
+test-vault/.obsidian/*
+!test-vault/.obsidian/community-plugins.json
+
+test-vault/.obsidian/plugins/*
+!test-vault/.obsidian/plugins/hot-reload/*
+test-vault/.obsidian/plugins/attachments-cache/*
+!test-vault/.obsidian/plugins/attachments-cache/.hotreload
+!test-vault/.obsidian/plugins/attachments-cache/data.json
