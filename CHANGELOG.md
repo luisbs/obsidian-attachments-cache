@@ -1,5 +1,11 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.5.7
+
+### Patch Changes
+
+- b27c4f9: Added notice about supported file formats
+
 ## 0.5.6
 
 ### Patch Changes
