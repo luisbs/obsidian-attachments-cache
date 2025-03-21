@@ -15,7 +15,7 @@ import {
 import { RuleSettings } from './RuleSettings'
 import { docs, LEVEL_LABELS, PRIORITY_LABELS } from './values'
 
-export class SettingsTab extends PluginSettingTab {
+export class AttachmentsCacheSettingsTab extends PluginSettingTab {
     #plugin: AttachmentsCachePlugin
 
     #configsList?: HTMLDivElement

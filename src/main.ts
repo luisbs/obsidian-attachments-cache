@@ -1,11 +1,16 @@
 import { Logger, LogLevel } from '@luis.bs/obsidian-fnc'
-import { Plugin, type App, type PluginManifest } from 'obsidian'
-import { AttachmentsCacheApi } from './AttachmentsCacheAPI'
-import { MarkdownHandler } from './filesystem/MarkdownHandler'
-import { SettingsTab } from './settings/SettingsTab'
+import {
+    Plugin,
+    type App,
+    type MarkdownPostProcessor,
+    type PluginManifest,
+} from 'obsidian'
+import { AttachmentsCacheApi } from './AttachmentsCacheApi'
+import { AttachmentsCacheSettingsTab } from './settings/AttachmentsCacheSettingsTab'
 import { prepareCacheRules } from './utility/rules'
 import {
     prepareSettings,
+    PRIORITY,
     type AttachmentsCacheSettings,
 } from './utility/settings'
 import { prepareState, type AttachmentsCacheState } from './utility/state'
@@ -25,8 +30,8 @@ export default class AttachmentsCachePlugin extends Plugin {
     public settings = {} as AttachmentsCacheSettings
     public state = {} as AttachmentsCacheState
 
-    public api: AttachmentsCacheApi
-    public markdown: MarkdownHandler
+    #api: AttachmentsCacheApi
+    #mpp?: MarkdownPostProcessor
 
     constructor(app: App, manifest: PluginManifest) {
         super(app, manifest)
@@ -36,18 +41,11 @@ export default class AttachmentsCachePlugin extends Plugin {
         this.log.setLevel(LogLevel.DEBUG)
         this.log.setFormat('[hh:mm:ss.ms] level:')
 
-        this.api = new AttachmentsCacheApi(this)
-        this.markdown = new MarkdownHandler(this)
+        this.#api = new AttachmentsCacheApi(this)
 
         // thrid-party API
         // @ts-expect-error non-standard API
-        window.AttachmentsCache = this.api
-    }
-
-    async onload(): Promise<void> {
-        await this.loadSettings()
-        this.addSettingTab(new SettingsTab(this))
-        this.markdown.registerMarkdownProcessor()
+        window.AttachmentsCache = this.#api
     }
 
     onunload(): void {
@@ -55,14 +53,12 @@ export default class AttachmentsCachePlugin extends Plugin {
         delete window.AttachmentsCache
     }
 
-    async loadSettings(): Promise<void> {
-        const group = this.log.group('Loading Settings')
-
-        this.settings = await prepareSettings(this.loadData())
-        group.debug('Loaded: ', this.settings)
-
-        this.#prepareState(group)
-        group.flush('Loaded Settings')
+    #prepareState(log: Logger): void {
+        log.info('Preparing state')
+        this.state = prepareState(this.settings)
+        this.log.setLevel(LogLevel[this.settings.plugin_level])
+        if (this.#mpp)
+            this.#mpp.sortOrder = PRIORITY[this.settings.plugin_priority]
     }
 
     async saveSettings(): Promise<void> {
@@ -80,12 +76,57 @@ export default class AttachmentsCachePlugin extends Plugin {
         group.flush('Saved Settings')
     }
 
-    #prepareState(log: Logger): void {
-        log.info('Preparing state')
+    async onload(): Promise<void> {
+        const group = this.log.group('Loading AttachmentsCache')
 
-        // change Plugin behavior based on user input
-        this.log.setLevel(LogLevel[this.settings.plugin_level])
-        this.markdown.syncPriority()
-        this.state = prepareState(this.settings)
+        this.settings = await prepareSettings(this.loadData())
+        group.debug('Loaded: ', this.settings)
+
+        this.addSettingTab(new AttachmentsCacheSettingsTab(this))
+        this.#registerMarkdownProcessor()
+        this.#prepareState(group)
+
+        group.flush('Loaded AttachmentsCache')
+    }
+
+    /**
+     * Priorities sorts the **PostProcesors** order of execution, `higher == after`.
+     * When **PostProcesors** use an `async` function, it is not awaited
+     * so the sortOrder is not enforced.
+     *
+     * When a **PostProcesors** runs after the cache **PostProcesor**,
+     * any attachment generated will not be detected.
+     *
+     * For context on priority of other plugins:
+     * * luisbs/obsidian-components: `-100`
+     * * blacksmithgu/obsidian-dataview: `-100`
+     *
+     * @default `1` caches attachments of normal PostProcesors (`priority = 0`)
+     */
+    #registerMarkdownProcessor(): void {
+        this.#mpp = this.registerMarkdownPostProcessor(
+            (element, { sourcePath }) => {
+                // imidiate execution
+                if (this.settings.plugin_priority === 'LOWER') {
+                    void this.#handle(element, sourcePath)
+                    return
+                }
+
+                // for plugins that use async PostProcessors await some seconds
+                const millis =
+                    this.settings.plugin_priority === 'HIGHER' ? 10000 : 2000
+                setTimeout(() => void this.#handle(element, sourcePath), millis)
+            },
+        )
+    }
+
+    async #handle(element: HTMLElement, sourcePath: string): Promise<void> {
+        for (const el of Array.from(element.querySelectorAll('img'))) {
+            const resolved = await this.#api.cache(sourcePath, el.src)
+            if (resolved) el.src = resolved
+        }
+
+        // TODO: add support for other types of attachments
+        // other attachments to support: https://help.obsidian.md/file-formats
     }
 }
