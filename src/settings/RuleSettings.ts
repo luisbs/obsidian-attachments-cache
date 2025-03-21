@@ -1,88 +1,89 @@
-import type { CacheConfig, CacheRemote } from '@/types'
-import { normalizePath, Setting, TextAreaComponent } from 'obsidian'
 import {
     checkRemotes,
     parseRemotes,
-    prepareResolver,
     serializeRemotes,
-} from '@/utility'
+    type RemoteRule,
+} from '@/utility/remotes'
+import { type CacheRule } from '@/utility/rules'
+import { pathResolver } from '@/utility/state'
+import { normalizePath, Setting, type TextAreaComponent } from 'obsidian'
 import { docs } from './values'
 
-type EventCallback = (cache: CacheConfig) => void
+type EventCallback = (cache: CacheRule) => void
 
-export class CacheSettings {
-    #cache: CacheConfig
-    #cacheHeader: Setting
-    #cacheDetails: HTMLElement
-    #cacheRemotes: HTMLElement
+export class RuleSettings {
+    #rule: CacheRule
+    #ruleHeader: Setting
+    #ruleDetails: HTMLElement
+    #ruleRemotes: HTMLElement
     #remotesText?: TextAreaComponent
 
-    constructor(parent: HTMLElement, cache: CacheConfig) {
+    constructor(parent: HTMLElement, cache: CacheRule) {
         // cloned to control flow of updates
-        this.#cache = { ...cache, remotes: [...cache.remotes] }
+        this.#rule = { ...cache, remotes: [...cache.remotes] }
 
-        this.#cacheHeader = new Setting(parent)
-        this.#cacheDetails =
-            this.#cacheHeader.settingEl.createDiv('cache-details')
-        this.#cacheRemotes =
-            this.#cacheHeader.settingEl.createDiv('cache-remotes')
+        this.#ruleHeader = new Setting(parent)
+        this.#ruleDetails =
+            this.#ruleHeader.settingEl.createDiv('cache-details')
+        this.#ruleRemotes =
+            this.#ruleHeader.settingEl.createDiv('cache-remotes')
 
         this.#displayCacheHeader()
         this.#displayCacheDetails()
-        this.#displayCacheRemotes()
+        this.#displayRuleRemotes()
     }
 
-    #cacheName(): DocumentFragment {
+    #ruleName(): DocumentFragment {
         return createFragment((div) => {
             div.append(`Notes at: `)
-            div.createEl('code').appendText(this.#cache.pattern)
+            div.createEl('code').appendText(this.#rule.pattern)
         })
     }
-    #cacheDesc(): DocumentFragment | string {
+    #ruleDesc(): DocumentFragment | string {
         return createFragment((div) => {
             div.append('Adds the attachment to:')
-            div.createEl('code').appendText(this.#cache.target)
+            div.createEl('code').appendText(this.#rule.target)
         })
     }
     #displayCacheHeader(): void {
-        this.#cacheHeader.setName(this.#cacheName())
-        this.#cacheHeader.setDesc(this.#cacheDesc())
+        this.#ruleHeader.setName(this.#ruleName())
+        this.#ruleHeader.setDesc(this.#ruleDesc())
 
-        if (this.#cache.pattern !== '*') {
-            this.#cacheHeader.addExtraButton((button) => {
+        if (this.#rule.pattern !== '*') {
+            this.#ruleHeader.addExtraButton((button) => {
                 button.setIcon('trash-2').setTooltip('Remove')
                 button.onClick(() => {
-                    if (this.#cache.pattern === '*') {
+                    if (this.#rule.pattern === '*') {
                         console.warn("fallback config('*') can't be removed")
                         return
                     }
 
-                    this.#cacheHeader.clear()
-                    this.#cacheHeader.settingEl.remove()
+                    this.#ruleHeader.clear()
+                    this.#ruleHeader.settingEl.remove()
                     this.#invokeRemove()
                 })
             })
         }
-        this.#cacheHeader.addToggle((toggle) => {
-            toggle.setValue(this.#cache.enabled)
+        this.#ruleHeader.addToggle((toggle) => {
+            toggle.setValue(this.#rule.enabled)
             toggle.onChange((value) => {
-                this.#cache.enabled = value
+                this.#rule.enabled = value
                 this.#invokeChange()
 
-                this.#cacheHeader.setName(this.#cacheName())
+                this.#ruleHeader.setName(this.#ruleName())
             })
         })
-        this.#cacheHeader.addExtraButton((button) => {
+        this.#ruleHeader.addExtraButton((button) => {
             let visible = false
             button.setIcon('chevron-down').setTooltip('Details')
             button.onClick(() => {
                 visible = !visible
                 if (visible) {
                     button.setIcon('chevron-up')
-                    this.#cacheHeader.settingEl.addClass('show-details')
+                    this.#ruleHeader.settingEl.addClass('show-details')
                 } else {
                     button.setIcon('chevron-down')
-                    this.#cacheHeader.settingEl.removeClass('show-details')
+                    this.#ruleHeader.settingEl.removeClass('show-details')
                 }
             })
         })
@@ -95,6 +96,7 @@ export class CacheSettings {
             div.appendText(' or ')
             div.createEl('code', { text: '{notename}' })
             docs('Attachments storage', div)
+            div.appendText('Path example: ')
 
             const ul = div.createEl('ul')
             const note = ul.createEl('li')
@@ -104,7 +106,7 @@ export class CacheSettings {
 
             // prettier-ignore
             const example = normalizePath(
-                prepareResolver(this.#cache.target)('a/b/c/note1.md') + '/img1.jpg',
+                pathResolver(this.#rule.target)('a/b/c/note1.md') + '/img1.jpg',
             )
 
             const attachment = ul.createEl('li')
@@ -114,13 +116,13 @@ export class CacheSettings {
         })
     }
     #displayCacheDetails(): void {
-        const cacheSetting = new Setting(this.#cacheDetails)
+        const cacheSetting = new Setting(this.#ruleDetails)
         cacheSetting.setName('Attachments storage')
         cacheSetting.setDesc(this.#targetDesc())
         cacheSetting.addText((input) => {
-            input.setValue(this.#cache.target)
+            input.setValue(this.#rule.target)
             input.onChange((value) => {
-                this.#cache.target = value
+                this.#rule.target = value
                 this.#invokeChange()
 
                 cacheSetting.setDesc(this.#targetDesc())
@@ -129,13 +131,13 @@ export class CacheSettings {
 
         const remotesDesc = createFragment()
         const remotesDescUl = remotesDesc.createEl('ul')
-        const remotesSetting = new Setting(this.#cacheDetails)
+        const remotesSetting = new Setting(this.#ruleDetails)
         remotesSetting.setClass('remotes-input')
         remotesSetting.setName('Remotes')
         remotesSetting.setDesc(remotesDesc)
         remotesSetting.addTextArea((textarea) => {
             this.#remotesText = textarea
-            textarea.setValue(serializeRemotes(this.#cache.remotes))
+            textarea.setValue(serializeRemotes(this.#rule.remotes))
             textarea.onChange((value) => {
                 // handle validation
                 remotesDescUl.empty()
@@ -147,14 +149,14 @@ export class CacheSettings {
                     return
                 }
 
-                this.#cache.remotes = parseRemotes(this.#cache.remotes, value)
+                this.#rule.remotes = parseRemotes(this.#rule.remotes, value)
                 this.#invokeChange()
-                this.#displayCacheRemotes()
+                this.#displayRuleRemotes()
             })
         })
     }
 
-    #remoteName(r: CacheRemote): DocumentFragment {
+    #remoteName(r: RemoteRule): DocumentFragment {
         return createFragment((div) => {
             div.append(
                 `${r.whitelisted ? 'Whitelisted' : 'Blacklisted'} remote: `,
@@ -162,18 +164,18 @@ export class CacheSettings {
             div.createEl('code').appendText(r.pattern)
         })
     }
-    #displayCacheRemotes(): void {
-        this.#cacheRemotes.empty()
+    #displayRuleRemotes(): void {
+        this.#ruleRemotes.empty()
 
-        for (const remote of this.#cache.remotes) {
-            const setting = new Setting(this.#cacheRemotes)
+        for (const remote of this.#rule.remotes) {
+            const setting = new Setting(this.#ruleRemotes)
             setting.setName(this.#remoteName(remote))
 
             if (remote.pattern !== '*') {
                 setting.addExtraButton((button) => {
                     button.setIcon('trash-2').setTooltip('Remove')
                     button.onClick(() => {
-                        const remotes = this.#cache.remotes //
+                        const remotes = this.#rule.remotes //
                             .filter((r) => r.pattern !== remote.pattern)
                         this.#updateRemotes(remotes)
                     })
@@ -185,7 +187,7 @@ export class CacheSettings {
                     remote.whitelisted ? 'Blacklist' : 'Whitelist',
                 )
                 button.onClick(() => {
-                    const remotes = this.#cache.remotes.map((r) => {
+                    const remotes = this.#rule.remotes.map((r) => {
                         if (r.pattern !== remote.pattern) return r
                         return { ...r, whitelisted: !r.whitelisted }
                     })
@@ -195,22 +197,22 @@ export class CacheSettings {
         }
     }
 
-    #updateRemotes(remotes: CacheRemote[]): void {
-        this.#cache.remotes = remotes
+    #updateRemotes(remotes: RemoteRule[]): void {
+        this.#rule.remotes = remotes
         this.#invokeChange()
 
         this.#remotesText?.setValue(serializeRemotes(remotes))
-        this.#displayCacheRemotes()
+        this.#displayRuleRemotes()
     }
 
     #changeListeners: EventCallback[] = []
     #removeListeners: EventCallback[] = []
 
     #invokeChange(): void {
-        for (const listener of this.#changeListeners) listener(this.#cache)
+        for (const listener of this.#changeListeners) listener(this.#rule)
     }
     #invokeRemove(): void {
-        for (const listener of this.#removeListeners) listener(this.#cache)
+        for (const listener of this.#removeListeners) listener(this.#rule)
     }
 
     onChange(callback: EventCallback): this {

@@ -1,11 +1,21 @@
-import type { CacheConfig } from '@/types'
+import { prepareRemotes, type RemoteRule } from './remotes'
 import { compareBySpecificity } from './strings'
-import { prepareRemotes } from './remotes'
 
-export function prepareConfigs(configs: CacheConfig[]): CacheConfig[] {
-    const result = [] as CacheConfig[]
+export interface CacheRule {
+    /** Vault path glob pattern. */
+    pattern: string
+    /** Ordered list of remotes Whitelisted/Blacklisted. */
+    remotes: RemoteRule[]
+    /** Can be disabled instead of been removed. */
+    enabled: boolean
+    /** Used alongside **mode**. */
+    target: string
+}
 
-    for (const a of configs) {
+export function prepareCacheRules(rules: CacheRule[]): CacheRule[] {
+    const result = [] as CacheRule[]
+
+    for (const a of rules) {
         // if is unique, keep it
         const bIndex = result.findIndex((b) => b.pattern === a.pattern)
         if (bIndex === -1) {
@@ -25,10 +35,10 @@ export function prepareConfigs(configs: CacheConfig[]): CacheConfig[] {
     return result.sort((a, b) => compareBySpecificity(a.pattern, b.pattern))
 }
 
-export function checkPattern(configs: CacheConfig[], _value: string): string[] {
+export function checkPattern(rules: CacheRule[], _value: string): string[] {
     if (!_value) return ['invalid pattern']
-    for (const config of configs) {
-        if (config.pattern === _value) return [`duplicated pattern '${_value}'`]
+    for (const rule of rules) {
+        if (rule.pattern === _value) return [`duplicated pattern '${_value}'`]
     }
     return []
 }

@@ -1,9 +1,19 @@
-import type { CacheRemote } from '@/types'
 import { compareBySpecificity } from './strings'
 
+export interface RemoteRule {
+    /**
+     * Whether the remote should be whitelisted/blacklisted.
+     * - `true` means whitelisted
+     * - `false` means blacklisted
+     */
+    whitelisted: boolean
+    /** Remote pattern to match against. */
+    pattern: string
+}
+
 /** Ensures uniqueness and order of a list of remotes. */
-export function prepareRemotes(remotes: CacheRemote[]): CacheRemote[] {
-    const result = [] as CacheRemote[]
+export function prepareRemotes(remotes: RemoteRule[]): RemoteRule[] {
+    const result = [] as RemoteRule[]
     let hasFallback = false
 
     // keep only first apperences
@@ -19,7 +29,7 @@ export function prepareRemotes(remotes: CacheRemote[]): CacheRemote[] {
 }
 
 /** Serialize remotes as an string. */
-export function serializeRemotes(remotes: CacheRemote[]): string {
+export function serializeRemotes(remotes: RemoteRule[]): string {
     return remotes
         .map(({ whitelisted, pattern }) => {
             return `${whitelisted ? 'w' : 'b'} ${pattern}`
@@ -44,10 +54,10 @@ export function parseRemote(source: string): [string, boolean | undefined] {
 
 /** Splits a remotes string, keeping previous states when posible. */
 export function parseRemotes(
-    remotes: CacheRemote[],
+    remotes: RemoteRule[],
     sources: string,
-): CacheRemote[] {
-    const result = [] as CacheRemote[]
+): RemoteRule[] {
+    const result = [] as RemoteRule[]
     let hasFallback = false
 
     // one remote per-line

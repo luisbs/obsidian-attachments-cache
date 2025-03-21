@@ -1,19 +1,19 @@
-import type { AttachmentsCachePlugin, CacheConfig } from '@/types'
+import type AttachmentsCachePlugin from '@/main'
 import {
-    ButtonComponent,
-    DropdownComponent,
+    type CacheRule,
+    checkPattern,
+    prepareCacheRules,
+} from '@/utility/rules'
+import type { AttachmentsCacheSettings } from '@/utility/settings'
+import {
+    type ButtonComponent,
+    type DropdownComponent,
     PluginSettingTab,
     Setting,
-    TextComponent,
+    type TextComponent,
 } from 'obsidian'
-import { checkPattern, prepareConfigs } from '@/utility'
-import { CacheSettings } from './CacheSettings'
-import {
-    type AttachmentsCacheSettings,
-    docs,
-    LEVEL_LABELS,
-    PRIORITY_LABELS,
-} from './values'
+import { RuleSettings } from './RuleSettings'
+import { docs, LEVEL_LABELS, PRIORITY_LABELS } from './values'
 
 export class SettingsTab extends PluginSettingTab {
     #plugin: AttachmentsCachePlugin
@@ -119,7 +119,7 @@ export class SettingsTab extends PluginSettingTab {
         headerEl.addDropdown((dropdown) => {
             sourceDropdown = dropdown
             dropdown.setValue('*')
-            for (const config of this.#plugin.settings.cache_configs) {
+            for (const config of this.#plugin.settings.cache_rules) {
                 dropdown.addOption(config.pattern, config.pattern)
             }
         })
@@ -135,7 +135,7 @@ export class SettingsTab extends PluginSettingTab {
 
                 // handle validation
                 const problems = checkPattern(
-                    this.#plugin.settings.cache_configs,
+                    this.#plugin.settings.cache_rules,
                     value,
                 )
                 if (problems.length > 0) {
@@ -155,7 +155,7 @@ export class SettingsTab extends PluginSettingTab {
                 const match = patternInput?.getValue()
                 const ref = sourceDropdown?.getValue() ?? '*'
 
-                const src = this.#plugin.settings.cache_configs.find(
+                const src = this.#plugin.settings.cache_rules.find(
                     (i) => i.pattern === ref,
                 )
                 if (!match || !src) {
@@ -163,7 +163,7 @@ export class SettingsTab extends PluginSettingTab {
                     return
                 }
 
-                const configs = this.#plugin.settings.cache_configs
+                const configs = this.#plugin.settings.cache_rules
                 configs.push({
                     pattern: match,
                     remotes: src.remotes,
@@ -179,17 +179,17 @@ export class SettingsTab extends PluginSettingTab {
         if (!this.#configsList) return
         this.#configsList.empty()
 
-        for (const cache of this.#plugin.settings.cache_configs) {
-            const setting = new CacheSettings(this.#configsList, cache)
+        for (const cache of this.#plugin.settings.cache_rules) {
+            const setting = new RuleSettings(this.#configsList, cache)
             setting.onChange((_cache) => {
                 // re-render is already handle
-                const configs = this.#plugin.settings.cache_configs //
+                const configs = this.#plugin.settings.cache_rules //
                     .map((c) => (c.pattern === _cache.pattern ? _cache : c))
                 this.#updateConfigs(configs)
             })
             setting.onRemove((_cache) => {
                 // clean up of reder is already handle
-                const configs = this.#plugin.settings.cache_configs //
+                const configs = this.#plugin.settings.cache_rules //
                     .filter((c) => c.pattern !== _cache.pattern)
                 this.#updateConfigs(configs)
             })
@@ -201,8 +201,8 @@ export class SettingsTab extends PluginSettingTab {
         this.#plugin.settings[key] = value
         void this.#plugin.saveSettings()
     }
-    #updateConfigs(config: CacheConfig[]): void {
-        this.#plugin.settings.cache_configs = prepareConfigs(config)
+    #updateConfigs(config: CacheRule[]): void {
+        this.#plugin.settings.cache_rules = prepareCacheRules(config)
         void this.#plugin.saveSettings()
     }
 }

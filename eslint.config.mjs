@@ -34,6 +34,11 @@ export default ts.config(
                 'error',
                 { allowBoolean: true, allowNumber: true },
             ],
+            '@typescript-eslint/consistent-type-exports': 'error',
+            '@typescript-eslint/consistent-type-imports': [
+                'error',
+                { fixStyle: 'inline-type-imports' },
+            ],
         },
     },
     {

@@ -1,22 +1,31 @@
-import { App, Plugin, PluginManifest } from 'obsidian'
 import { Logger, LogLevel } from '@luis.bs/obsidian-fnc'
+import { Plugin, type App, type PluginManifest } from 'obsidian'
+import { AttachmentsCacheApi } from './AttachmentsCacheAPI'
+import { MarkdownHandler } from './filesystem/MarkdownHandler'
+import { SettingsTab } from './settings/SettingsTab'
+import { prepareCacheRules } from './utility/rules'
 import {
-    DEFAULT_SETTINGS,
+    prepareSettings,
     type AttachmentsCacheSettings,
-} from '@/settings/values'
-import type { PluginState } from '@/types'
-import { prepareConfigs, prepareState } from '@/utility'
-import { AttachmentsCacheAPI } from '@/AttachmentsCacheAPI'
-import { SettingsTab } from '@/settings/SettingsTab'
-import { MarkdownHandler } from '@/filesystem/MarkdownHandler'
+} from './utility/settings'
+import { prepareState, type AttachmentsCacheState } from './utility/state'
+
+// TODO: add an string `id` value
+// TODO: change the code that uses `pattern` as an id
+// TODO: sort CacheRules by `id` on settings UI
+// TODO: add an input for the user to change the CacheRule `id`
+// TODO: add an input for the user to change the CacheRule `pattern`
+// TODO: add an toggle for the user to enable/disable the rule (as separated setting)
+// TODO: change CacheConfig rendering behavior, when expanded replace header separated inputs
+// TODO: add option to link a note to a CacheRule
 
 export default class AttachmentsCachePlugin extends Plugin {
     public log = Logger.consoleLogger(AttachmentsCachePlugin.name)
 
     public settings = {} as AttachmentsCacheSettings
-    public state = {} as PluginState
+    public state = {} as AttachmentsCacheState
 
-    public api: AttachmentsCacheAPI
+    public api: AttachmentsCacheApi
     public markdown: MarkdownHandler
 
     constructor(app: App, manifest: PluginManifest) {
@@ -27,7 +36,7 @@ export default class AttachmentsCachePlugin extends Plugin {
         this.log.setLevel(LogLevel.DEBUG)
         this.log.setFormat('[hh:mm:ss.ms] level:')
 
-        this.api = new AttachmentsCacheAPI(this)
+        this.api = new AttachmentsCacheApi(this)
         this.markdown = new MarkdownHandler(this)
 
         // thrid-party API
@@ -48,17 +57,8 @@ export default class AttachmentsCachePlugin extends Plugin {
 
     async loadSettings(): Promise<void> {
         const group = this.log.group('Loading Settings')
-        const { cache_configs, ...primitives } = ((await this.loadData()) ??
-            {}) as Partial<AttachmentsCacheSettings>
 
-        // ensure a fallback value is present
-        // ensure order of configs and remotes
-        this.settings = Object.assign({}, DEFAULT_SETTINGS, primitives)
-        this.settings.cache_configs = prepareConfigs([
-            ...(cache_configs ?? []),
-            ...DEFAULT_SETTINGS.cache_configs,
-        ])
-
+        this.settings = await prepareSettings(this.loadData())
         group.debug('Loaded: ', this.settings)
 
         this.#prepareState(group)
@@ -70,8 +70,8 @@ export default class AttachmentsCachePlugin extends Plugin {
         const data = Object.assign({}, this.settings)
 
         // serialize special data types (Map, Set, etc)
-        // ensure order of configs and remotes
-        data.cache_configs = prepareConfigs(data.cache_configs)
+        // ensure order of CacheRules and remotes
+        data.cache_rules = prepareCacheRules(data.cache_rules)
 
         await this.saveData(data)
         group.debug('Saved: ', data)
@@ -86,6 +86,6 @@ export default class AttachmentsCachePlugin extends Plugin {
         // change Plugin behavior based on user input
         this.log.setLevel(LogLevel[this.settings.plugin_level])
         this.markdown.syncPriority()
-        this.state = prepareState(this)
+        this.state = prepareState(this.settings)
     }
 }

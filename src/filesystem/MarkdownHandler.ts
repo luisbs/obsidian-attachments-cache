@@ -1,6 +1,6 @@
-import type { AttachmentsCachePlugin } from '@/types'
+import type AttachmentsCachePlugin from '@/main'
+import { PRIORITY } from '@/utility/settings'
 import type { MarkdownPostProcessor } from 'obsidian'
-import { PRIORITY } from '@/settings/values'
 
 export class MarkdownHandler {
     constructor(private plugin: AttachmentsCachePlugin) {}

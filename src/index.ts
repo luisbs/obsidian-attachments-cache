@@ -2,7 +2,7 @@
 import type { App } from 'obsidian'
 
 /** Public API for third-party integration. */
-export interface AttachmentsCachePluginAPI {
+export interface AttachmentsCacheApi {
     /** Test whether the attachments should be cached. */
     mayCache(notepath: string, remote: string): boolean
     /** Test whether a remote file is already cached. */
@@ -31,7 +31,7 @@ export const isPluginEnabled = (app: App) => {
  * otherwise it is inferred from the global API object installed
  * on the window.
  */
-export const getAPI = (app?: App): AttachmentsCachePluginAPI | undefined => {
+export const getAPI = (app?: App): AttachmentsCacheApi | undefined => {
     // @ts-expect-error non-standard API
     // eslint-disable-next-line
     if (app) return app.plugins.plugins['attachments-cache']?.api
