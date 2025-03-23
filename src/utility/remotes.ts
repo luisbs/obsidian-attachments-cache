@@ -37,6 +37,32 @@ export function serializeRemotes(remotes: RemoteRule[]): string {
         .join('\n')
 }
 
+/** Detects posible problems with the user defined remotes. */
+export function checkRemotes(sources: string): string[] {
+    const problems: string[] = []
+    let hasFallback = false
+
+    // one remote per-line
+    for (const source of sources.split(/\n+/g)) {
+        const trimmed = source.trim().replace(/^[wb]\s+/, '')
+        if (trimmed === '*') {
+            hasFallback = true
+            continue
+        }
+
+        if (/^\w+:/gi.test(trimmed)) {
+            problems.push("remove protocols, ex: 'http://'")
+        }
+        if (!/^(\w+\.)+\w+/.test(trimmed)) {
+            problems.push("should include domain, ex: 'example.org/path'")
+        }
+    }
+
+    if (!hasFallback) problems.unshift("should include a fallback '*'")
+
+    return problems
+}
+
 /**
  * Parses a remote string, keeping whitelisted status if present.
  * - `'w example.com'` → `['example.com', true]`
@@ -107,30 +133,4 @@ export function parseRemotes(
 
     // sorting
     return result.sort((a, b) => compareBySpecificity(a.pattern, b.pattern))
-}
-
-/** Detects posible problems with the user defined remotes. */
-export function checkRemotes(sources: string): string[] {
-    const problems: string[] = []
-    let hasFallback = false
-
-    // one remote per-line
-    for (const source of sources.split(/\n+/g)) {
-        const trimmed = source.trim().replace(/^[wb]\s+/, '')
-        if (trimmed === '*') {
-            hasFallback = true
-            continue
-        }
-
-        if (/^\w+:/gi.test(trimmed)) {
-            problems.push("remove protocols, ex: 'http://'")
-        }
-        if (!/^(\w+\.)+\w+/.test(trimmed)) {
-            problems.push("should include domain, ex: 'example.org/path'")
-        }
-    }
-
-    if (!hasFallback) problems.unshift("should include a fallback '*'")
-
-    return problems
 }

@@ -4,15 +4,30 @@ import type { App } from 'obsidian'
 /** Public API for third-party integration. */
 export interface AttachmentsCacheApi {
     /** Test whether the attachments should be cached. */
-    mayCache(notepath: string, remote: string): boolean
+    mayCache(remote: string, notepath: string, frontmatter?: unknown): boolean
     /** Test whether a remote file is already cached. */
-    isCached(notepath: string, remote: string): Promise<boolean>
+    isCached(remote: string, notepath: string, frontmatter?: unknown): boolean
     /** Tries to map a remote url into a Vault resourcePath. */
-    resource(notepath: string, remote: string): Promise<string | undefined>
+    resource(
+        remote: string,
+        notepath: string,
+        frontmatter?: unknown,
+    ): undefined | string
     /** Tries to map a remote url into a Vault filePath. */
-    resolve(notepath: string, remote: string): Promise<string | undefined>
-    /** Tries to cache a file locally and returns a Vault resourcePath. */
-    cache(notepath: string, remote: string): Promise<string | undefined>
+    resolve(
+        remote: string,
+        notepath: string,
+        frontmatter?: unknown,
+    ): undefined | string
+    /**
+     * Tries to cache a file localy and returns a Vault resourcePath.
+     * @returns the Vault resourcePath or a Promise for it.
+     */
+    cache(
+        remote: string,
+        notepath: string,
+        frontmatter?: unknown,
+    ): undefined | string | Promise<undefined | string>
 }
 
 ///////////////////////

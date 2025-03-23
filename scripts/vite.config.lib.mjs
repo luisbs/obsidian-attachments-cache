@@ -14,7 +14,7 @@ export default defineConfig({
         lib: {
             formats: ['es'],
             fileName: () => 'obsidian-attachments-cache.esm.js',
-            entry: resolve(__dirname, '../src/index.ts'),
+            entry: resolve(__dirname, '../src/lib.ts'),
         },
     },
 })

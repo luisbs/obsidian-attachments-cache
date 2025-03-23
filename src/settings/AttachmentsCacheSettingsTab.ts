@@ -17,12 +17,12 @@ import { docs, LEVEL_LABELS, PRIORITY_LABELS } from './values'
 
 export class AttachmentsCacheSettingsTab extends PluginSettingTab {
     #plugin: AttachmentsCachePlugin
-
     #configsList?: HTMLDivElement
 
     constructor(plugin: AttachmentsCachePlugin) {
         super(plugin.app, plugin)
         this.#plugin = plugin
+        console.log('AttachmentsCacheSettingsTab')
     }
 
     display(): void {

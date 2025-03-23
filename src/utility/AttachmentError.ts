@@ -1,10 +1,6 @@
-import { RequestUrlResponse } from 'obsidian'
+import type { RequestUrlResponse } from 'obsidian'
 
-type ErrorCode =
-    | 'remote-no-url'
-    | 'remote-no-ext'
-    | 'url-request-head'
-    | 'url-request-get'
+type ErrorCode = 'remote-no-url' | 'remote-no-ext' | 'url-request-get'
 
 export class AttachmentError extends Error {
     /**
@@ -54,12 +50,8 @@ export class AttachmentError extends Error {
                 return 'remote param should be an URL'
             case 'remote-no-ext':
                 return 'a file-extension could not be determined'
-
-            case 'url-request-head':
-                return 'the request to get the file-extension failed'
             case 'url-request-get':
                 return 'the request to download the file failed'
-
             default:
                 return 'try-reloading Obsidian'
         }

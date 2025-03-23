@@ -1,3 +1,4 @@
+import { pathResolver } from '@/utility/matchers'
 import {
     checkRemotes,
     parseRemotes,
@@ -5,7 +6,6 @@ import {
     type RemoteRule,
 } from '@/utility/remotes'
 import { type CacheRule } from '@/utility/rules'
-import { pathResolver } from '@/utility/state'
 import { normalizePath, Setting, type TextAreaComponent } from 'obsidian'
 import { docs } from './values'
 

@@ -1,12 +1,12 @@
 {
-  "plugin_level": "WARN",
+  "plugin_level": "DEBUG",
   "plugin_priority": "NORMAL",
   "allow_characters": false,
   "url_param_cache": "cache_file",
   "url_param_ignore": "ignore_file",
   "note_param_cache": "cache_from",
   "note_param_ignore": "cache_unless",
-  "cache_configs": [
+  "cache_rules": [
     {
       "pattern": "*",
       "remotes": [

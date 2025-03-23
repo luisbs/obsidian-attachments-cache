@@ -15,6 +15,12 @@ export const PRIORITY: Record<PluginPriority, number> = {
     /** Only ignores the highest priority `Number.MAX_SAFE_INTEGER` */
     HIGHER: Number.MAX_SAFE_INTEGER - 1,
 }
+export const PRIORITY_TIMEOUT: Partial<Record<PluginPriority, number>> = {
+    /** Sleep for 2 seconds to allow for async process to render. */
+    NORMAL: 2000,
+    /** Sleep for 10 seconds to allow for slow process to render. */
+    HIGHER: 10000,
+}
 
 export interface AttachmentsCacheSettings {
     /** Defines the minimun level to log while running. */

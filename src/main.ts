@@ -5,15 +5,16 @@ import {
     type MarkdownPostProcessor,
     type PluginManifest,
 } from 'obsidian'
-import { AttachmentsCacheApi } from './AttachmentsCacheApi'
+import { AttachmentsCache } from './AttachmentsCacheApi'
+import type { AttachmentsCacheApi } from './lib'
 import { AttachmentsCacheSettingsTab } from './settings/AttachmentsCacheSettingsTab'
 import { prepareCacheRules } from './utility/rules'
 import {
     prepareSettings,
     PRIORITY,
+    PRIORITY_TIMEOUT,
     type AttachmentsCacheSettings,
 } from './utility/settings'
-import { prepareState, type AttachmentsCacheState } from './utility/state'
 
 // TODO: add an string `id` value
 // TODO: change the code that uses `pattern` as an id
@@ -23,12 +24,11 @@ import { prepareState, type AttachmentsCacheState } from './utility/state'
 // TODO: add an toggle for the user to enable/disable the rule (as separated setting)
 // TODO: change CacheConfig rendering behavior, when expanded replace header separated inputs
 // TODO: add option to link a note to a CacheRule
+// TODO: add option to early download when a link is pasted
 
 export default class AttachmentsCachePlugin extends Plugin {
-    public log = Logger.consoleLogger(AttachmentsCachePlugin.name)
-
-    public settings = {} as AttachmentsCacheSettings
-    public state = {} as AttachmentsCacheState
+    log = Logger.consoleLogger(AttachmentsCachePlugin.name)
+    settings = {} as AttachmentsCacheSettings
 
     #api: AttachmentsCacheApi
     #mpp?: MarkdownPostProcessor
@@ -41,9 +41,8 @@ export default class AttachmentsCachePlugin extends Plugin {
         this.log.setLevel(LogLevel.DEBUG)
         this.log.setFormat('[hh:mm:ss.ms] level:')
 
-        this.#api = new AttachmentsCacheApi(this)
-
         // thrid-party API
+        this.#api = new AttachmentsCache(this)
         // @ts-expect-error non-standard API
         window.AttachmentsCache = this.#api
     }
@@ -53,16 +52,15 @@ export default class AttachmentsCachePlugin extends Plugin {
         delete window.AttachmentsCache
     }
 
-    #prepareState(log: Logger): void {
-        log.info('Preparing state')
-        this.state = prepareState(this.settings)
+    #syncSettings(log: Logger): void {
+        log.info('Syncing AttachmentsCache settings')
         this.log.setLevel(LogLevel[this.settings.plugin_level])
         if (this.#mpp)
             this.#mpp.sortOrder = PRIORITY[this.settings.plugin_priority]
     }
 
     async saveSettings(): Promise<void> {
-        const group = this.log.group('Saving Settings')
+        const group = this.log.group('Saving AttachmentsCache settings')
         const data = Object.assign({}, this.settings)
 
         // serialize special data types (Map, Set, etc)
@@ -72,8 +70,8 @@ export default class AttachmentsCachePlugin extends Plugin {
         await this.saveData(data)
         group.debug('Saved: ', data)
 
-        this.#prepareState(group)
-        group.flush('Saved Settings')
+        this.#syncSettings(group)
+        group.flush('Saved AttachmentsCache settings')
     }
 
     async onload(): Promise<void> {
@@ -82,10 +80,9 @@ export default class AttachmentsCachePlugin extends Plugin {
         this.settings = await prepareSettings(this.loadData())
         group.debug('Loaded: ', this.settings)
 
-        this.addSettingTab(new AttachmentsCacheSettingsTab(this))
+        this.#syncSettings(group)
         this.#registerMarkdownProcessor()
-        this.#prepareState(group)
-
+        this.addSettingTab(new AttachmentsCacheSettingsTab(this))
         group.flush('Loaded AttachmentsCache')
     }
 
@@ -105,25 +102,41 @@ export default class AttachmentsCachePlugin extends Plugin {
      */
     #registerMarkdownProcessor(): void {
         this.#mpp = this.registerMarkdownPostProcessor(
-            (element, { sourcePath }) => {
-                // imidiate execution
-                if (this.settings.plugin_priority === 'LOWER') {
-                    void this.#handle(element, sourcePath)
-                    return
-                }
+            (element, { sourcePath, frontmatter }) => {
+                // inmediate execution for static attachments
+                // avoid the creation of 2 requests for them
+                this.#handleCache(element, sourcePath, frontmatter)
 
-                // for plugins that use async PostProcessors await some seconds
-                const millis =
-                    this.settings.plugin_priority === 'HIGHER' ? 10000 : 2000
-                setTimeout(() => void this.#handle(element, sourcePath), millis)
+                // defers a second execution, with a timeout to
+                // allow async or slow PostProcessors to render extra content
+                if (this.settings.plugin_priority in PRIORITY_TIMEOUT) {
+                    setTimeout(() => {
+                        this.#handleCache(element, sourcePath, frontmatter)
+                    }, PRIORITY_TIMEOUT[this.settings.plugin_priority])
+                }
             },
         )
     }
 
-    async #handle(element: HTMLElement, sourcePath: string): Promise<void> {
+    #handleCache(
+        element: HTMLElement,
+        notepath: string,
+        frontmatter: unknown,
+    ): void {
         for (const el of Array.from(element.querySelectorAll('img'))) {
-            const resolved = await this.#api.cache(sourcePath, el.src)
-            if (resolved) el.src = resolved
+            const resolved = this.#api.cache(el.src, notepath, frontmatter)
+            if (!resolved) continue
+
+            // handle already cached attachments
+            if (String.isString(resolved)) {
+                el.src = resolved
+                continue
+            }
+
+            // handled freshly downloaded attachments
+            void resolved.then((resourcepath) => {
+                if (resourcepath) el.src = resourcepath
+            })
         }
 
         // TODO: add support for other types of attachments
