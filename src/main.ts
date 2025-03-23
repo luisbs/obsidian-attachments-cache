@@ -125,17 +125,32 @@ export default class AttachmentsCachePlugin extends Plugin {
     ): void {
         for (const el of Array.from(element.querySelectorAll('img'))) {
             const resolved = this.#api.cache(el.src, notepath, frontmatter)
+            // when `result = undefined` keep the original URL
             if (!resolved) continue
 
-            // handle already cached attachments
+            // when `result is string` the attachment it's already cached
             if (String.isString(resolved)) {
                 el.src = resolved
                 continue
             }
 
-            // handled freshly downloaded attachments
+            // otherwise the image is been downloaded, so
+            // restrain Obsidian from downloading the original URL
+            const source = [el.src, el.title]
+            el.title = 'Caching...'
+            el.src = ''
+
+            // when the download is completed
             void resolved.then((resourcepath) => {
-                if (resourcepath) el.src = resourcepath
+                if (resourcepath) {
+                    // when the download succeded, use the local URL
+                    el.src = resourcepath
+                    el.title = source[1] ?? source[0]
+                } else {
+                    // otherwise restore the original URL
+                    el.src = source[0]
+                    el.title = source[1]
+                }
             })
         }
 
