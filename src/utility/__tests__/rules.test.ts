@@ -26,9 +26,9 @@ const U = Object.freeze<CacheRule>({
     remotes: [
         { whitelisted: true, pattern: 'images.org' },
         { whitelisted: true, pattern: 'example.com/images' },
-        { whitelisted: true, pattern: 'example.com/blog' },
-        { whitelisted: true, pattern: '*' },
-        { whitelisted: true, pattern: 'example.com' },
+        { whitelisted: false, pattern: 'example.com/blog' },
+        { whitelisted: false, pattern: '*' },
+        { whitelisted: false, pattern: 'example.com' },
         { whitelisted: true, pattern: 'example.com/blog/asd' },
     ],
 })
@@ -39,11 +39,11 @@ const O = Object.freeze<CacheRule>({
     target: 'attachments/images/{notename}',
     remotes: [
         { whitelisted: true, pattern: 'example.com/blog/asd' },
-        { whitelisted: true, pattern: 'example.com/blog' },
+        { whitelisted: false, pattern: 'example.com/blog' },
         { whitelisted: true, pattern: 'example.com/images' },
-        { whitelisted: true, pattern: 'example.com' },
+        { whitelisted: false, pattern: 'example.com' },
         { whitelisted: true, pattern: 'images.org' },
-        { whitelisted: true, pattern: '*' },
+        { whitelisted: false, pattern: '*' },
     ],
 })
 

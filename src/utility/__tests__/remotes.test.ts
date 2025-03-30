@@ -4,11 +4,11 @@ import { prepareRemoteRules, type RemoteRule } from '../remotes'
 // objects freezed to keep expected order
 const remotes = Object.freeze<RemoteRule[]>([
     { whitelisted: true, pattern: 'example.com/blog/asd' },
-    { whitelisted: true, pattern: 'example.com/blog' },
+    { whitelisted: false, pattern: 'example.com/blog' },
     { whitelisted: true, pattern: 'example.com/images' },
-    { whitelisted: true, pattern: 'example.com' },
+    { whitelisted: false, pattern: 'example.com' },
     { whitelisted: true, pattern: 'images.org' },
-    { whitelisted: true, pattern: '*' },
+    { whitelisted: false, pattern: '*' },
 ])
 
 describe('Testing RemoteRule utilities', () => {

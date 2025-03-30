@@ -41,7 +41,7 @@ export interface AttachmentsCacheSettings {
     cache_rules: CacheRule[]
 }
 
-export const DEFAULT_SETTINGS: AttachmentsCacheSettings = {
+export const DEFAULT_SETTINGS: AttachmentsCacheSettings = Object.freeze({
     // * 'WARN' level to force the user to choose a lower level when is required
     // * this decition, prevents the console from been overpopulated by default
     plugin_level: 'WARN',
@@ -58,26 +58,30 @@ export const DEFAULT_SETTINGS: AttachmentsCacheSettings = {
         {
             id: 'FALLBACK',
             pattern: '*',
-            enabled: false,
-            remotes: [{ whitelisted: false, pattern: '*' }],
-            target: '',
+            enabled: true,
+            remotes: [{ whitelisted: true, pattern: '*' }],
+            target: '{folderpath}',
         },
     ],
-}
+})
 
-export async function prepareSettings(
-    source: Promise<unknown>,
-): Promise<AttachmentsCacheSettings> {
-    const loaded = (await source) as AttachmentsCacheSettings | undefined
-    if (!loaded) return DEFAULT_SETTINGS
+export function prepareSettings(settings: unknown): AttachmentsCacheSettings {
+    if (!settings || typeof settings !== 'object') return DEFAULT_SETTINGS
+    const s = settings as Partial<AttachmentsCacheSettings>
 
-    // ensure a fallback value is present
-    return Object.assign({}, DEFAULT_SETTINGS, {
-        ...loaded,
-        // ensure order of rules and remotes
-        cache_rules: prepareCacheRules(
-            loaded.cache_rules,
-            DEFAULT_SETTINGS.cache_rules,
-        ),
-    })
+    // prettier-ignore
+    return {
+        // ensure fallback values are present
+        // ignore/remove any non-standard/deprecated settings
+        plugin_level:      s.plugin_level      ?? DEFAULT_SETTINGS.plugin_level,
+        plugin_priority:   s.plugin_priority   ?? DEFAULT_SETTINGS.plugin_priority,
+        allow_characters:  s.allow_characters  ?? DEFAULT_SETTINGS.allow_characters,
+        url_param_cache:   s.url_param_cache   ?? DEFAULT_SETTINGS.url_param_cache,
+        url_param_ignore:  s.url_param_ignore  ?? DEFAULT_SETTINGS.url_param_ignore,
+        note_param_cache:  s.note_param_cache  ?? DEFAULT_SETTINGS.note_param_cache,
+        note_param_ignore: s.note_param_ignore ?? DEFAULT_SETTINGS.note_param_ignore,
+
+        // ensure correct sorting of RemoteRules
+        cache_rules: prepareCacheRules(s.cache_rules ?? DEFAULT_SETTINGS.cache_rules),
+    }
 }

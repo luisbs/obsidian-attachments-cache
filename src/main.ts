@@ -8,7 +8,6 @@ import {
 import { AttachmentsCache } from './AttachmentsCacheApi'
 import type { AttachmentsCacheApi } from './lib'
 import { AttachmentsCacheSettingsTab } from './settings/AttachmentsCacheSettingsTab'
-import { prepareCacheRules } from './utility/rules'
 import {
     prepareSettings,
     PRIORITY,
@@ -16,15 +15,18 @@ import {
     type AttachmentsCacheSettings,
 } from './utility/settings'
 
-// TODO: add an string `id` value
-// TODO: change the code that uses `pattern` as an id
-// TODO: sort CacheRules by `id` on settings UI
-// TODO: add an input for the user to change the CacheRule `id`
-// TODO: add an input for the user to change the CacheRule `pattern`
-// TODO: add an toggle for the user to enable/disable the rule (as separated setting)
-// TODO: change CacheConfig rendering behavior, when expanded replace header separated inputs
-// TODO: add option to link a note to a CacheRule
-// TODO: add option to early download when a link is pasted
+// * [x] add an string `id` value
+// * [ ] change the code that uses `pattern` as an id
+// * [x] sort CacheRules by `id` on settings UI
+// * [ ] add an input for the user to change the CacheRule `id`
+// * [ ] add an input for the user to change the CacheRule `pattern`
+// * [ ] add an toggle for the user to enable/disable the rule (as separated setting)
+// * [ ] change CacheConfig rendering behavior, when expanded replace header separated inputs
+// * [ ] add option to link a note to a CacheRule
+// * [ ] add option to early download when a link is pasted
+// * [x] drop forced fallback CacheRule
+// * [x] drop forced fallback RemoteRule
+// * [x] change fallback CacheRule, makes the plugin noticible when freshly installed
 
 export default class AttachmentsCachePlugin extends Plugin {
     log = Logger.consoleLogger(AttachmentsCachePlugin.name)
@@ -52,38 +54,33 @@ export default class AttachmentsCachePlugin extends Plugin {
         delete window.AttachmentsCache
     }
 
-    #syncSettings(log: Logger): void {
-        log.info('Syncing AttachmentsCache settings')
-        this.log.setLevel(LogLevel[this.settings.plugin_level])
-        if (this.#mpp)
-            this.#mpp.sortOrder = PRIORITY[this.settings.plugin_priority]
-    }
-
-    async saveSettings(): Promise<void> {
-        const group = this.log.group('Saving AttachmentsCache settings')
-        const data = Object.assign({}, this.settings)
-
-        // serialize special data types (Map, Set, etc)
-        // ensure order of CacheRules and remotes
-        data.cache_rules = prepareCacheRules(data.cache_rules)
-
-        await this.saveData(data)
-        group.debug('Saved: ', data)
-
-        this.#syncSettings(group)
-        group.flush('Saved AttachmentsCache settings')
-    }
-
     async onload(): Promise<void> {
         const group = this.log.group('Loading AttachmentsCache')
 
-        this.settings = await prepareSettings(this.loadData())
+        this.settings = prepareSettings(await this.loadData())
         group.debug('Loaded: ', this.settings)
 
         this.#syncSettings(group)
         this.#registerMarkdownProcessor()
         this.addSettingTab(new AttachmentsCacheSettingsTab(this))
         group.flush('Loaded AttachmentsCache')
+    }
+
+    async saveSettings(): Promise<void> {
+        const group = this.log.group('Saving AttachmentsCache settings')
+
+        await this.saveData(this.settings)
+        group.debug('Saved: ', this.settings)
+
+        this.#syncSettings(group)
+        group.flush('Saved AttachmentsCache settings')
+    }
+
+    #syncSettings(log: Logger): void {
+        log.info('Syncing AttachmentsCache settings')
+        this.log.setLevel(LogLevel[this.settings.plugin_level])
+        if (this.#mpp)
+            this.#mpp.sortOrder = PRIORITY[this.settings.plugin_priority]
     }
 
     /**
