@@ -56,9 +56,10 @@ export const DEFAULT_SETTINGS: AttachmentsCacheSettings = {
     note_param_ignore: 'cache_unless',
     cache_rules: [
         {
+            id: 'FALLBACK',
             pattern: '*',
-            remotes: [{ whitelisted: false, pattern: '*' }],
             enabled: false,
+            remotes: [{ whitelisted: false, pattern: '*' }],
             target: '',
         },
     ],
@@ -74,9 +75,9 @@ export async function prepareSettings(
     return Object.assign({}, DEFAULT_SETTINGS, {
         ...loaded,
         // ensure order of rules and remotes
-        cache_rules: prepareCacheRules([
-            ...loaded.cache_rules,
-            ...DEFAULT_SETTINGS.cache_rules,
-        ]),
+        cache_rules: prepareCacheRules(
+            loaded.cache_rules,
+            DEFAULT_SETTINGS.cache_rules,
+        ),
     })
 }

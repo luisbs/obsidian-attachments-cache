@@ -1,5 +1,3 @@
-import { compareBySpecificity } from './strings'
-
 export interface RemoteRule {
     /**
      * Whether the remote should be whitelisted/blacklisted.
@@ -9,23 +7,6 @@ export interface RemoteRule {
     whitelisted: boolean
     /** Remote pattern to match against. */
     pattern: string
-}
-
-/** Ensures uniqueness and order of a list of remotes. */
-export function prepareRemotes(remotes: RemoteRule[]): RemoteRule[] {
-    const result = [] as RemoteRule[]
-    let hasFallback = false
-
-    // keep only first apperences
-    for (const a of remotes) {
-        if (result.every((b) => b.pattern !== a.pattern)) {
-            if (a.pattern === '*') hasFallback = true
-            result.push(a)
-        }
-    }
-
-    if (!hasFallback) result.push({ pattern: '*', whitelisted: false })
-    return result.sort((a, b) => compareBySpecificity(a.pattern, b.pattern))
 }
 
 /** Serialize remotes as an string. */
@@ -132,5 +113,29 @@ export function parseRemotes(
     if (!hasFallback) result.push({ pattern: '*', whitelisted: false })
 
     // sorting
-    return result.sort((a, b) => compareBySpecificity(a.pattern, b.pattern))
+    return prepareRemoteRules(result)
+}
+
+export function prepareRemoteRules(...remotes: RemoteRule[][]): RemoteRule[] {
+    const _remotes: RemoteRule[] = []
+
+    // keep only first RemoteRule appariences
+    for (const a of remotes.flat()) {
+        if (_remotes.some((b) => b.pattern === a.pattern)) continue
+        _remotes.push(a)
+    }
+
+    // sort RemoteRules by specificity
+    return _remotes.sort((a, b) => {
+        // `*` is fallback, it should come last
+        if (!a.pattern.startsWith('*') && b.pattern.startsWith('*')) return -1
+        if (a.pattern.startsWith('*') && !b.pattern.startsWith('*')) return 1
+
+        // prioritize specificity
+        if (a.pattern.startsWith(b.pattern)) return -1
+        if (b.pattern.startsWith(a.pattern)) return 1
+
+        // order alfabetically
+        return a.pattern.localeCompare(b.pattern, 'en')
+    })
 }

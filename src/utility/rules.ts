@@ -1,44 +1,27 @@
-import { prepareRemotes, type RemoteRule } from './remotes'
-import { compareBySpecificity } from './strings'
+import { prepareRemoteRules, type RemoteRule } from './remotes'
 
 export interface CacheRule {
+    /** User defined id. */
+    id: string
     /** Vault path glob pattern. */
     pattern: string
+    /** Allow disabling the rule instead of been removed. */
+    enabled: boolean
     /** Ordered list of remotes Whitelisted/Blacklisted. */
     remotes: RemoteRule[]
-    /** Can be disabled instead of been removed. */
-    enabled: boolean
     /** Used alongside **mode**. */
     target: string
 }
 
-export function prepareCacheRules(rules: CacheRule[]): CacheRule[] {
-    const result = [] as CacheRule[]
+export function prepareCacheRules(...rules: CacheRule[][]): CacheRule[] {
+    const _rules = [] as CacheRule[]
 
-    for (const a of rules) {
-        // if is unique, keep it
-        const bIndex = result.findIndex((b) => b.pattern === a.pattern)
-        if (bIndex === -1) {
-            // ensure remotes are sorted
-            result.push({ ...a, remotes: prepareRemotes(a.remotes) })
-            continue
-        }
-
-        // when duplicates, keep the more specific one
-        if (a.remotes.length > result[bIndex].remotes.length) {
-            // ensure remotes are sorted
-            result[bIndex] = { ...a, remotes: prepareRemotes(a.remotes) }
-        }
+    for (const aRule of rules.flat()) {
+        // keep only first CacheRule appariences
+        if (_rules.some((bRule) => bRule.id === aRule.id)) continue
+        _rules.push({ ...aRule, remotes: prepareRemoteRules(aRule.remotes) })
     }
 
-    // ensure sorting of paths
-    return result.sort((a, b) => compareBySpecificity(a.pattern, b.pattern))
-}
-
-export function checkPattern(rules: CacheRule[], _value: string): string[] {
-    if (!_value) return ['invalid pattern']
-    for (const rule of rules) {
-        if (rule.pattern === _value) return [`duplicated pattern '${_value}'`]
-    }
-    return []
+    // keep user defined order
+    return _rules
 }
