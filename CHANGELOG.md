@@ -1,5 +1,13 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.5.7
+
+### Patch Changes
+
+- b27c4f9: Added notice about supported file formats
+- 45c0c7b: Settings change to cache attachments when freshly installed
+- a9546d3: Avoid the attachment from been downloaded twice while it's been cached
+
 ## 0.5.6
 
 ### Patch Changes
