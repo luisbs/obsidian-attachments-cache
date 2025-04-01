@@ -85,21 +85,20 @@ By default, attachments are added to the root of your vault.
 
 You can change the attachment location of each vault path individually. The input allows the usage of variables in the path. For example:
 
-From the note `a/b/c/note1.md` the next variables are available:
+From the note `a/b/c/note.md` the next variables are available:
 
-- `{notepath}` resolves `a/b/c/note1`
-- `{notename}` resolves `note1`
+- `{notepath}` resolves `a/b/c/note`
+- `{notename}` resolves `note`
 - `{folderpath}` resolves `a/b/c`
 - `{foldername}` resolves `c`
 
 <!--
-> An objective for later
+> TODO: add this options
 From the attachment added the next variables are available:
 
-- `{type}` like `images`, `audios` or `videos`
-- `{extension}` like `jpg`
+- `{ext}` like `jpg`, `pdf` or `mp3`
+- `{type}` user-defined extension groups, like `images = jpg,png`
 -->
-
 Values equivalent to _Obsidian.md_ standard attachment location setting would be:
 
 - `/`: **Vault folder** adds the attachments to the root of your vault.
