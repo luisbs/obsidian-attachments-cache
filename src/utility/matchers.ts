@@ -1,37 +1,6 @@
-import { URI } from '@luis.bs/obsidian-fnc'
-import { minimatch } from 'minimatch'
 import { parseFrontMatterEntry } from 'obsidian'
 import type { CacheRule } from './rules'
 
-/** Resolve the attachments path from the notepath. */
-export type PathResolver = (notepath: string) => string
-/** Generates a resolver for paths with variable parts. */
-export function pathResolver(target: string): PathResolver {
-    // adds the attachments to a static folder
-    if (!/[{}]/gi.test(target)) return () => target
-    // adds the attachments to a dynamic folder
-    return (note: string) => {
-        // use functions to avoid unnecesary calculations
-        return target
-            .replaceAll('{notepath}', () => URI.removeExt(note))
-            .replaceAll('{notename}', () => URI.getBasename(note) ?? '')
-            .replaceAll('{folderpath}', () => URI.getParent(note) ?? '')
-            .replaceAll('{foldername}', () => {
-                return URI.getBasename(URI.getParent(note) ?? '') ?? ''
-            })
-    }
-}
-
-/** Try to match the notepath against the listed CacheRules. */
-export function findCacheRule(
-    rules: CacheRule[],
-    notepath: string,
-): CacheRule | undefined {
-    return rules.find((rule) => {
-        if (rule.pattern === '*') return true
-        return minimatch(notepath, rule.pattern)
-    })
-}
 /** Test an URL against the listed rule-remotes. */
 export function testCacheRemote(rule: CacheRule, url: string): boolean {
     for (const { pattern, whitelisted } of rule.remotes) {

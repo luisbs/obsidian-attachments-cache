@@ -1,3 +1,5 @@
+import { URI } from '@luis.bs/obsidian-fnc/lib/utility/uri'
+import { minimatch } from 'minimatch'
 import { prepareRemoteRules, type RemoteRule } from './remotes'
 
 export interface CacheRule {
@@ -24,4 +26,31 @@ export function prepareCacheRules(...rules: CacheRule[][]): CacheRule[] {
 
     // keep user defined order
     return _rules
+}
+
+/** Try to match the notepath against the listed CacheRules. */
+export function findCacheRule(
+    rules: CacheRule[],
+    notepath: string,
+): CacheRule | undefined {
+    return rules.find((rule) => {
+        if (rule.pattern === '*') return true
+        return minimatch(notepath, rule.pattern)
+    })
+}
+
+/** Resolve a variable path. */
+export function resolveCachePath(target: string, notepath: string): string {
+    // resolve the attachments to a static folder
+    if (!/[{}]/gi.test(target)) return target
+    // resolve the attachments to a dynamic folder
+    // use functions to avoid unnecesary calculations
+    return target
+        .replaceAll('{notepath}', () => URI.removeExt(notepath))
+        .replaceAll('{notename}', () => URI.getBasename(notepath) ?? '')
+        .replaceAll('{folderpath}', () => URI.getParent(notepath) ?? '')
+        .replaceAll('{foldername}', () => {
+            return URI.getBasename(URI.getParent(notepath) ?? '') ?? ''
+        })
+    // TODO: add support for `{ext}` and `{type}` variables
 }

@@ -1,5 +1,10 @@
 import { describe, expect, test } from 'vitest'
-import { prepareCacheRules, type CacheRule } from '../rules'
+import {
+    findCacheRule,
+    prepareCacheRules,
+    resolveCachePath,
+    type CacheRule,
+} from '../rules'
 
 //
 // objects freezed to keep expected order
@@ -51,13 +56,53 @@ describe('Testing CacheRule utilities', () => {
     test('prepareCacheRules', () => {
         // alphabetical order 'files' > 'images' > 'papers'
         // but the user-defined order should be respected
-        expect.soft(prepareCacheRules([U, A, B])).toStrictEqual([O, A, B])
-        expect.soft(prepareCacheRules([A, B, U])).toStrictEqual([A, B, O])
-        expect.soft(prepareCacheRules([B, U, A])).toStrictEqual([B, O, A])
+        expect(prepareCacheRules([U, A, B])).toStrictEqual([O, A, B])
+        expect(prepareCacheRules([A, B, U])).toStrictEqual([A, B, O])
+        expect(prepareCacheRules([B, U, A])).toStrictEqual([B, O, A])
 
         // keep only first apperiences, based on `id`
-        expect.soft(prepareCacheRules([B, U, A, B])).toStrictEqual([B, O, A])
-        expect.soft(prepareCacheRules([B, A, B, U])).toStrictEqual([B, A, O])
-        expect.soft(prepareCacheRules([B, B, U, A])).toStrictEqual([B, O, A])
+        expect(prepareCacheRules([B, U, A, B])).toStrictEqual([B, O, A])
+        expect(prepareCacheRules([B, A, B, U])).toStrictEqual([B, A, O])
+        expect(prepareCacheRules([B, B, U, A])).toStrictEqual([B, O, A])
+    })
+
+    test('findCacheRule', () => {
+        // '*' pattern
+        expect(findCacheRule([B], 'example.md')).toBe(B)
+        expect(findCacheRule([A], 'example.md')).toBeUndefined()
+        // minimatch pattern
+        expect(findCacheRule([A], 'notes/example.md')).toBe(A)
+        expect(findCacheRule([A], 'images/example.md')).toBeUndefined()
+
+        // user-defined order should be respected
+        expect(findCacheRule([A, B, O], 'images/example.md')).toBe(B)
+        expect(findCacheRule([A, O, B], 'images/example.md')).toBe(O)
+    })
+
+    test('resolveCachePath', () => {
+        // static target path
+        expect(resolveCachePath('attachments', 'a/b/c/note.md')) //
+            .toBe('attachments')
+
+        // variables target path
+        expect(resolveCachePath('{notepath}', 'a/b/c/note.md')) //
+            .toBe('a/b/c/note')
+        expect(resolveCachePath('{notename}', 'a/b/c/note.md')) //
+            .toBe('note')
+        expect(resolveCachePath('{folderpath}', 'a/b/c/note.md')) //
+            .toBe('a/b/c')
+        expect(resolveCachePath('{foldername}', 'a/b/c/note.md')) //
+            .toBe('c')
+        // slashes between variables are not enforced
+        expect(resolveCachePath('{notepath}{folderpath}', 'a/b/c/note.md')) //
+            .toBe('a/b/c/notea/b/c')
+
+        // expected usage examples
+        expect(resolveCachePath('attachments/{notename}', 'a/b/c/note.md')) //
+            .toBe('attachments/note')
+        expect(resolveCachePath('attachments/{notepath}', 'a/b/c/note.md')) //
+            .toBe('attachments/a/b/c/note')
+        expect(resolveCachePath('__/{foldername}/{notename}', 'a/b/c/note.md')) //
+            .toBe('__/c/note')
     })
 })
