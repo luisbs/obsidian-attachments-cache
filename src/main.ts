@@ -24,6 +24,7 @@ import {
 // * [ ] change CacheConfig rendering behavior, when expanded replace header separated inputs
 // * [ ] add option to link a note to a CacheRule
 // * [ ] add option to early download when a link is pasted
+// * [ ] add user-defined extensions groups, like `images = jpg,png`
 // * [x] drop forced fallback CacheRule
 // * [x] drop forced fallback RemoteRule
 // * [x] change fallback CacheRule, makes the plugin noticible when freshly installed

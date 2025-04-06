@@ -42,7 +42,7 @@ describe('Testing settings utilities', () => {
         expect(prepareSettings({})).toStrictEqual(DEFAULT_SETTINGS)
 
         // using custom Settings
-        // ensure all settings rely con a default value
+        // ensure all settings rely on a default value
         // non-standard/deprecated settings should be removed
         expect(prepareSettings({ ...some, deprecated: 'ignore' })) //
             .toStrictEqual({ ...DEFAULT_SETTINGS, ...some })

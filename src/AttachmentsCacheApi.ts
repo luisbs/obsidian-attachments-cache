@@ -187,7 +187,7 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         }
 
         // standard behavior
-        if (testCacheRemote(rule, remote)) {
+        if (testCacheRemote(rule.remotes, remote)) {
             log.debug('remote has to be cached')
             return rule.target
         }

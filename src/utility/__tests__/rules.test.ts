@@ -81,28 +81,24 @@ describe('Testing CacheRule utilities', () => {
 
     test('resolveCachePath', () => {
         // static target path
-        expect(resolveCachePath('attachments', 'a/b/c/note.md')) //
-            .toBe('attachments')
+        expect(resolveCachePath('assets', 'a/b/note.md')).toBe('assets')
 
         // variables target path
-        expect(resolveCachePath('{notepath}', 'a/b/c/note.md')) //
-            .toBe('a/b/c/note')
-        expect(resolveCachePath('{notename}', 'a/b/c/note.md')) //
-            .toBe('note')
-        expect(resolveCachePath('{folderpath}', 'a/b/c/note.md')) //
-            .toBe('a/b/c')
-        expect(resolveCachePath('{foldername}', 'a/b/c/note.md')) //
-            .toBe('c')
+        expect(resolveCachePath('{notepath}', 'a/b/note.md')).toBe('a/b/note')
+        expect(resolveCachePath('{notename}', 'a/b/note.md')).toBe('note')
+        expect(resolveCachePath('{folderpath}', 'a/b/note.md')).toBe('a/b')
+        expect(resolveCachePath('{foldername}', 'a/b/note.md')).toBe('b')
+
         // slashes between variables are not enforced
-        expect(resolveCachePath('{notepath}{folderpath}', 'a/b/c/note.md')) //
-            .toBe('a/b/c/notea/b/c')
+        expect(resolveCachePath('{notepath}{folderpath}', 'a/b/note.md')) //
+            .toBe('a/b/notea/b')
 
         // expected usage examples
-        expect(resolveCachePath('attachments/{notename}', 'a/b/c/note.md')) //
+        expect(resolveCachePath('attachments/{notename}', 'a/b/note.md')) //
             .toBe('attachments/note')
-        expect(resolveCachePath('attachments/{notepath}', 'a/b/c/note.md')) //
-            .toBe('attachments/a/b/c/note')
-        expect(resolveCachePath('__/{foldername}/{notename}', 'a/b/c/note.md')) //
-            .toBe('__/c/note')
+        expect(resolveCachePath('attachments/{notepath}', 'a/b/note.md')) //
+            .toBe('attachments/a/b/note')
+        expect(resolveCachePath('__/{foldername}/{notename}', 'a/b/note.md')) //
+            .toBe('__/b/note')
     })
 })
