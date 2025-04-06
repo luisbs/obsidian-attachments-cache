@@ -32,7 +32,7 @@
 
         "importHelpers": true,
         "skipDefaultLibCheck": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "lib": ["DOM", "ES2022"],
     }
 }
