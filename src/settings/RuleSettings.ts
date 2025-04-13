@@ -15,7 +15,7 @@ type ChangeCallback = (modified: CacheRule) => void
 type MoveCallback = (direction: 'up' | 'down') => void
 
 const NOTE_PATH = 'a/b/c/note1.md'
-const FILE_NAME = '/img1.jpg'
+const FILE_NAME = 'img1.jpg'
 const i18n = new I18n()
 
 export class RuleSettings {
@@ -231,7 +231,7 @@ export class RuleSettings {
         }
 
         // TODO: change function to recive 3 parameters
-        const file = resolveCachePath(this.#rule.storage, NOTE_PATH) + FILE_NAME
+        const file = resolveCachePath(this.#rule.storage, NOTE_PATH, FILE_NAME)
 
         this.#headerNameEl.empty()
         this.#headerDescEl.empty()

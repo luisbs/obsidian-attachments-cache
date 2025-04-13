@@ -35,7 +35,7 @@ const some = Object.freeze<Partial<AttachmentsCacheSettings>>({
     ],
 })
 
-describe('Testing settings utilities', () => {
+describe('Testing PluginSettings utilities', () => {
     test('prepareSettings', () => {
         // newly installed plugins
         expect(prepareSettings(undefined)).toStrictEqual(DEFAULT_SETTINGS)

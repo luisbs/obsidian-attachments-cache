@@ -52,7 +52,7 @@ const O = Object.freeze<CacheRule>({
     ],
 })
 
-describe('Testing CacheRule utilities', () => {
+describe('Testing CacheRules utilities', () => {
     test('prepareCacheRules', () => {
         // alphabetical order 'files' > 'images' > 'papers'
         // but the user-defined order should be respected
@@ -80,25 +80,33 @@ describe('Testing CacheRule utilities', () => {
     })
 
     test('resolveCachePath', () => {
-        // static target path
-        expect(resolveCachePath('assets', 'a/b/note.md')).toBe('assets')
+        const notepath = 'a/b/c/note1.md'
+        const filename = 'img1.jpg'
+        // prettier-ignore
+        const storage_set: Array<[string, string]> = [
+            // static paths are simpler to process
+            ['attachments', `attachments/${filename}`],
 
-        // variables target path
-        expect(resolveCachePath('{notepath}', 'a/b/note.md')).toBe('a/b/note')
-        expect(resolveCachePath('{notename}', 'a/b/note.md')).toBe('note')
-        expect(resolveCachePath('{folderpath}', 'a/b/note.md')).toBe('a/b')
-        expect(resolveCachePath('{foldername}', 'a/b/note.md')).toBe('b')
+            // variables storage path
+            ['{notepath}', `a/b/c/note1/${filename}`],
+            ['{notename}', `note1/${filename}`],
+            ['{folderpath}', `a/b/c/${filename}`],
+            ['{foldername}', `c/${filename}`],
+            ['{ext}', `jpg/${filename}`],
 
-        // slashes between variables are not enforced
-        expect(resolveCachePath('{notepath}{folderpath}', 'a/b/note.md')) //
-            .toBe('a/b/notea/b')
+            // slashes between variables are not enforced
+            ['{notepath}{folderpath}', `a/b/c/note1a/b/c/${filename}`],
 
-        // expected usage examples
-        expect(resolveCachePath('attachments/{notename}', 'a/b/note.md')) //
-            .toBe('attachments/note')
-        expect(resolveCachePath('attachments/{notepath}', 'a/b/note.md')) //
-            .toBe('attachments/a/b/note')
-        expect(resolveCachePath('__/{foldername}/{notename}', 'a/b/note.md')) //
-            .toBe('__/b/note')
+            // expected usage examples
+            ['{folderpath}/{ext}', `a/b/c/jpg/${filename}`],
+            ['attachments/{notename}', `attachments/note1/${filename}`],
+            ['attachments/{notepath}', `attachments/a/b/c/note1/${filename}`],
+            ['attachments/{foldername}/{notename}', `attachments/c/note1/${filename}`],
+        ]
+
+        // prettier-ignore
+        for (const [storage, result] of storage_set) {
+            expect.soft(resolveCachePath(storage, notepath, filename)).toBe(result)
+        }
     })
 })

@@ -52,17 +52,27 @@ export function findCacheRule(
 }
 
 /** Resolve a variable path. */
-export function resolveCachePath(storage: string, notepath: string): string {
+export function resolveCachePath(
+    storage: string,
+    notepath: string,
+    filename: string,
+): string {
     // resolve the attachments to a static folder
-    if (!/[{}]/gi.test(storage)) return storage
+    if (!/[{}]/gi.test(storage)) return URI.join(storage, filename)
+
     // resolve the attachments to a dynamic folder
     // use functions to avoid unnecesary calculations
-    return storage
+    const folderpath = storage
+        // resolved from `notepath`
         .replaceAll('{notepath}', () => URI.removeExt(notepath))
         .replaceAll('{notename}', () => URI.getBasename(notepath) ?? '')
         .replaceAll('{folderpath}', () => URI.getParent(notepath) ?? '')
         .replaceAll('{foldername}', () => {
             return URI.getBasename(URI.getParent(notepath) ?? '') ?? ''
         })
-    // TODO: add support for `{ext}` and `{type}` variables
+        // resolved from `filename`
+        .replaceAll('{ext}', () => URI.getExt(filename) ?? '')
+    // TODO: add support for `{type}` variables
+
+    return URI.join(folderpath, filename)
 }

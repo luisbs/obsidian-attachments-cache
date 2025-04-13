@@ -4,7 +4,11 @@ import type { AttachmentsCacheApi } from './lib'
 import type AttachmentsCachePlugin from './main'
 import { AttachmentError } from './utility/AttachmentError'
 import { testCacheRemote, testFmEntry, testUrlParam } from './utility/matchers'
-import { findCacheRule } from './utility/rules'
+import {
+    type CacheRule,
+    findCacheRule,
+    resolveCachePath,
+} from './utility/rules'
 import type { AttachmentsCacheSettings } from './utility/settings'
 
 export type UpdateSettings = (settings: AttachmentsCacheSettings) => void
@@ -27,7 +31,7 @@ export class AttachmentsCache implements AttachmentsCacheApi {
     }
 
     mayCache(remote: string, notepath: string, frontmatter?: unknown): boolean {
-        return !!this.#findCachePath(remote, notepath, frontmatter, this.#log)
+        return !!this.#findCache(remote, notepath, frontmatter, this.#log)
     }
 
     isCached(remote: string, notepath: string, frontmatter?: unknown): boolean {
@@ -128,15 +132,20 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         }
 
         // match cache rules
-        const target = this.#findCachePath(remote, notepath, frontmatter, log)
-        if (!target) {
+        const rule = this.#findCache(remote, notepath, frontmatter, log)
+        if (!rule) {
             log.debug('a cache rule could not be matched')
             return
         }
 
         // ensure path normalization
-        const name = URI.getName(baseUrl)
-        const filepath = URI.join(target, notepath, name)
+        const filename = URI.getName(baseUrl)
+        if (!filename) {
+            log.warn(`a filename could not be identified from <${filename}>`)
+            return
+        }
+
+        const filepath = resolveCachePath(rule.storage, notepath, filename)
         const localPath = !this.#settings.allow_characters
             ? normalizePath(URI.normalize(filepath))
             : normalizePath(filepath)
@@ -149,12 +158,12 @@ export class AttachmentsCache implements AttachmentsCacheApi {
     }
 
     /** Try to match the remote against the active cache rules. */
-    #findCachePath(
+    #findCache(
         remote: string,
         notepath: string,
         frontmatter: unknown,
         log: Logger,
-    ): string | undefined {
+    ): CacheRule | undefined {
         log.debug('searching an active cache rule')
         const rule = findCacheRule(this.#settings.cache_rules, notepath)
         if (!rule?.enabled) {
@@ -169,7 +178,7 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         }
         if (testUrlParam(this.#settings.url_param_cache, remote)) {
             log.debug('remote has to be cached (URL param)')
-            return rule.target
+            return rule
         }
 
         // Frontmatter overrides
@@ -183,13 +192,13 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         }
         if (testFmEntry(fm, this.#settings.note_param_cache, remote)) {
             log.debug('remote has to be cached (Frontmatter attribute)')
-            return rule.target
+            return rule
         }
 
         // standard behavior
         if (testCacheRemote(rule.remotes, remote)) {
             log.debug('remote has to be cached')
-            return rule.target
+            return rule
         }
         log.debug('remote has to be ignored')
         return

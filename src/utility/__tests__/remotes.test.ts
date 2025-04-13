@@ -11,7 +11,7 @@ const remotes = Object.freeze<RemoteRule[]>([
     { whitelisted: false, pattern: '*' },
 ])
 
-describe('Testing RemoteRule utilities', () => {
+describe('Testing RemoteRules utilities', () => {
     test('prepareRemoteRules', () => {
         const mix = [remotes, remotes].flat().sort(() => 0.5 - Math.random())
 
