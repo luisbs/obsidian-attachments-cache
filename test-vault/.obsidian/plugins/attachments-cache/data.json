@@ -8,7 +8,10 @@
   "note_param_ignore": "cache_unless",
   "cache_rules": [
     {
+      "id": "default",
+      "enabled": true,
       "pattern": "*",
+      "storage": "attachments/{notepath}",
       "remotes": [
         {
           "pattern": "4kwallpapers.com/images",
@@ -26,9 +29,7 @@
           "pattern": "*",
           "whitelisted": false
         }
-      ],
-      "enabled": true,
-      "target": "attachments/{notepath}"
+      ]
     }
   ]
 }

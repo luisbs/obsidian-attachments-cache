@@ -79,7 +79,9 @@ cache_from: [example.com/photos, images.net/assets]
 
 ---
 
-### Attachments storage
+## CacheRule configurations
+
+### CacheRule `storage`
 
 By default, attachments are added to the root of your vault.
 
@@ -110,3 +112,7 @@ Other supported examples are:
 
 - `attachments/{notename}`: adds the attachments to the folder `attachments` under a folder with the note name.
 - `attachments/{notepath}`: adds the attachments to the folder `attachments` under folders replicating the note path.
+
+### CacheRule `remotes`
+
+<!-- TODO: add description of behavior http/https/<none> -->

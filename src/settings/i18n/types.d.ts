@@ -6,7 +6,11 @@ export type Translations = Record<SimpleTranslation, string> &
 
 export type SupportedLocale = 'en'
 
+type WhitelistState = boolean
+
 export type SimpleTranslation =
+    | `remoteStateAction_${WhitelistState}`
+    //
     | 'idName'
     | 'idDesc'
     | 'idHint'
@@ -17,15 +21,24 @@ export type SimpleTranslation =
     //
     | 'storageName'
     | 'storageHint'
+    //
+    | 'remotesName'
+    | 'remotesHint'
 
 export type ComplexTranslation =
     | 'ruleName'
     | 'ruleDesc'
-    //
-    | 'idEmpty'
-    | 'patternEmpty'
+    | 'ruleNoteExample'
+    | 'ruleFileExample'
+    | `remoteState_${WhitelistState}`
     //
     | 'storageDesc'
-    | 'storageInputExample'
-    | 'storageOutputExample'
+    | 'remotesDesc'
+    // validations
+    | 'idEmpty'
+    | 'patternEmpty'
     | 'storageEmpty'
+    | 'remotesEmpty'
+    | 'remoteDuplicated'
+    | 'remoteMissingDomain'
+    | 'remoteInvalidProtocol'

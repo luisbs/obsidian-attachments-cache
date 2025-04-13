@@ -5,14 +5,14 @@ import { prepareRemoteRules, type RemoteRule } from './remotes'
 export interface CacheRule {
     /** User defined id. */
     id: string
-    /** Vault path glob pattern. */
-    pattern: string
     /** Allow disabling the rule instead of been removed. */
     enabled: boolean
+    /** Vault path glob pattern. */
+    pattern: string
+    /** Vault path to store the attachments into. */
+    storage: string
     /** Ordered list of remotes Whitelisted/Blacklisted. */
     remotes: RemoteRule[]
-    /** Used alongside **mode**. */
-    target: string
 }
 
 export function prepareCacheRules(...rules: CacheRule[][]): CacheRule[] {
@@ -40,12 +40,12 @@ export function findCacheRule(
 }
 
 /** Resolve a variable path. */
-export function resolveCachePath(target: string, notepath: string): string {
+export function resolveCachePath(storage: string, notepath: string): string {
     // resolve the attachments to a static folder
-    if (!/[{}]/gi.test(target)) return target
+    if (!/[{}]/gi.test(storage)) return storage
     // resolve the attachments to a dynamic folder
     // use functions to avoid unnecesary calculations
-    return target
+    return storage
         .replaceAll('{notepath}', () => URI.removeExt(notepath))
         .replaceAll('{notename}', () => URI.getBasename(notepath) ?? '')
         .replaceAll('{folderpath}', () => URI.getParent(notepath) ?? '')

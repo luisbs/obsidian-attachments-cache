@@ -6,6 +6,8 @@ import {
 import { EN } from './en'
 import type { SupportedLocale, TranslationKeys, Translations } from './types'
 
+export type * from './types'
+
 export class I18n extends I18nTranslator<
     SupportedLocale,
     TranslationKeys,
