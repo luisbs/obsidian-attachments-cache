@@ -7,7 +7,7 @@ import {
 } from 'obsidian'
 import { AttachmentsCache } from './AttachmentsCacheApi'
 import type { AttachmentsCacheApi } from './lib'
-import { AttachmentsCacheSettingsTab } from './settings/AttachmentsCacheSettingsTab'
+import { SettingsTab } from './settings/SettingsTab'
 import {
     prepareSettings,
     PRIORITY,
@@ -16,11 +16,11 @@ import {
 } from './utility/settings'
 
 // * [x] add an string `id` value
-// * [ ] change the code that uses `pattern` as an id
+// * [x] change the code that uses `pattern` as an id
 // * [x] sort CacheRules by `id` on settings UI
-// * [ ] add an input for the user to change the CacheRule `id`
-// * [ ] add an input for the user to change the CacheRule `pattern`
-// * [ ] add an toggle for the user to enable/disable the rule (as separated setting)
+// * [x] add an input for the user to change the CacheRule `id`
+// * [x] add an input for the user to change the CacheRule `pattern`
+// * [-] add an toggle for the user to enable/disable the rule (as separated setting)
 // * [ ] change CacheConfig rendering behavior, when expanded replace header separated inputs
 // * [ ] add option to link a note to a CacheRule
 // * [ ] add option to early download when a link is pasted
@@ -63,7 +63,7 @@ export default class AttachmentsCachePlugin extends Plugin {
 
         this.#syncSettings(group)
         this.#registerMarkdownProcessor()
-        this.addSettingTab(new AttachmentsCacheSettingsTab(this))
+        this.addSettingTab(new SettingsTab(this))
         group.flush('Loaded AttachmentsCache')
     }
 

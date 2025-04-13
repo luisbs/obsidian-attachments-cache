@@ -1,7 +1,8 @@
 import { prepareRemoteRules, type RemoteRule } from '@/utility/remotes'
-import type { PluginLevel, PluginPriority } from '@/utility/settings'
 import type { TextAreaComponent, TextComponent } from 'obsidian'
 import type { TranslationKeys } from './i18n'
+
+export { I18n } from './i18n'
 
 export type CacheRulekeys = 'id' | 'pattern' | 'storage' | 'remotes'
 export type ValidatorResult = [TranslationKeys, string[]]
@@ -9,22 +10,6 @@ export type InputHandler = (
     input: TextComponent | TextAreaComponent,
     validator?: (value: string) => ValidatorResult[],
 ) => void
-
-// TODO: move to I18n
-export const LEVEL_LABELS: Record<PluginLevel, string> = {
-    ERROR: 'ERROR',
-    WARN: ' WARN',
-    INFO: ' INFO',
-    DEBUG: 'DEBUG',
-    TRACE: 'TRACE',
-}
-
-// TODO: move to I18n
-export const PRIORITY_LABELS: Record<PluginPriority, string> = {
-    LOWER: 'Only cache static attachments',
-    NORMAL: 'Cache majority of attachments',
-    HIGHER: 'Cache all posible attachments',
-}
 
 /** Serialize remotes as an string. */
 export function serializeRemotes(remotes: RemoteRule[]): string {

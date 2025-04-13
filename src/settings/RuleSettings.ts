@@ -1,17 +1,16 @@
 import { type CacheRule, resolveCachePath } from '@/utility/rules'
 import { Setting, type TextAreaComponent } from 'obsidian'
-import { I18n } from './i18n'
 import {
     type CacheRulekeys,
     checkRemotes,
+    I18n,
     type InputHandler,
     parseRemotes,
     serializeRemotes,
     type ValidatorResult,
-} from './values'
+} from './settings-tools'
 
-type RemoveCallback = () => void
-type ChangeCallback = (modified: CacheRule) => void
+type EventCallback = (modified: CacheRule) => void
 type MoveCallback = (direction: 'up' | 'down') => void
 
 const NOTE_PATH = 'a/b/c/note1.md'
@@ -62,12 +61,14 @@ export class RuleSettings {
             toggle.onChange((value) => this.#updateRule('enabled', value))
         })
         this.#ruleHeader.addExtraButton((button) => {
-            button.setIcon('trash-2').setTooltip('Remove CacheRule')
-            button.onClick(() => this.#removeListener?.())
+            button.setIcon('trash-2')
+            button.setTooltip(i18n.translate('cacheRuleRemove'))
+            button.onClick(() => this.#removeListener?.(this.#rule))
         })
         this.#ruleHeader.addExtraButton((button) => {
             let visible = false
-            button.setIcon('settings-2').setTooltip('Edit CacheRule')
+            button.setIcon('settings-2')
+            button.setTooltip(i18n.translate('cacheRuleEdit'))
             button.onClick(() => {
                 visible = !visible
                 if (visible) this.#parent.addClass('show-details')
@@ -78,12 +79,14 @@ export class RuleSettings {
         // priority sorting
         this.#ruleHeader.addExtraButton((button) => {
             if (this.#isFirst) button.setDisabled(true)
-            button.setIcon('chevron-up').setTooltip('Move up')
+            button.setIcon('chevron-up')
+            button.setTooltip(i18n.translate('cacheRuleMoveAbove'))
             button.onClick(() => this.#moveListener?.('up'))
         })
         this.#ruleHeader.addExtraButton((button) => {
             if (this.#isLast) button.setDisabled(true)
-            button.setIcon('chevron-down').setTooltip('Move below')
+            button.setIcon('chevron-down')
+            button.setTooltip(i18n.translate('cacheRuleMoveBelow'))
             button.onClick(() => this.#moveListener?.('down'))
         })
     }
@@ -94,7 +97,8 @@ export class RuleSettings {
             const setting = new Setting(this.#ruleRemotes)
             setting.setName(i18n.translate(`remoteState_${w}`, [pattern]))
             setting.addExtraButton((button) => {
-                button.setIcon('trash-2').setTooltip('Remove')
+                button.setIcon('trash-2')
+                button.setTooltip(i18n.translate('remove'))
                 button.onClick(() => {
                     const remotes = this.#rule.remotes //
                         .filter((r) => r.pattern !== pattern)
@@ -144,7 +148,8 @@ export class RuleSettings {
         })
         // storage setting has an state element
         const storageUl = storageInfo.createEl('ul')
-        i18n.appendTo(storageUl.createEl('li'), 'ruleNoteExample', [NOTE_PATH])
+        const storageLi1 = storageUl.createEl('li')
+        storageLi1.append(i18n.translate('cacheRuleNoteExample', [NOTE_PATH]))
         storageUl.append(this.#storageEl)
 
         // prettier-ignore
@@ -197,16 +202,16 @@ export class RuleSettings {
         return [setting, handler, infoEl]
     }
 
-    #removeListener?: RemoveCallback
-    #changeListener?: ChangeCallback
+    #removeListener?: EventCallback
+    #changeListener?: EventCallback
     #moveListener?: MoveCallback
     #isFirst = true
     #isLast = true
 
-    onRemove(callback: RemoveCallback): void {
+    onRemove(callback: EventCallback): void {
         this.#removeListener = callback
     }
-    onChange(callback: ChangeCallback): void {
+    onChange(callback: EventCallback): void {
         this.#changeListener = callback
     }
     onMove(callback: MoveCallback): void {
@@ -237,8 +242,8 @@ export class RuleSettings {
         this.#headerDescEl.empty()
         this.#storageEl.empty()
 
-        i18n.appendTo(this.#headerNameEl, 'ruleName', [this.#rule.id])
-        i18n.appendTo(this.#headerDescEl, 'ruleDesc', [this.#rule.storage])
-        i18n.appendTo(this.#storageEl, 'ruleFileExample', [file])
+        i18n.appendTo(this.#headerNameEl, 'cacheRuleName', [this.#rule.id])
+        i18n.appendTo(this.#headerDescEl, 'cacheRuleDesc', [this.#rule.storage])
+        i18n.appendTo(this.#storageEl, 'cacheRuleFileExample', [file])
     }
 }

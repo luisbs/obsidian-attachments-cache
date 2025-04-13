@@ -28,8 +28,9 @@ export class I18n extends I18nTranslator<
     }
 
     docElementInfo([, id, text]: DocumentationSegment): DomElementInfo {
+        const learnTranslation = this.translate('learn')
         return {
-            text: text ?? 'docs',
+            text: text ?? learnTranslation,
             href: `https://github.com/luisbs/obsidian-attachments-cache/blob/main/docs/settings.md#${id}`,
         }
     }
