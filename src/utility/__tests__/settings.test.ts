@@ -15,7 +15,7 @@ const some = Object.freeze<Partial<AttachmentsCacheSettings>>({
             id: 'images',
             enabled: true,
             pattern: 'images/**',
-            target: 'attachments/images/{notename}',
+            storage: 'attachments/images/{notename}',
             remotes: [
                 { whitelisted: true, pattern: 'example.com/blog/asd' },
                 { whitelisted: false, pattern: 'example.com/blog' },
@@ -29,7 +29,7 @@ const some = Object.freeze<Partial<AttachmentsCacheSettings>>({
             id: 'files',
             enabled: true,
             pattern: '*',
-            target: 'attachments/{notepath}',
+            storage: 'attachments/{notepath}',
             remotes: [{ whitelisted: true, pattern: '*' }],
         },
     ],

@@ -13,21 +13,21 @@ const A = Object.freeze<CacheRule>({
     id: 'papers',
     enabled: false,
     pattern: 'notes/**',
-    target: '{folderpath}/attachments',
+    storage: '{folderpath}/attachments',
     remotes: [{ whitelisted: true, pattern: '*' }],
 })
 const B = Object.freeze<CacheRule>({
     id: 'files',
     enabled: true,
     pattern: '*',
-    target: 'attachments/{notepath}',
+    storage: 'attachments/{notepath}',
     remotes: [{ whitelisted: true, pattern: '*' }],
 })
 const U = Object.freeze<CacheRule>({
     id: 'images',
     enabled: true,
     pattern: 'images/**',
-    target: 'attachments/images/{notename}',
+    storage: 'attachments/images/{notename}',
     remotes: [
         { whitelisted: true, pattern: 'images.org' },
         { whitelisted: true, pattern: 'example.com/images' },
@@ -41,7 +41,7 @@ const O = Object.freeze<CacheRule>({
     id: 'images',
     enabled: true,
     pattern: 'images/**',
-    target: 'attachments/images/{notename}',
+    storage: 'attachments/images/{notename}',
     remotes: [
         { whitelisted: true, pattern: 'example.com/blog/asd' },
         { whitelisted: false, pattern: 'example.com/blog' },

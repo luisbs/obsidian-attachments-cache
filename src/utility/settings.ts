@@ -41,7 +41,7 @@ export interface AttachmentsCacheSettings {
     cache_rules: CacheRule[]
 }
 
-export const DEFAULT_SETTINGS: AttachmentsCacheSettings = Object.freeze({
+export const DEFAULT_SETTINGS = Object.freeze<AttachmentsCacheSettings>({
     // * 'WARN' level to force the user to choose a lower level when is required
     // * this decition, prevents the console from been overpopulated by default
     plugin_level: 'WARN',
@@ -57,10 +57,10 @@ export const DEFAULT_SETTINGS: AttachmentsCacheSettings = Object.freeze({
     cache_rules: [
         {
             id: 'FALLBACK',
-            pattern: '*',
             enabled: true,
+            storage: '{folderpath}',
+            pattern: '*',
             remotes: [{ whitelisted: true, pattern: '*' }],
-            target: '{folderpath}',
         },
     ],
 })

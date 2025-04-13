@@ -7,12 +7,15 @@ export interface CacheRule {
     id: string
     /** Allow disabling the rule instead of been removed. */
     enabled: boolean
-    /** Vault path glob pattern. */
-    pattern: string
     /** Vault path to store the attachments into. */
     storage: string
+    /** Vault path glob pattern. */
+    pattern: string
     /** Ordered list of remotes Whitelisted/Blacklisted. */
     remotes: RemoteRule[]
+
+    /** @deprecated use `storage` instead. */
+    target?: string
 }
 
 export function prepareCacheRules(...rules: CacheRule[][]): CacheRule[] {
@@ -21,7 +24,16 @@ export function prepareCacheRules(...rules: CacheRule[][]): CacheRule[] {
     for (const aRule of rules.flat()) {
         // keep only first CacheRule appariences
         if (_rules.some((bRule) => bRule.id === aRule.id)) continue
-        _rules.push({ ...aRule, remotes: prepareRemoteRules(aRule.remotes) })
+        // prettier-ignore
+        _rules.push({
+            id: aRule.id,
+            enabled: aRule.enabled,
+            // for the original installations to not fail jaja
+            // eslint-disable-next-line
+            storage: aRule.storage || aRule.target || '',
+            pattern: aRule.pattern,
+            remotes: prepareRemoteRules(aRule.remotes),
+        })
     }
 
     // keep user defined order
