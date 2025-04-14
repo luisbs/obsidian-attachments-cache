@@ -10,8 +10,8 @@
     {
       "id": "default",
       "enabled": true,
-      "pattern": "*",
       "storage": "attachments/{notepath}",
+      "pattern": "*",
       "remotes": [
         {
           "pattern": "4kwallpapers.com/images",
@@ -30,6 +30,13 @@
           "whitelisted": false
         }
       ]
+    },
+    {
+      "id": "second",
+      "enabled": false,
+      "storage": "attachments/{notename}",
+      "pattern": "*",
+      "remotes": []
     }
   ]
 }

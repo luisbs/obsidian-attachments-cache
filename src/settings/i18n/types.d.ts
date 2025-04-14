@@ -8,22 +8,25 @@ export type SupportedLocale = 'en'
 
 type Name_Desc = 'Name' | 'Desc'
 type Overrides_Settings = `${'url' | 'note'}${'Ignore' | 'Cache'}`
-type CacheRule_Settings = 'id' | 'pattern' | 'storage' | 'remotes'
-type WhitelistState = boolean
+type CacheRule_Settings =
+    `cacheRule_${'id' | 'pattern' | 'storage' | 'remotes'}`
+type true_false = boolean
 
 /** Translations that REQUIRE to be strings */
 export type TextTranslation =
-    | 'remove'
     | 'learn'
+    | 'remove'
+    | 'removeConfirmation'
     // * General Section
     | `pluginPriorityOption${'Lower' | 'Normal' | 'Higher'}`
     // * Overrides Section
     | `${Overrides_Settings}Hint`
     // * CacheRule Section
-    | `cacheRule${'Add' | 'Edit' | 'Remove' | 'MoveAbove' | 'MoveBelow'}`
+    | `cacheRule${'Add' | 'Edit' | 'MoveAbove' | 'MoveBelow'}`
     // ? CacheRule Settings
     | `${CacheRule_Settings}Hint`
-    | `remoteStateAction_${WhitelistState}`
+    | `cacheRule_enabled_${true_false}`
+    | `remoteStateAction_${true_false}`
 
 /** Translations that not require to be strings */
 export type FlexibleTranslation =
@@ -34,6 +37,7 @@ export type FlexibleTranslation =
     | `allowCharacters${Name_Desc}`
     // * Overrides Section
     | 'overridesSection'
+    | 'overridesSectionDesc'
     | `${Overrides_Settings}${Name_Desc}`
     // * CacheRule Section
     | 'cacheRulesSection'
@@ -41,8 +45,10 @@ export type FlexibleTranslation =
     | `cacheRule${Name_Desc}`
     | `cacheRule${'Note' | 'File'}Example`
     // ? CacheRule Settings
+    | `cacheRuleRemove${Name_Desc}`
+    | `cacheRule_enabled${Name_Desc}`
     | `${CacheRule_Settings}${Name_Desc}`
-    | `remoteState_${WhitelistState}`
+    | `remoteState_${true_false}`
     | 'remoteDuplicated'
     | 'remoteMissingDomain'
     | 'remoteInvalidProtocol'

@@ -4,12 +4,13 @@ import type { Translations } from './types'
  * whenever `undefined` is used, is a placeholder
  */
 export const EN: Translations = {
-    remove: 'Remove',
     learn: 'Learn more',
+    remove: 'Remove',
+    removeConfirmation: 'Are you sure?',
     valueMayNotBeEmpty: 'A value is required.',
     //
     // * General Section
-    pluginLogLevelName: ['Log level', ['docs', 'log-level']],
+    pluginLogLevelName: 'Log level',
     pluginLogLevelDesc: [
         'Control the logs printed to the console. ',
         ['docs', 'log-level'],
@@ -32,59 +33,76 @@ export const EN: Translations = {
     //
     // * Overrides Section
     overridesSection: 'Overrides',
+    overridesSectionDesc: [
+        'Available ways to override the defined ',
+        ['b', { text: 'Cache Rules' }],
+        '. ',
+        ['docs', 'overrides-settings'],
+    ],
+    //
     urlIgnoreName: "URL's ignore param",
-    urlIgnoreDesc: 'Overrides rules and ignores the attachment.',
+    urlIgnoreDesc: 'Forces the attachment to be ignored.',
     urlIgnoreHint: "like: 'ignore_file'",
     //
     urlCacheName: "URL's cache param",
-    urlCacheDesc: 'Overrides rules and caches the attachment.',
+    urlCacheDesc: 'Forces the attachment to be cached.',
     urlCacheHint: "like: 'cache_file'",
     //
     noteIgnoreName: "Note's ignore frontmatter attribute",
-    noteIgnoreDesc: 'Overrides rules and ignores the Note attachments.',
+    noteIgnoreDesc: 'Forces all the note attachments to be ignored.',
     noteIgnoreHint: "like: 'cache_unless'",
     //
     noteCacheName: "Note's cache frontmatter attribute",
-    noteCacheDesc: 'Overrides rules and caches the Note attachments.',
+    noteCacheDesc: 'Forces all the note attachments to be cached.',
     noteCacheHint: "like: 'cache_from'",
     //
     // * CacheRules Section
     cacheRulesSection: 'Cache Rules',
-    cacheRuleAdd: 'Add cache rule',
+    cacheRuleAdd: 'Add CacheRule',
     cacheRuleEdit: 'Edit CacheRule',
-    cacheRuleRemove: 'Remove CacheRule',
     cacheRuleMoveAbove: 'Move above',
     cacheRuleMoveBelow: 'Move below',
     // ? CacheRules State
-    cacheRuleName: ['Rule ', ['code']],
+    cacheRuleName: ['Rule ', ['b']],
     cacheRuleDesc: ['Stores to ', ['code']],
     cacheRuleNoteExample: ["Note: '", ['b'], "'"],
     cacheRuleFileExample: ["Attachment: '", ['b'], "'"],
     //
-    idName: 'Rule identifier',
-    idDesc: 'Name used to reference this rule on the notes frontmatter.',
-    idHint: "like: 'images' or 'docs'",
+    cacheRuleRemoveName: 'Remove this rule?',
+    cacheRuleRemoveDesc: [
+        'Is suggested you disable your rules, instead of removing them.',
+        ['br'],
+        ['b', { text: 'This can not be reversed.', cls: 'invalid-value' }],
+    ],
     //
-    patternName: 'Rule pattern',
-    patternDesc: 'Glob pattern to match agains the note name.',
-    patternHint: "glob: 'folder/**' or '**/(note|notes)-**'",
+    cacheRule_enabledName: 'Is this rule enabled?',
+    cacheRule_enabledDesc: 'When disabled the rule is ignored on caching.',
+    cacheRule_enabled_true: 'Disable CacheRule',
+    cacheRule_enabled_false: 'Enable CacheRule',
     //
-    storageName: 'Rule storage',
-    storageDesc: [
-        'Some variables can be use, ex: ',
+    cacheRule_idName: 'Rule identifier',
+    cacheRule_idDesc:
+        'Name used to reference this rule on the notes frontmatter.',
+    cacheRule_idHint: "like: 'images' or 'docs'",
+    //
+    cacheRule_patternName: 'Rule pattern',
+    cacheRule_patternDesc: 'Glob pattern to match agains the note name.',
+    cacheRule_patternHint: "glob: 'folder/**' or '**/(note|notes)-**'",
+    //
+    cacheRule_storageName: 'Rule storage',
+    cacheRule_storageDesc: [
+        'Some path variables are supported, like ',
         ['code', { text: '{folderpath}' }],
         ' or ',
         ['code', { text: '{notename}' }],
         ['br'],
-        'Check the ',
         ['docs', 'cacherule-storage'],
-        ' for details.',
     ],
-    storageHint: "like: 'attachments/{notepath}'",
+    cacheRule_storageHint: "like: 'attachments/{notepath}'",
     //
-    remotesName: 'Rule remotes',
-    remotesDesc: ['Check the ', ['docs', 'cacherule-remotes'], ' for details.'],
-    remotesHint: "like: 'b domain.org/<optional_path>'",
+    cacheRule_remotesName: 'Rule remotes',
+    cacheRule_remotesDesc: [['docs', 'cacherule-remotes']],
+    cacheRule_remotesHint: "like: 'b domain.org/<optional_path>'",
     remoteState_true: ['Whitelisted remote: ', ['code']],
     remoteState_false: ['Blacklisted remote: ', ['code']],
     remoteStateAction_true: 'Blacklist',

@@ -7,7 +7,7 @@ import {
 } from 'obsidian'
 import { AttachmentsCache } from './AttachmentsCacheApi'
 import type { AttachmentsCacheApi } from './lib'
-import { SettingsTab } from './settings/SettingsTab'
+import { PluginSettingTab } from './settings/PluginSettingTab'
 import {
     prepareSettings,
     PRIORITY,
@@ -63,7 +63,7 @@ export default class AttachmentsCachePlugin extends Plugin {
 
         this.#syncSettings(group)
         this.#registerMarkdownProcessor()
-        this.addSettingTab(new SettingsTab(this))
+        this.addSettingTab(new PluginSettingTab(this))
         group.flush('Loaded AttachmentsCache')
     }
 

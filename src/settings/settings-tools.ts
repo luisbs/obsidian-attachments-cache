@@ -35,6 +35,7 @@ export function checkRemotes(sources: string): ValidatorResult[] {
         // store to identify duplicates
         values.push(trimmed)
 
+        if (trimmed === '*') continue
         const [protocol, path] = trimmed.contains('://')
             ? trimmed.split('://')
             : ['', trimmed]
@@ -71,12 +72,10 @@ export function parseRemotes(
     sources: string,
 ): RemoteRule[] {
     const result = [] as RemoteRule[]
-    let hasFallback = false
 
     // one remote per-line
     for (const source of sources.split(/\n+/g)) {
         const [pattern, w] = parseRemote(source)
-        if (pattern === '*') hasFallback = true
 
         // ignore duplicated entries
         if (result.some((b) => b.pattern === pattern)) continue
@@ -115,8 +114,6 @@ export function parseRemotes(
             result.push({ pattern, whitelisted: false })
         }
     }
-
-    if (!hasFallback) result.push({ pattern: '*', whitelisted: false })
 
     // sorting
     return prepareRemoteRules(result)
