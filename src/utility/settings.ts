@@ -1,5 +1,5 @@
 import type { LogLevel } from '@luis.bs/obsidian-fnc'
-import { prepareCacheRules, type CacheRule } from './rules'
+import { DEFAULT_CACHE_RULE, prepareCacheRules, type CacheRule } from './rules'
 
 export type PluginLevel = keyof typeof LogLevel
 
@@ -54,15 +54,7 @@ export const DEFAULT_SETTINGS = Object.freeze<AttachmentsCacheSettings>({
     url_param_ignore: 'ignore_file',
     note_param_cache: 'cache_from',
     note_param_ignore: 'cache_unless',
-    cache_rules: [
-        {
-            id: 'FALLBACK',
-            enabled: true,
-            storage: '{folderpath}',
-            pattern: '*',
-            remotes: [{ whitelisted: true, pattern: '*' }],
-        },
-    ],
+    cache_rules: [DEFAULT_CACHE_RULE],
 })
 
 export function prepareSettings(settings: unknown): AttachmentsCacheSettings {

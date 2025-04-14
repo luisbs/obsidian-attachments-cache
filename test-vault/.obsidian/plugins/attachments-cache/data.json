@@ -8,6 +8,18 @@
   "note_param_ignore": "cache_unless",
   "cache_rules": [
     {
+      "id": "newrule",
+      "enabled": false,
+      "storage": "assets/{folderpath}",
+      "pattern": "*",
+      "remotes": [
+        {
+          "whitelisted": true,
+          "pattern": "*"
+        }
+      ]
+    },
+    {
       "id": "default",
       "enabled": true,
       "storage": "attachments/{notepath}",

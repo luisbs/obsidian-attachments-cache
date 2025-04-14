@@ -1,5 +1,5 @@
 import type AttachmentsCachePlugin from '@/main'
-import type { CacheRule } from '@/utility/rules'
+import { DEFAULT_CACHE_RULE, type CacheRule } from '@/utility/rules'
 import type { AttachmentsCacheSettings } from '@/utility/settings'
 import { PluginSettingTab as BaseSettingTab, Setting } from 'obsidian'
 import { CacheRuleSettings } from './CacheRuleSettings'
@@ -37,11 +37,27 @@ export class PluginSettingTab extends BaseSettingTab {
 
         const cacheRulesSection = new Setting(this.containerEl).setHeading()
         cacheRulesSection.setName(i18n.translate('cacheRulesSection'))
-        // TODO: re-implement adding new CacheRules
-        // cacheRulesSection.addButton((button) => {
-        //     button.setButtonText(i18n.translate('cacheRuleAdd'))
-        // })
+        cacheRulesSection.addButton((button) => {
+            button.setButtonText(i18n.translate('cacheRuleAdd'))
+            button.onClick(() => {
+                // shift all indexes by 1
+                for (const [key, { childEl, index }] of this.#store.entries()) {
+                    this.#store.set(key, { childEl, index: index + 1 })
+                }
 
+                // prepend the new CacheRule
+                const key = this.#newKey()
+                const cacheRule = { ...DEFAULT_CACHE_RULE, id: key }
+                const childEl = this.#initCacheRuleSettings(key, cacheRule)
+                this.#plugin.settings.cache_rules.unshift(cacheRule)
+                this.#store.set(key, { childEl, index: 0 })
+
+                // render new order
+                this.#enableOrderButtons()
+            })
+        })
+
+        // print currently defined CacheRules
         this.#cacheRulesEl = this.containerEl.createDiv()
         for (
             let index = 0;
@@ -169,9 +185,9 @@ export class PluginSettingTab extends BaseSettingTab {
             // update state
             this.#store.delete(key)
             // update index of CacheRules that where after the deleted
-            for (const [id, { index, childEl }] of this.#store.entries()) {
+            for (const [key2, { childEl, index }] of this.#store.entries()) {
                 if (index < state.index) continue
-                this.#store.set(id, { childEl, index: index - 1 })
+                this.#store.set(key2, { childEl, index: index - 1 })
             }
 
             // CacheRuleSettings handles the removing on its own
@@ -193,9 +209,9 @@ export class PluginSettingTab extends BaseSettingTab {
             void this.#plugin.saveSettings()
 
             // switch state indexes
-            for (const [id, { index, childEl }] of this.#store.entries()) {
+            for (const [key2, { childEl, index }] of this.#store.entries()) {
                 if (index !== otherIndex) continue
-                this.#store.set(id, { childEl, index: state.index })
+                this.#store.set(key2, { childEl, index: state.index })
             }
             this.#store.set(key, { childEl: state.childEl, index: otherIndex })
 

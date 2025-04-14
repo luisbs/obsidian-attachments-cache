@@ -18,6 +18,14 @@ export interface CacheRule {
     target?: string
 }
 
+export const DEFAULT_CACHE_RULE = Object.freeze<CacheRule>({
+    id: 'FALLBACK',
+    enabled: true,
+    storage: '{folderpath}',
+    pattern: '*',
+    remotes: [{ whitelisted: true, pattern: '*' }],
+})
+
 export function prepareCacheRules(...rules: CacheRule[][]): CacheRule[] {
     const _rules = [] as CacheRule[]
 
