@@ -79,8 +79,7 @@ export class PluginSettingTab extends BaseSettingTab {
         pluginLogLevelSetting.setName(i18n.translate('pluginLogLevelName'))
         pluginLogLevelSetting.setDesc(i18n.translate('pluginLogLevelDesc'))
         pluginLogLevelSetting.addDropdown((dropdown) => {
-            dropdown.setValue(this.#plugin.settings.plugin_level)
-            dropdown.onChange(this.#update.bind(this, 'plugin_level'))
+            // `addOptions` should called before `setValue`
             dropdown.addOptions({
                 ERROR: 'ERROR',
                 WARN: ' WARN',
@@ -88,19 +87,22 @@ export class PluginSettingTab extends BaseSettingTab {
                 DEBUG: 'DEBUG',
                 TRACE: 'TRACE',
             })
+            dropdown.setValue(this.#plugin.settings.plugin_level)
+            dropdown.onChange(this.#update.bind(this, 'plugin_level'))
         })
 
         const pluginPrioritySetting = new Setting(this.containerEl)
         pluginPrioritySetting.setName(i18n.translate('pluginPriorityName'))
         pluginPrioritySetting.setDesc(i18n.translate('pluginPriorityDesc'))
         pluginPrioritySetting.addDropdown((dropdown) => {
-            dropdown.setValue(this.#plugin.settings.plugin_priority)
-            dropdown.onChange(this.#update.bind(this, 'plugin_priority'))
+            // `addOptions` should called before `setValue`
             dropdown.addOptions({
                 LOWER: i18n.translate('pluginPriorityOptionLower'),
                 NORMAL: i18n.translate('pluginPriorityOptionNormal'),
                 HIGHER: i18n.translate('pluginPriorityOptionHigher'),
             })
+            dropdown.setValue(this.#plugin.settings.plugin_priority)
+            dropdown.onChange(this.#update.bind(this, 'plugin_priority'))
         })
 
         const allowCharactersSetting = new Setting(this.containerEl)

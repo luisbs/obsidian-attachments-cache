@@ -98,10 +98,13 @@ export class CacheRuleSettings {
         enabledSetting.addToggle((toggle) => {
             this.#detailsEnabledComponent = toggle
             toggle.setValue(this.#rule.enabled)
-            toggle.onChange((value) => this.#update('enabled', value))
+            toggle.onChange((value) => {
+                // prevent second update when `setValue` is runned outside
+                if (value === this.#rule.enabled) return
+                this.#update('enabled', value)
+            })
         })
 
-        // TODO: check why remove is not been done
         let state = 0
         const removeSetting = new Setting(this.#cacheRuleDetails)
         removeSetting.setName(i18n.translate('cacheRuleRemoveName'))
@@ -208,6 +211,7 @@ export class CacheRuleSettings {
     }
 
     #update<K extends keyof CacheRule>(key: K, value: CacheRule[K]): void {
+        console.log('executing update', key, value)
         this.#rule[key] = value
         this.#changeListener?.(this.#rule)
         this.#displayRuleState(key)
