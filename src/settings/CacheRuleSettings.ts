@@ -2,7 +2,6 @@ import { type CacheRule, resolveCachePath } from '@/utility/rules'
 import {
     type ExtraButtonComponent,
     Setting,
-    type TextAreaComponent,
     type ToggleComponent,
 } from 'obsidian'
 import {
@@ -29,12 +28,10 @@ export class CacheRuleSettings {
     #rootEl: HTMLDivElement
     #cacheRuleHeader: Setting
     #cacheRuleDetails: HTMLDivElement
-    #cacheRuleRemotes: HTMLDivElement
 
     // state elements
     #headerEnabledComponent?: ExtraButtonComponent
     #detailsEnabledComponent?: ToggleComponent
-    #detailsRemotesComponent?: TextAreaComponent
     #detailsStorageExample: HTMLLIElement
 
     constructor(cache: CacheRule) {
@@ -45,13 +42,11 @@ export class CacheRuleSettings {
         this.#rootEl = createDiv('cache-rule-settings')
         this.#cacheRuleHeader = new Setting(this.#rootEl)
         this.#cacheRuleDetails = createDiv('cache-rule-details')
-        this.#cacheRuleRemotes = createDiv('cache-rule-remotes')
         this.#detailsStorageExample = createEl('li')
 
         //
         this.#displayRuleHeader()
         this.#displayRuleDetails()
-        this.#displayRuleRemotes()
         this.#displayRuleState()
     }
 
@@ -69,20 +64,14 @@ export class CacheRuleSettings {
             button.onClick(() => this.#update('enabled', !this.#rule.enabled))
         })
 
-        let visible = false
+        let hidden = true
         this.#cacheRuleHeader.addExtraButton((button) => {
             button.setIcon('settings-2')
             button.setTooltip(i18n.translate('cacheRuleEdit'))
             button.onClick(() => {
-                if ((visible = !visible)) {
-                    this.#rootEl.append(this.#cacheRuleDetails)
-                    this.#rootEl.append(this.#cacheRuleRemotes)
-                    this.#rootEl.addClass('show-details')
-                } else {
-                    this.#cacheRuleDetails.remove()
-                    this.#cacheRuleRemotes.remove()
-                    this.#rootEl.removeClass('show-details')
-                }
+                hidden = !hidden
+                if (hidden) this.#cacheRuleDetails.remove()
+                else this.#rootEl.append(this.#cacheRuleDetails)
             })
         })
 
@@ -100,42 +89,6 @@ export class CacheRuleSettings {
             button.setTooltip(i18n.translate('cacheRuleMoveBelow'))
             button.onClick(() => this.#moveListener?.('below'))
         })
-    }
-
-    #displayRuleRemotes(): void {
-        this.#cacheRuleRemotes.empty()
-        for (const { whitelisted: w, pattern } of this.#rule.remotes) {
-            const setting = new Setting(this.#cacheRuleRemotes)
-            setting.setName(i18n.translate(`remoteState_${w}`, [pattern]))
-            setting.addExtraButton((button) => {
-                button.setIcon('trash-2')
-                button.setTooltip(i18n.translate('remove'))
-                button.onClick(() => {
-                    const remotes = this.#rule.remotes //
-                        .filter((r) => r.pattern !== pattern)
-
-                    // TODO: solve recursive re-render
-                    this.#update('remotes', remotes)
-                    this.#detailsRemotesComponent //
-                        ?.setValue(serializeRemotes(this.#rule.remotes))
-                })
-            })
-            setting.addButton((button) => {
-                button.setButtonText(i18n.translate(`remoteStateAction_${w}`))
-                button.onClick(() => {
-                    const remotes = this.#rule.remotes.map((r) => {
-                        if (r.pattern !== pattern) return r
-                        return { ...r, whitelisted: !r.whitelisted }
-                    })
-
-                    // TODO: solve recursive re-render
-                    this.#update('remotes', remotes)
-                    this.#detailsRemotesComponent?.setValue(
-                        serializeRemotes(this.#rule.remotes),
-                    )
-                })
-            })
-        }
     }
 
     #displayRuleDetails(): void {
@@ -195,7 +148,6 @@ export class CacheRuleSettings {
         // prettier-ignore
         const [remotesSetting, remotesHandler] = this.#initSetting('remotes')
         remotesSetting.addTextArea((input) => {
-            this.#detailsRemotesComponent = input
             input.setValue(serializeRemotes(this.#rule.remotes))
             remotesHandler(input, checkRemotes)
         })
@@ -262,11 +214,7 @@ export class CacheRuleSettings {
     }
 
     #displayRuleState(key?: keyof CacheRule): void {
-        if (key === 'pattern') return
-        if (key === 'remotes') {
-            this.#displayRuleRemotes()
-            return
-        }
+        if (key === 'pattern' || key === 'remotes') return
 
         // prettier-ignore
         if (key === 'enabled') {

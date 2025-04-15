@@ -15,20 +15,6 @@ import {
     type AttachmentsCacheSettings,
 } from './utility/settings'
 
-// * [x] add an string `id` value
-// * [x] change the code that uses `pattern` as an id
-// * [x] sort CacheRules by `id` on settings UI
-// * [x] add an input for the user to change the CacheRule `id`
-// * [x] add an input for the user to change the CacheRule `pattern`
-// * [-] add an toggle for the user to enable/disable the rule (as separated setting)
-// * [ ] change CacheConfig rendering behavior, when expanded replace header separated inputs
-// * [ ] add option to link a note to a CacheRule
-// * [ ] add option to early download when a link is pasted
-// * [ ] add user-defined extensions groups, like `images = jpg,png`
-// * [x] drop forced fallback CacheRule
-// * [x] drop forced fallback RemoteRule
-// * [x] change fallback CacheRule, makes the plugin noticible when freshly installed
-
 export default class AttachmentsCachePlugin extends Plugin {
     log = Logger.consoleLogger(AttachmentsCachePlugin.name)
     settings = {} as AttachmentsCacheSettings
