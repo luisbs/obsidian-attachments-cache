@@ -37,6 +37,8 @@ export interface AttachmentsCacheSettings {
     note_param_cache: string
     /** User defined Frontmatter param to ignore, overrides standard rules. */
     note_param_ignore: string
+    /** User defined Frontmatter param to reference a CacheRule. */
+    note_param_rule: string
     /** User defined cache rules. */
     cache_rules: CacheRule[]
 }
@@ -54,6 +56,7 @@ export const DEFAULT_SETTINGS = Object.freeze<AttachmentsCacheSettings>({
     url_param_ignore: 'ignore_file',
     note_param_cache: 'cache_from',
     note_param_ignore: 'cache_unless',
+    note_param_rule: 'cache_rule',
     cache_rules: [DEFAULT_CACHE_RULE],
 })
 
@@ -72,6 +75,7 @@ export function prepareSettings(settings: unknown): AttachmentsCacheSettings {
         url_param_ignore:  s.url_param_ignore  ?? DEFAULT_SETTINGS.url_param_ignore,
         note_param_cache:  s.note_param_cache  ?? DEFAULT_SETTINGS.note_param_cache,
         note_param_ignore: s.note_param_ignore ?? DEFAULT_SETTINGS.note_param_ignore,
+        note_param_rule:   s.note_param_rule   ?? DEFAULT_SETTINGS.note_param_rule,
 
         // ensure correct sorting of RemoteRules
         cache_rules: prepareCacheRules(s.cache_rules ?? DEFAULT_SETTINGS.cache_rules),

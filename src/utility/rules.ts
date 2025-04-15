@@ -1,6 +1,7 @@
 import { URI } from '@luis.bs/obsidian-fnc/lib/utility/uri'
 import { minimatch } from 'minimatch'
 import { prepareRemoteRules, type RemoteRule } from './remotes'
+import type { AttachmentsCacheSettings } from './settings'
 
 export interface CacheRule {
     /** User defined id. */
@@ -50,10 +51,25 @@ export function prepareCacheRules(...rules: CacheRule[][]): CacheRule[] {
 
 /** Try to match the notepath against the listed CacheRules. */
 export function findCacheRule(
-    rules: CacheRule[],
+    settings: AttachmentsCacheSettings,
     notepath: string,
+    frontmatter?: Record<string, unknown>,
 ): CacheRule | undefined {
-    return rules.find((rule) => {
+    // match based on the CacheRule reference
+    if (frontmatter && settings.note_param_rule in frontmatter) {
+        const id = frontmatter[settings.note_param_rule]
+        if (typeof id === 'string') {
+            for (const rule of settings.cache_rules) {
+                if (rule.enabled && rule.id === id) return rule
+            }
+        }
+
+        // if the CacheRule reference is not found, avoid matching
+        return
+    }
+
+    // match based on the CacheRule path
+    return settings.cache_rules.find((rule) => {
         if (rule.pattern === '*') return true
         return minimatch(notepath, rule.pattern)
     })

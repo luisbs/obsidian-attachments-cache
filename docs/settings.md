@@ -117,6 +117,18 @@ cache_from: [example.com/photos, https://images.net/assets]
 
 The syntax used can be seen in the [about the domains](#about-the-domains) section.
 
+### `Note's CacheRule frontmatter attribute`
+
+Makes the current note follow the behavior of the referenced **CacheRule**.
+
+The used attribute name can be changed on the **Plugin Settings** by default is `cache_rule` e.g.:
+
+```yml
+# this params correspond to the Note's Frontmatter
+# the identifier of the CacheRule should be used
+cache_rule: identifier
+```
+
 ---
 
 ## CacheRule configurations

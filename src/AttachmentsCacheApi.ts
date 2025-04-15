@@ -165,7 +165,12 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         log: Logger,
     ): CacheRule | undefined {
         log.debug('searching an active cache rule')
-        const rule = findCacheRule(this.#settings.cache_rules, notepath)
+        const fm =
+            typeof frontmatter === 'object'
+                ? (frontmatter as Record<string, unknown>)
+                : this.#app.metadataCache.getCache(notepath)?.frontmatter
+
+        const rule = findCacheRule(this.#settings, notepath, fm)
         if (!rule?.enabled) {
             log.debug('notepath does not match and active rule')
             return
@@ -182,10 +187,6 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         }
 
         // Frontmatter overrides
-        const fm =
-            typeof frontmatter !== 'object'
-                ? frontmatter
-                : this.#app.metadataCache.getCache(notepath)?.frontmatter
         if (testFmEntry(fm, this.#settings.note_param_ignore, remote)) {
             log.debug('remote has to be ignored (Frontmatter attribute)')
             return

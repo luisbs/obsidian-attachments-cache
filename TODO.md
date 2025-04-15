@@ -8,6 +8,7 @@
 - [x] Whitelist/blacklist remote URLs to cache.
 - [x] Support per-link overrides to cache/ignore an individual attachment.
 - [x] Support per-note overrides to cache/ignore notes attachments.
+- [x] Support per-note overrides to attach to the behavior of a CacheRule.
 - [x] For listed Vault paths allow defining where to store the files.
 - [x] For listed remote URLs allows path especificity ej: `example.com/images`
 - [x] Expose API for thrid-party integration.
@@ -18,10 +19,7 @@
 - [ ] Add support for comments on the remotes list.
 - [ ] Avoid re-arrenging the remotes list.
 - [ ] Add support for `{type}` extension groups path variables.
-- [ ] Add option to link a note to a CacheRule.
-- [ ] Add support for the `cache_rule` frontmatter parameter.
 - [ ] Add option to early download when a link is pasted.
-- [ ] Add a way to edit the used `cache_rule` parameter.
 - [ ] Define a cache time limit (auto-clean old or unused attachments, to reduce vault size)
 - [ ] Allow image resizing if possible, like:
 

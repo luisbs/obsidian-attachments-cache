@@ -1,21 +1,29 @@
 {
-  "plugin_level": "DEBUG",
+  "plugin_level": "WARN",
   "plugin_priority": "NORMAL",
   "allow_characters": false,
   "url_param_cache": "cache_file",
   "url_param_ignore": "ignore_file",
   "note_param_cache": "cache_from",
   "note_param_ignore": "cache_unless",
+  "note_param_rule": "cache_rule",
   "cache_rules": [
     {
-      "id": "newrule",
+      "id": "empty",
       "enabled": false,
-      "storage": "assets/{folderpath}",
+      "storage": "attachments/{notename}",
       "pattern": "*",
+      "remotes": []
+    },
+    {
+      "id": "rule_override",
+      "enabled": true,
+      "storage": "attachments/{notename}",
+      "pattern": "doesnt-match",
       "remotes": [
         {
-          "whitelisted": true,
-          "pattern": "*"
+          "pattern": "*",
+          "whitelisted": true
         }
       ]
     },
@@ -42,13 +50,6 @@
           "whitelisted": false
         }
       ]
-    },
-    {
-      "id": "second",
-      "enabled": false,
-      "storage": "attachments/{notename}",
-      "pattern": "*",
-      "remotes": []
     }
   ]
 }

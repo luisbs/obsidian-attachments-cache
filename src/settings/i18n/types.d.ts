@@ -7,10 +7,14 @@ export type Translations = Record<TextTranslation, string> &
 export type SupportedLocale = 'en'
 
 type Name_Desc = 'Name' | 'Desc'
-type Overrides_Settings = `${'url' | 'note'}${'Ignore' | 'Cache'}`
+type true_false = boolean
+
+type Overrides_Settings =
+    | `${'url' | 'note'}${'Ignore' | 'Cache'}`
+    | 'noteCacheRule'
+
 type CacheRule_Settings =
     `cacheRule_${'id' | 'pattern' | 'storage' | 'remotes'}`
-type true_false = boolean
 
 /** Translations that REQUIRE to be strings */
 export type TextTranslation =

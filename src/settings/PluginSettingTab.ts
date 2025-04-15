@@ -146,6 +146,15 @@ export class PluginSettingTab extends BaseSettingTab {
             input.setValue(this.#plugin.settings.note_param_cache)
             input.onChange(this.#update.bind(this, 'note_param_cache'))
         })
+
+        const noteCacheRuleSetting = new Setting(this.containerEl)
+        noteCacheRuleSetting.setName(i18n.translate('noteCacheRuleName'))
+        noteCacheRuleSetting.setDesc(i18n.translate('noteCacheRuleDesc'))
+        noteCacheRuleSetting.addText((input) => {
+            input.setPlaceholder(i18n.translate('noteCacheRuleHint'))
+            input.setValue(this.#plugin.settings.note_param_rule)
+            input.onChange(this.#update.bind(this, 'note_param_rule'))
+        })
     }
 
     #store = new Map<string, { index: number; childEl: CacheRuleSettings }>()

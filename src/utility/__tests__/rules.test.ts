@@ -5,6 +5,7 @@ import {
     resolveCachePath,
     type CacheRule,
 } from '../rules'
+import { prepareSettings } from '../settings'
 
 //
 // objects freezed to keep expected order
@@ -67,16 +68,29 @@ describe('Testing CacheRules utilities', () => {
     })
 
     test('findCacheRule', () => {
+        const fn = (
+            rules: CacheRule[],
+            notepath: string,
+            frontmatter?: Record<string, unknown>,
+        ) => {
+            const settings = prepareSettings({ cache_rules: rules })
+            return findCacheRule(settings, notepath, frontmatter)
+        }
+
         // '*' pattern
-        expect(findCacheRule([B], 'example.md')).toBe(B)
-        expect(findCacheRule([A], 'example.md')).toBeUndefined()
+        expect(fn([B], 'example.md')).toStrictEqual(B)
+        expect(fn([A], 'example.md')).toBeUndefined()
         // minimatch pattern
-        expect(findCacheRule([A], 'notes/example.md')).toBe(A)
-        expect(findCacheRule([A], 'images/example.md')).toBeUndefined()
+        expect(fn([A], 'notes/example.md')).toStrictEqual(A)
+        expect(fn([A], 'images/example.md')).toBeUndefined()
 
         // user-defined order should be respected
-        expect(findCacheRule([A, B, O], 'images/example.md')).toBe(B)
-        expect(findCacheRule([A, O, B], 'images/example.md')).toBe(O)
+        expect(fn([A, B, O], 'images/example.md')).toStrictEqual(B)
+        expect(fn([A, O, B], 'images/example.md')).toStrictEqual(O)
+
+        // if provided use cache_rule
+        expect(fn([O], 'example.md', { cache_rule: 'images' })).toStrictEqual(O)
+        expect(fn([O], 'example.md', { cache_rule: 'imagez' })).toBeUndefined()
     })
 
     test('resolveCachePath', () => {

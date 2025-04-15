@@ -56,6 +56,13 @@ export const EN: Translations = {
     noteCacheDesc: 'Forces all the note attachments to be cached.',
     noteCacheHint: "like: 'cache_from'",
     //
+    noteCacheRuleName: "Note's CacheRule frontmatter attribute",
+    noteCacheRuleDesc: [
+        'Forces a note to follow certain CacheRule behavior. ',
+        ['docs', 'notes-cacherule-frontmatter-attribute'],
+    ],
+    noteCacheRuleHint: "like: 'cache_rule'",
+    //
     // * CacheRules Section
     cacheRulesSection: 'Cache Rules',
     cacheRuleAdd: 'Add CacheRule',
