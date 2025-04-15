@@ -86,7 +86,19 @@ export const EN: Translations = {
     cacheRule_idHint: "like: 'images' or 'docs'",
     //
     cacheRule_patternName: 'Rule pattern',
-    cacheRule_patternDesc: 'Glob pattern to match agains the note name.',
+    cacheRule_patternDesc: [
+        'Glob pattern to match agains the note name.',
+        ['br'],
+        'Test your pattern with ',
+        [
+            'a',
+            {
+                text: 'this tool',
+                href: 'https://www.digitalocean.com/community/tools/glob',
+            },
+        ],
+        '.',
+    ],
     cacheRule_patternHint: "glob: 'folder/**' or '**/(note|notes)-**'",
     //
     cacheRule_storageName: 'Rule storage',
@@ -101,7 +113,16 @@ export const EN: Translations = {
     cacheRule_storageHint: "like: 'attachments/{notepath}'",
     //
     cacheRule_remotesName: 'Rule remotes',
-    cacheRule_remotesDesc: [['docs', 'cacherule-remotes']],
+    cacheRule_remotesDesc: [
+        'List the urls to whitelist/blacklist prefixed with ',
+        ['code', { text: 'w' }],
+        ' or ',
+        ['code', { text: 'b' }],
+        ['br'],
+        'Protocols can be omitted for more flexible matching.',
+        ['br'],
+        ['docs', 'cacherule-remotes'],
+    ],
     cacheRule_remotesHint: "like: 'b domain.org/<optional_path>'",
     remoteState_true: ['Whitelisted remote: ', ['code']],
     remoteState_false: ['Blacklisted remote: ', ['code']],
