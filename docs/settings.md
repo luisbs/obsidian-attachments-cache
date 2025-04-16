@@ -191,7 +191,7 @@ If you don't have much experience with globs, check [this  tool](https://www.dig
 Defines the remotes URLs that should be cached/ignored. The syntax follows the next rules:
 
 - **One** domain per line.
-- `#` at the start of the line means comment. ***(TODO)***
+- `#` at the start of the line means comment.
 - Start the line with `'w'` or `'b'` to **whitelist**/**blacklist** the domain.
 - The syntax used for the domains can be seen in the [about the domains](#about-the-domains) section.
 
