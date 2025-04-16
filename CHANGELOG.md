@@ -1,5 +1,20 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.6.0
+
+### Minor Changes
+
+- 1fe37e2: Consolidation of the plugin refactoring
+
+### Patch Changes
+
+- d8d9647: Removed CacheRule remotes whitelist/blacklist settings
+- b27c4f9: Added notice about supported file formats
+- 45c0c7b: Defaults change to cache attachments when freshly installed
+- a9546d3: Avoid the attachment from been downloaded twice while it's been cached
+- 8cff131: Add support for `{ext}` storage variable
+- beb30c4: Add `cache_rule` override
+
 ## 0.5.6
 
 ### Patch Changes
