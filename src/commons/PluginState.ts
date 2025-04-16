@@ -1,7 +1,7 @@
 import {
     LogLevel,
     type LogLevelValue,
-} from '@luis.bs/obsidian-fnc/lib/logging/index'
+} from '@luis.bs/obsidian-fnc/lib/logging/Logger'
 import { type CacheRule } from './CacheRules'
 import {
     PRIORITY,

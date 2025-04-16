@@ -48,7 +48,7 @@
         "release": "changeset"
     },
     "dependencies": {
-        "@luis.bs/obsidian-fnc": "link:../obsidian-fnc",
+        "@luis.bs/obsidian-fnc": "^1.4.8",
         "minimatch": "^10.0.1"
     },
     "devDependencies": {
