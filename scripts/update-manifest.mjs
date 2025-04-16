@@ -1,4 +1,4 @@
-import { copyFileSync, readFileSync, writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
 const run = (command) => console.log(execSync(command).toString('utf8'))
@@ -9,11 +9,6 @@ const NEW_VERSION = process.env.npm_package_version
 const manifest = JSON.parse(readFileSync('manifest.json', 'utf8'))
 manifest.version = NEW_VERSION
 writeFileSync('manifest.json', JSON.stringify(manifest, null, '\t'))
-// update manifest.json on the test-vault
-copyFileSync(
-    'manifest.json',
-    'test-vault/.obsidian/plugins/attachments-cache/manifest.json',
-)
 
 // update versions.json with target version and minAppVersion
 const versions = JSON.parse(readFileSync('versions.json', 'utf8'))
@@ -28,9 +23,7 @@ run('git status --porcelain')
 console.log('⧗  Committing changes')
 run('git config user.name "github-actions[bot]"')
 run('git config user.email "github-actions[bot]@users.noreply.github.com"')
-run(
-    'git commit test-vault/.obsidian/plugins/attachments-cache/* manifest.json versions.json -m"chore: sync plugin manifest"',
-)
+run('git commit manifest.json versions.json -m"chore: sync plugin manifest"')
 
 // feedback
 console.log('⧗  Pushing changes')
