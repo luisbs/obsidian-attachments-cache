@@ -1,5 +1,11 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.6.1
+
+### Patch Changes
+
+- 19130d4: Fixed loading deprecated cache_configs setting
+
 ## 0.6.0
 
 ### Minor Changes
