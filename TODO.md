@@ -16,8 +16,6 @@
 
 ## Behavior settings
 
-- [ ] Add support for comments on the remotes list.
-- [ ] Avoid re-arrenging the remotes list.
 - [ ] Add support for `{type}` extension groups path variables.
 - [ ] Add option to early download when a link is pasted.
 - [ ] Define a cache time limit (auto-clean old or unused attachments, to reduce vault size)

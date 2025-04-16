@@ -6,18 +6,18 @@ import {
     type PluginManifest,
 } from 'obsidian'
 import { AttachmentsCache } from './AttachmentsCacheApi'
-import type { AttachmentsCacheApi } from './lib'
-import { PluginSettingTab } from './settings/PluginSettingTab'
 import {
     prepareSettings,
-    PRIORITY,
-    PRIORITY_TIMEOUT,
     type AttachmentsCacheSettings,
-} from './utility/settings'
+} from './commons/PluginSettings'
+import { prepareState, type AttachmentsCacheState } from './commons/PluginState'
+import type { AttachmentsCacheApi } from './lib'
+import { PluginSettingTab } from './settings/PluginSettingTab'
 
 export default class AttachmentsCachePlugin extends Plugin {
     log = Logger.consoleLogger(AttachmentsCachePlugin.name)
     settings = {} as AttachmentsCacheSettings
+    state = {} as AttachmentsCacheState
 
     #api: AttachmentsCacheApi
     #mpp?: MarkdownPostProcessor
@@ -47,9 +47,10 @@ export default class AttachmentsCachePlugin extends Plugin {
         this.settings = prepareSettings(await this.loadData())
         group.debug('Loaded: ', this.settings)
 
-        this.#syncSettings(group)
-        this.#registerMarkdownProcessor()
         this.addSettingTab(new PluginSettingTab(this))
+
+        this.#prepareState(group)
+        this.#registerMarkdownProcessor()
         group.flush('Loaded AttachmentsCache')
     }
 
@@ -59,15 +60,16 @@ export default class AttachmentsCachePlugin extends Plugin {
         await this.saveData(this.settings)
         group.debug('Saved: ', this.settings)
 
-        this.#syncSettings(group)
+        this.#prepareState(group)
         group.flush('Saved AttachmentsCache settings')
     }
 
-    #syncSettings(log: Logger): void {
-        log.info('Syncing AttachmentsCache settings')
-        this.log.setLevel(LogLevel[this.settings.plugin_level])
-        if (this.#mpp)
-            this.#mpp.sortOrder = PRIORITY[this.settings.plugin_priority]
+    #prepareState(log: Logger): void {
+        log.info('Preparing AttachmentsCache state')
+        this.state = prepareState(this.settings)
+
+        this.log.setLevel(this.state.plugin_level)
+        if (this.#mpp) this.#mpp.sortOrder = this.state.plugin_priority
     }
 
     /**
@@ -93,10 +95,10 @@ export default class AttachmentsCachePlugin extends Plugin {
 
                 // defers a second execution, with a timeout to
                 // allow async or slow PostProcessors to render extra content
-                if (this.settings.plugin_priority in PRIORITY_TIMEOUT) {
+                if (this.state.plugin_timeout) {
                     setTimeout(() => {
                         this.#handleCache(element, sourcePath, frontmatter)
-                    }, PRIORITY_TIMEOUT[this.settings.plugin_priority])
+                    }, this.state.plugin_timeout)
                 }
             },
         )

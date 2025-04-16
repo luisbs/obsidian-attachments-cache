@@ -1,5 +1,9 @@
 import type { LogLevel } from '@luis.bs/obsidian-fnc'
-import { DEFAULT_CACHE_RULE, prepareCacheRules, type CacheRule } from './rules'
+import {
+    DEFAULT_CACHE_RULE,
+    prepareCacheRules,
+    type CacheRule,
+} from './CacheRules'
 
 export type PluginLevel = keyof typeof LogLevel
 

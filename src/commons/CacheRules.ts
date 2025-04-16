@@ -1,7 +1,19 @@
 import { URI } from '@luis.bs/obsidian-fnc/lib/utility/uri'
 import { minimatch } from 'minimatch'
-import { prepareRemoteRules, type RemoteRule } from './remotes'
-import type { AttachmentsCacheSettings } from './settings'
+import {
+    type AttachmentsCacheState,
+    type ExtendedCacheRule,
+} from './PluginState'
+
+/**
+ * This settings are deprecated and will be keeped for at least 6 months.
+ */
+export type LoadedCacheRule = Omit<CacheRule, 'remotes'> & {
+    /** @since 2025-04-15 */
+    target?: string
+    /** @since 2025-04-15 */
+    remotes: string | Array<{ pattern: string; whitelisted: boolean }>
+}
 
 export interface CacheRule {
     /** User defined id. */
@@ -10,13 +22,10 @@ export interface CacheRule {
     enabled: boolean
     /** Vault path to store the attachments into. */
     storage: string
-    /** Vault path glob pattern. */
+    /** Glob pattern to match the notes-path against. */
     pattern: string
-    /** Ordered list of remotes Whitelisted/Blacklisted. */
-    remotes: RemoteRule[]
-
-    /** @deprecated use `storage` instead. */
-    target?: string
+    /** List of whitelisted/blacklisted remotes. */
+    remotes: string
 }
 
 export const DEFAULT_CACHE_RULE = Object.freeze<CacheRule>({
@@ -24,42 +33,41 @@ export const DEFAULT_CACHE_RULE = Object.freeze<CacheRule>({
     enabled: true,
     storage: '{folderpath}',
     pattern: '*',
-    remotes: [{ whitelisted: true, pattern: '*' }],
+    remotes: 'w *',
 })
 
-export function prepareCacheRules(...rules: CacheRule[][]): CacheRule[] {
-    const _rules = [] as CacheRule[]
-
-    for (const aRule of rules.flat()) {
-        // keep only first CacheRule appariences
-        if (_rules.some((bRule) => bRule.id === aRule.id)) continue
-        // prettier-ignore
-        _rules.push({
-            id: aRule.id,
-            enabled: aRule.enabled,
-            // for the original installations to not fail jaja
-            // eslint-disable-next-line
-            storage: aRule.storage || aRule.target || '',
-            pattern: aRule.pattern,
-            remotes: prepareRemoteRules(aRule.remotes),
-        })
-    }
-
+export function prepareCacheRules(
+    rules: Array<Partial<LoadedCacheRule>>,
+): CacheRule[] {
     // keep user defined order
-    return _rules
+    return rules.map((rule) => {
+        // prettier-ignore
+        const remotes =
+            Array.isArray(rule.remotes)
+                ? rule.remotes.map((r) => `${r.whitelisted ? 'w' : 'b'} ${r.pattern}`).join('\n')
+                : rule.remotes ?? ''
+
+        return {
+            id: rule.id ?? '',
+            enabled: rule.enabled ?? false,
+            storage: rule.storage ?? rule.target ?? '',
+            pattern: rule.pattern ?? '',
+            remotes,
+        }
+    })
 }
 
 /** Try to match the notepath against the listed CacheRules. */
 export function findCacheRule(
-    settings: AttachmentsCacheSettings,
+    state: AttachmentsCacheState,
     notepath: string,
     frontmatter?: Record<string, unknown>,
-): CacheRule | undefined {
+): ExtendedCacheRule | undefined {
     // match based on the CacheRule reference
-    if (frontmatter && settings.note_param_rule in frontmatter) {
-        const id = frontmatter[settings.note_param_rule]
+    if (frontmatter && state.note_param_rule in frontmatter) {
+        const id = frontmatter[state.note_param_rule]
         if (typeof id === 'string') {
-            for (const rule of settings.cache_rules) {
+            for (const rule of state.cache_rules) {
                 if (rule.enabled && rule.id === id) return rule
             }
         }
@@ -69,7 +77,7 @@ export function findCacheRule(
     }
 
     // match based on the CacheRule path
-    return settings.cache_rules.find((rule) => {
+    return state.cache_rules.find((rule) => {
         if (rule.pattern === '*') return true
         return minimatch(notepath, rule.pattern)
     })

@@ -3,10 +3,10 @@ import {
     type AttachmentsCacheSettings,
     DEFAULT_SETTINGS,
     prepareSettings,
-} from '../settings'
+} from '../PluginSettings'
 
 // objects freezed to keep expected order
-const some = Object.freeze<Partial<AttachmentsCacheSettings>>({
+const settings = Object.freeze<Partial<AttachmentsCacheSettings>>({
     allow_characters: true,
     url_param_cache: 'cache',
     url_param_ignore: 'ignore',
@@ -17,20 +17,20 @@ const some = Object.freeze<Partial<AttachmentsCacheSettings>>({
             pattern: 'images/**',
             storage: 'attachments/images/{notename}',
             remotes: [
-                { whitelisted: true, pattern: 'example.com/blog/asd' },
-                { whitelisted: false, pattern: 'example.com/blog' },
-                { whitelisted: true, pattern: 'example.com/images' },
-                { whitelisted: false, pattern: 'example.com' },
-                { whitelisted: true, pattern: 'images.org' },
-                { whitelisted: false, pattern: '*' },
-            ],
+                'w example.com/blog/asd',
+                'b example.com/blog',
+                'w example.com/images',
+                'b example.com',
+                'w images.org',
+                'b *',
+            ].join('\n'),
         },
         {
             id: 'files',
             enabled: true,
             pattern: '*',
             storage: 'attachments/{notepath}',
-            remotes: [{ whitelisted: true, pattern: '*' }],
+            remotes: 'w *',
         },
     ],
 })
@@ -44,7 +44,7 @@ describe('Testing PluginSettings utilities', () => {
         // using custom Settings
         // ensure all settings rely on a default value
         // non-standard/deprecated settings should be removed
-        expect(prepareSettings({ ...some, deprecated: 'ignore' })) //
-            .toStrictEqual({ ...DEFAULT_SETTINGS, ...some })
+        expect(prepareSettings({ ...settings, deprecated: 'ignore' })) //
+            .toStrictEqual({ ...DEFAULT_SETTINGS, ...settings })
     })
 })

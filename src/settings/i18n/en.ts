@@ -131,18 +131,17 @@ export const EN: Translations = {
         ['docs', 'cacherule-remotes'],
     ],
     cacheRule_remotesHint: "like: 'b domain.org/<optional_path>'",
-    remoteState_true: ['Whitelisted remote: ', ['code']],
-    remoteState_false: ['Blacklisted remote: ', ['code']],
-    remoteStateAction_true: 'Blacklist',
-    remoteStateAction_false: 'Whitelist',
-    remoteDuplicated: ['Duplicated: ', ['code']],
-    remoteMissingDomain: ['Missing domain: ', ['code']],
-    remoteInvalidProtocol: [
+    // ? CacheRuleRemotes Validations
+    patternDuplicated: ['Duplicated: ', ['code']],
+    patternAfterFallback: ['Lines after fallback(*) are useless', ['code']],
+    patternInvalidPrefix: ['Invalid prefix: ', ['code']],
+    patternInvalidProtocol: [
         'Only ',
         ['b', { text: 'http' }],
         ' or ',
         ['b', { text: 'https' }],
-        ' are supported: ',
+        ' protocols are supported: ',
         ['code'],
     ],
+    patternInvalidDomain: ['Invalid URL domain: ', ['code']],
 }

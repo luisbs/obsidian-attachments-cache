@@ -4,19 +4,19 @@ import {
     testFmEntry,
     testUrlDomain,
     testUrlParam,
-} from '../matchers'
-import type { RemoteRule } from '../remotes'
+} from '../PluginMatchers'
+import { type CacheRuleRemote } from '../PluginState'
 
-const remotes = Object.freeze<RemoteRule[]>([
-    { whitelisted: true, pattern: 'example.com/blog/asd' },
-    { whitelisted: false, pattern: 'example.com/blog' },
-    { whitelisted: true, pattern: 'example.com/images' },
-    { whitelisted: false, pattern: 'example.com' },
-    { whitelisted: true, pattern: 'images.org' },
-    { whitelisted: false, pattern: '*' },
+const remotes = Object.freeze<CacheRuleRemote[]>([
+    { accepted: true, pattern: 'example.com/blog/asd' },
+    { accepted: false, pattern: 'example.com/blog' },
+    { accepted: true, pattern: 'example.com/images' },
+    { accepted: false, pattern: 'example.com' },
+    { accepted: true, pattern: 'images.org' },
+    { accepted: false, pattern: '*' },
 ])
 
-describe('Testing matchers utilities', () => {
+describe('Testing PluginMatchers utilities', () => {
     test('testUrlDomain', () => {
         // when protocol is present, enforce it
         const withProtocol = testUrlDomain.bind(null, 'https://example.org')

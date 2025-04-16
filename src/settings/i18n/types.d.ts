@@ -30,7 +30,6 @@ export type TextTranslation =
     // ? CacheRule Settings
     | `${CacheRule_Settings}Hint`
     | `cacheRule_enabled_${true_false}`
-    | `remoteStateAction_${true_false}`
 
 /** Translations that not require to be strings */
 export type FlexibleTranslation =
@@ -52,7 +51,9 @@ export type FlexibleTranslation =
     | `cacheRuleRemove${Name_Desc}`
     | `cacheRule_enabled${Name_Desc}`
     | `${CacheRule_Settings}${Name_Desc}`
-    | `remoteState_${true_false}`
-    | 'remoteDuplicated'
-    | 'remoteMissingDomain'
-    | 'remoteInvalidProtocol'
+    // ? CacheRuleRemotes Validations
+    | 'patternDuplicated'
+    | 'patternAfterFallback'
+    | 'patternInvalidPrefix'
+    | 'patternInvalidProtocol'
+    | 'patternInvalidDomain'

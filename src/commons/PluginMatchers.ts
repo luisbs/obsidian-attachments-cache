@@ -1,4 +1,4 @@
-import type { RemoteRule } from './remotes'
+import { type CacheRuleRemote } from './PluginState'
 
 /** Test an URL against a domain pattern */
 export function testUrlDomain(pattern: string, url: string): boolean {
@@ -9,12 +9,12 @@ export function testUrlDomain(pattern: string, url: string): boolean {
 
 /** Test an URL against the listed RemoteRules. */
 export function testCacheRemote(
-    remotes: readonly RemoteRule[],
+    remotes: readonly CacheRuleRemote[],
     url: string,
 ): boolean {
-    for (const { pattern, whitelisted } of remotes) {
-        if (pattern === '*') return whitelisted
-        if (testUrlDomain(pattern, url)) return whitelisted
+    for (const { pattern, accepted } of remotes) {
+        if (pattern === '*') return accepted
+        if (testUrlDomain(pattern, url)) return accepted
     }
     return false
 }

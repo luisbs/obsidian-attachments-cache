@@ -1,29 +1,23 @@
 import { type Logger, type LoggingGroup, URI, URL } from '@luis.bs/obsidian-fnc'
 import { normalizePath, requestUrl } from 'obsidian'
-import type { AttachmentsCacheApi } from './lib'
-import type AttachmentsCachePlugin from './main'
-import { AttachmentError } from './utility/AttachmentError'
-import { testCacheRemote, testFmEntry, testUrlParam } from './utility/matchers'
+import { AttachmentError } from './commons/AttachmentError'
 import {
     type CacheRule,
     findCacheRule,
     resolveCachePath,
-} from './utility/rules'
-import type { AttachmentsCacheSettings } from './utility/settings'
-
-export type UpdateSettings = (settings: AttachmentsCacheSettings) => void
+} from './commons/CacheRules'
+import {
+    testCacheRemote,
+    testFmEntry,
+    testUrlParam,
+} from './commons/PluginMatchers'
+import type { AttachmentsCacheApi } from './lib'
+import type AttachmentsCachePlugin from './main'
 
 export class AttachmentsCache implements AttachmentsCacheApi {
     #log: Logger
     #plugin: AttachmentsCachePlugin
     #memo = new Map<string, undefined | string>()
-
-    get #app() {
-        return this.#plugin.app
-    }
-    get #settings() {
-        return this.#plugin.settings
-    }
 
     constructor(plugin: AttachmentsCachePlugin) {
         this.#log = plugin.log.make(AttachmentsCache.name)
@@ -36,7 +30,7 @@ export class AttachmentsCache implements AttachmentsCacheApi {
 
     isCached(remote: string, notepath: string, frontmatter?: unknown): boolean {
         const filepath = this.resolve(remote, notepath, frontmatter)
-        return !!filepath && !!this.#app.vault.getFileByPath(filepath)
+        return !!filepath && !!this.#plugin.app.vault.getFileByPath(filepath)
     }
 
     resource(
@@ -47,8 +41,8 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         const filepath = this.resolve(remote, notepath, frontmatter)
         if (!filepath) return
 
-        const file = this.#app.vault.getFileByPath(filepath)
-        return file ? this.#app.vault.getResourcePath(file) : undefined
+        const file = this.#plugin.app.vault.getFileByPath(filepath)
+        return file ? this.#plugin.app.vault.getResourcePath(file) : undefined
     }
 
     resolve(
@@ -95,10 +89,10 @@ export class AttachmentsCache implements AttachmentsCacheApi {
             }
 
             // check existence
-            const cachedFile = this.#app.vault.getFileByPath(filepath)
+            const cachedFile = this.#plugin.app.vault.getFileByPath(filepath)
             if (cachedFile) {
                 group.flush(`remote is already in cache <${remote}>`)
-                return this.#app.vault.getResourcePath(cachedFile)
+                return this.#plugin.app.vault.getResourcePath(cachedFile)
             }
 
             // download file
@@ -146,7 +140,7 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         }
 
         const filepath = resolveCachePath(rule.storage, notepath, filename)
-        const localPath = !this.#settings.allow_characters
+        const localPath = !this.#plugin.state.allow_characters
             ? normalizePath(URI.normalize(filepath))
             : normalizePath(filepath)
 
@@ -168,36 +162,36 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         const fm =
             typeof frontmatter === 'object'
                 ? (frontmatter as Record<string, unknown>)
-                : this.#app.metadataCache.getCache(notepath)?.frontmatter
+                : this.#plugin.app.metadataCache.getCache(notepath)?.frontmatter
 
-        const rule = findCacheRule(this.#settings, notepath, fm)
+        const rule = findCacheRule(this.#plugin.state, notepath, fm)
         if (!rule?.enabled) {
             log.debug('notepath does not match and active rule')
             return
         }
 
         // URL overrides
-        if (testUrlParam(this.#settings.url_param_ignore, remote)) {
+        if (testUrlParam(this.#plugin.state.url_param_ignore, remote)) {
             log.debug('remote has to be ignored (URL param)')
             return
         }
-        if (testUrlParam(this.#settings.url_param_cache, remote)) {
+        if (testUrlParam(this.#plugin.state.url_param_cache, remote)) {
             log.debug('remote has to be cached (URL param)')
             return rule
         }
 
         // Frontmatter overrides
-        if (testFmEntry(fm, this.#settings.note_param_ignore, remote)) {
+        if (testFmEntry(fm, this.#plugin.state.note_param_ignore, remote)) {
             log.debug('remote has to be ignored (Frontmatter attribute)')
             return
         }
-        if (testFmEntry(fm, this.#settings.note_param_cache, remote)) {
+        if (testFmEntry(fm, this.#plugin.state.note_param_cache, remote)) {
             log.debug('remote has to be cached (Frontmatter attribute)')
             return rule
         }
 
         // standard behavior
-        if (testCacheRemote(rule.remotes, remote)) {
+        if (testCacheRemote(rule.remote_patterns, remote)) {
             log.debug('remote has to be cached')
             return rule
         }
@@ -224,16 +218,18 @@ export class AttachmentsCache implements AttachmentsCacheApi {
 
             group.debug(`Storing <${filepath}>`)
             const parentpath = URI.getParent(filepath) ?? '/'
-            if (!this.#app.vault.getFolderByPath(parentpath)) {
-                await this.#app.vault.createFolder(parentpath)
+            if (!this.#plugin.app.vault.getFolderByPath(parentpath)) {
+                await this.#plugin.app.vault.createFolder(parentpath)
             }
-            await this.#app.vault.createBinary(filepath, response.arrayBuffer)
+
+            // prettier-ignore
+            await this.#plugin.app.vault.createBinary(filepath, response.arrayBuffer)
 
             // check result
-            const downloadedFile = this.#app.vault.getFileByPath(filepath)
-            if (downloadedFile) {
+            const localFile = this.#plugin.app.vault.getFileByPath(filepath)
+            if (localFile) {
                 group.flush(`remote was cached <${remote}>`)
-                return this.#app.vault.getResourcePath(downloadedFile)
+                return this.#plugin.app.vault.getResourcePath(localFile)
             }
         } catch (error) {
             group.error(error)

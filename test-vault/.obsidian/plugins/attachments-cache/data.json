@@ -13,43 +13,21 @@
       "enabled": false,
       "storage": "attachments/{notename}",
       "pattern": "*",
-      "remotes": []
+      "remotes": ""
     },
     {
       "id": "rule_override",
       "enabled": true,
       "storage": "attachments/{notename}",
       "pattern": "doesnt-match",
-      "remotes": [
-        {
-          "pattern": "*",
-          "whitelisted": true
-        }
-      ]
+      "remotes": "w *"
     },
     {
       "id": "default",
       "enabled": true,
       "storage": "attachments/{notepath}",
       "pattern": "*",
-      "remotes": [
-        {
-          "pattern": "4kwallpapers.com/images",
-          "whitelisted": false
-        },
-        {
-          "pattern": "github.com/elementary/wallpapers",
-          "whitelisted": true
-        },
-        {
-          "pattern": "images.pexels.com/photos",
-          "whitelisted": true
-        },
-        {
-          "pattern": "*",
-          "whitelisted": false
-        }
-      ]
+      "remotes": "b 4kwallpapers.com/images\nw github.com/elementary/wallpapers\nw images.pexels.com/photos\n\n# fallback behavior\nb *"
     }
   ]
 }

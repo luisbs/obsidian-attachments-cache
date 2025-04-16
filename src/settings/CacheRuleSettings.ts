@@ -1,4 +1,4 @@
-import { type CacheRule, resolveCachePath } from '@/utility/rules'
+import { type CacheRule, resolveCachePath } from '@/commons/CacheRules'
 import {
     type ExtraButtonComponent,
     Setting,
@@ -9,8 +9,6 @@ import {
     checkRemotes,
     I18n,
     type InputHandler,
-    parseRemotes,
-    serializeRemotes,
     type ValidatorResult,
 } from './settings-tools'
 
@@ -36,7 +34,7 @@ export class CacheRuleSettings {
 
     constructor(cache: CacheRule) {
         // cloned to control flow of updates
-        this.#rule = { ...cache, remotes: [...cache.remotes] }
+        this.#rule = { ...cache }
 
         // main distribution
         this.#rootEl = createDiv('cache-rule-settings')
@@ -151,7 +149,7 @@ export class CacheRuleSettings {
         // prettier-ignore
         const [remotesSetting, remotesHandler] = this.#initSetting('remotes')
         remotesSetting.addTextArea((input) => {
-            input.setValue(serializeRemotes(this.#rule.remotes))
+            input.setValue(this.#rule.remotes)
             remotesHandler(input, checkRemotes)
         })
     }
@@ -182,8 +180,7 @@ export class CacheRuleSettings {
                     return
                 }
 
-                if (key !== 'remotes') this.#update(key, value)
-                else this.#update(key, parseRemotes(this.#rule.remotes, value))
+                this.#update(key, value)
             })
         }
 
@@ -211,7 +208,6 @@ export class CacheRuleSettings {
     }
 
     #update<K extends keyof CacheRule>(key: K, value: CacheRule[K]): void {
-        console.log('executing update', key, value)
         this.#rule[key] = value
         this.#changeListener?.(this.#rule)
         this.#displayRuleState(key)

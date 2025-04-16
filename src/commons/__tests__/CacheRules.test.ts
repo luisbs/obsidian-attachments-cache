@@ -4,72 +4,68 @@ import {
     prepareCacheRules,
     resolveCachePath,
     type CacheRule,
-} from '../rules'
-import { prepareSettings } from '../settings'
+    type LoadedCacheRule,
+} from '../CacheRules'
+import { prepareSettings } from '../PluginSettings'
 
 //
 // objects freezed to keep expected order
 //
-const A = Object.freeze<CacheRule>({
+const A = Object.freeze<LoadedCacheRule>({
     id: 'papers',
     enabled: false,
     pattern: 'notes/**',
     storage: '{folderpath}/attachments',
-    remotes: [{ whitelisted: true, pattern: '*' }],
+    remotes: 'w *',
 })
-const B = Object.freeze<CacheRule>({
+const B = Object.freeze<LoadedCacheRule>({
     id: 'files',
     enabled: true,
     pattern: '*',
     storage: 'attachments/{notepath}',
-    remotes: [{ whitelisted: true, pattern: '*' }],
+    remotes: 'w *',
 })
-const U = Object.freeze<CacheRule>({
+const O = Object.freeze<Partial<LoadedCacheRule>>({
+    id: 'images',
+    enabled: true,
+    pattern: 'images/**',
+    target: 'attachments/images/{notename}',
+    remotes: [
+        { whitelisted: true, pattern: 'images.org' },
+        { whitelisted: true, pattern: 'example.com/blog/asd' },
+        { whitelisted: false, pattern: 'example.com/blog' },
+        { whitelisted: true, pattern: 'example.com/images' },
+        { whitelisted: false, pattern: 'example.com' },
+        { whitelisted: false, pattern: '*' },
+    ],
+})
+const N = Object.freeze<CacheRule>({
     id: 'images',
     enabled: true,
     pattern: 'images/**',
     storage: 'attachments/images/{notename}',
     remotes: [
-        { whitelisted: true, pattern: 'images.org' },
-        { whitelisted: true, pattern: 'example.com/images' },
-        { whitelisted: false, pattern: 'example.com/blog' },
-        { whitelisted: false, pattern: '*' },
-        { whitelisted: false, pattern: 'example.com' },
-        { whitelisted: true, pattern: 'example.com/blog/asd' },
-    ],
-})
-const O = Object.freeze<CacheRule>({
-    id: 'images',
-    enabled: true,
-    pattern: 'images/**',
-    storage: 'attachments/images/{notename}',
-    remotes: [
-        { whitelisted: true, pattern: 'example.com/blog/asd' },
-        { whitelisted: false, pattern: 'example.com/blog' },
-        { whitelisted: true, pattern: 'example.com/images' },
-        { whitelisted: false, pattern: 'example.com' },
-        { whitelisted: true, pattern: 'images.org' },
-        { whitelisted: false, pattern: '*' },
-    ],
+        'w images.org',
+        'w example.com/blog/asd',
+        'b example.com/blog',
+        'w example.com/images',
+        'b example.com',
+        'b *',
+    ].join('\n'),
 })
 
 describe('Testing CacheRules utilities', () => {
     test('prepareCacheRules', () => {
-        // alphabetical order 'files' > 'images' > 'papers'
-        // but the user-defined order should be respected
-        expect(prepareCacheRules([U, A, B])).toStrictEqual([O, A, B])
-        expect(prepareCacheRules([A, B, U])).toStrictEqual([A, B, O])
-        expect(prepareCacheRules([B, U, A])).toStrictEqual([B, O, A])
+        // old format of `target` and `remotes` should be supported
+        expect(prepareCacheRules([O, A, B])).toStrictEqual([N, A, B])
 
-        // keep only first apperiences, based on `id`
-        expect(prepareCacheRules([B, U, A, B])).toStrictEqual([B, O, A])
-        expect(prepareCacheRules([B, A, B, U])).toStrictEqual([B, A, O])
-        expect(prepareCacheRules([B, B, U, A])).toStrictEqual([B, O, A])
+        // keep duplicates and respect order
+        expect(prepareCacheRules([B, O, A, B])).toStrictEqual([B, N, A, B])
     })
 
     test('findCacheRule', () => {
         const fn = (
-            rules: CacheRule[],
+            rules: Array<Partial<LoadedCacheRule>>,
             notepath: string,
             frontmatter?: Record<string, unknown>,
         ) => {
@@ -85,12 +81,12 @@ describe('Testing CacheRules utilities', () => {
         expect(fn([A], 'images/example.md')).toBeUndefined()
 
         // user-defined order should be respected
-        expect(fn([A, B, O], 'images/example.md')).toStrictEqual(B)
-        expect(fn([A, O, B], 'images/example.md')).toStrictEqual(O)
+        expect(fn([A, B, N], 'images/example.md')).toStrictEqual(B)
+        expect(fn([A, N, B], 'images/example.md')).toStrictEqual(N)
 
         // if provided use cache_rule
-        expect(fn([O], 'example.md', { cache_rule: 'images' })).toStrictEqual(O)
-        expect(fn([O], 'example.md', { cache_rule: 'imagez' })).toBeUndefined()
+        expect(fn([N], 'example.md', { cache_rule: 'images' })).toStrictEqual(N)
+        expect(fn([N], 'example.md', { cache_rule: 'imagez' })).toBeUndefined()
     })
 
     test('resolveCachePath', () => {

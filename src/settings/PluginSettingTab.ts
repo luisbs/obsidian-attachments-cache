@@ -1,6 +1,6 @@
+import { DEFAULT_CACHE_RULE, type CacheRule } from '@/commons/CacheRules'
+import type { AttachmentsCacheSettings } from '@/commons/PluginSettings'
 import type AttachmentsCachePlugin from '@/main'
-import { DEFAULT_CACHE_RULE, type CacheRule } from '@/utility/rules'
-import type { AttachmentsCacheSettings } from '@/utility/settings'
 import { PluginSettingTab as BaseSettingTab, Setting } from 'obsidian'
 import { CacheRuleSettings } from './CacheRuleSettings'
 import { I18n } from './settings-tools'
