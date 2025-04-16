@@ -1,4 +1,4 @@
-import type { LogLevel } from '@luis.bs/obsidian-fnc'
+import type { LogLevel } from '@luis.bs/obsidian-fnc/lib/logging/Logger'
 import {
     DEFAULT_CACHE_RULE,
     prepareCacheRules,
@@ -45,6 +45,12 @@ export interface AttachmentsCacheSettings {
     note_param_rule: string
     /** User defined cache rules. */
     cache_rules: CacheRule[]
+    /**
+     * Will be supported for 6 months.
+     * @deprecated use `cache_rules` instead
+     * @since 2025-04-16
+     */
+    cache_configs?: CacheRule[]
 }
 
 export const DEFAULT_SETTINGS = Object.freeze<AttachmentsCacheSettings>({
@@ -82,6 +88,7 @@ export function prepareSettings(settings: unknown): AttachmentsCacheSettings {
         note_param_rule:   s.note_param_rule   ?? DEFAULT_SETTINGS.note_param_rule,
 
         // ensure correct sorting of RemoteRules
-        cache_rules: prepareCacheRules(s.cache_rules ?? DEFAULT_SETTINGS.cache_rules),
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        cache_rules: prepareCacheRules(s.cache_rules ?? s.cache_configs ?? DEFAULT_SETTINGS.cache_rules),
     }
 }

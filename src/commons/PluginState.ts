@@ -1,8 +1,5 @@
-import {
-    LogLevel,
-    type LogLevelValue,
-} from '@luis.bs/obsidian-fnc/lib/logging/Logger'
-import { type CacheRule } from './CacheRules'
+import type { LogLevelValue } from '@luis.bs/obsidian-fnc/lib/logging/Logger'
+import type { CacheRule } from './CacheRules'
 import {
     PRIORITY,
     PRIORITY_TIMEOUT,
@@ -51,10 +48,18 @@ export function prepareState(
         })
     }
 
+    const plugin_level = {
+        TRACE: 1,
+        DEBUG: 2,
+        INFO: 3,
+        WARN: 4,
+        ERROR: 5,
+    }[settings.plugin_level] as LogLevelValue
+
     // keep most settings unchanged
     return {
         ...settings,
-        plugin_level: LogLevel[settings.plugin_level],
+        plugin_level,
         plugin_priority: PRIORITY[settings.plugin_priority],
         plugin_timeout: PRIORITY_TIMEOUT[settings.plugin_priority],
         cache_rules,
