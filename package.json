@@ -1,6 +1,6 @@
 {
     "license": "GPL-3.0-or-later",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "name": "@luis.bs/obsidian-attachments-cache",
     "description": "Store images and other attachments on the vault",
     "keywords": [
