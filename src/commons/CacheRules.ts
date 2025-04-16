@@ -68,7 +68,8 @@ export function findCacheRule(
         const id = frontmatter[state.note_param_rule]
         if (typeof id === 'string') {
             for (const rule of state.cache_rules) {
-                if (rule.enabled && rule.id === id) return rule
+                if (!rule.enabled) continue
+                if (rule.id === id) return rule
             }
         }
 
@@ -78,6 +79,7 @@ export function findCacheRule(
 
     // match based on the CacheRule path
     return state.cache_rules.find((rule) => {
+        if (!rule.enabled) return false
         if (rule.pattern === '*') return true
         return minimatch(notepath, rule.pattern)
     })
