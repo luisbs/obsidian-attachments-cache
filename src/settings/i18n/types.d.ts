@@ -1,10 +1,8 @@
-import type { I18nSegments } from '@luis.bs/obsidian-fnc/lib/i18n/I18nTranslator'
+import type { I18nSegments } from '@luis.bs/obsidian-fnc'
 
 export type TranslationKeys = TextTranslation | FlexibleTranslation
 export type Translations = Record<TextTranslation, string> &
     Record<FlexibleTranslation, string | I18nSegments>
-
-export type SupportedLocale = 'en'
 
 type Name_Desc = 'Name' | 'Desc'
 type true_false = boolean

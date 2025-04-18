@@ -1,9 +1,6 @@
 import type { Translations } from './types'
 
-/**
- * whenever `undefined` is used, is a placeholder
- */
-export const EN: Translations = {
+export const en: Translations = {
     learn: 'Learn more',
     remove: 'Remove',
     removeConfirmation: 'Are you sure?',
