@@ -72,8 +72,8 @@ export const en: Translations = {
     cacheRuleNoteExample: ["Note: '", ['b'], "'"],
     cacheRuleFileExample: ["Attachment: '", ['b'], "'"],
     //
-    cacheRuleRemoveName: 'Remove this rule?',
-    cacheRuleRemoveDesc: [
+    cacheRule_removeName: 'Remove this rule?',
+    cacheRule_removeDesc: [
         'Is suggested you disable your rules, instead of removing them.',
         ['br'],
         ['b', { text: 'This can not be reversed.', cls: 'invalid-value' }],
@@ -83,6 +83,10 @@ export const en: Translations = {
     cacheRule_enabledDesc: 'When disabled the rule is ignored on caching.',
     cacheRule_enabled_true: 'Disable CacheRule',
     cacheRule_enabled_false: 'Enable CacheRule',
+    //
+    cacheRule_replaceName: 'Update attachment link?',
+    cacheRule_replaceDesc:
+        'When enabled the attachment link on the note will be updated.',
     //
     cacheRule_idName: 'Rule identifier',
     cacheRule_idDesc:

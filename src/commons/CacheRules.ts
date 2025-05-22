@@ -20,6 +20,8 @@ export interface CacheRule {
     id: string
     /** Allow disabling the rule instead of been removed. */
     enabled: boolean
+    /** Whether or not the attachment links should be replaced. */
+    replace: boolean
     /** Vault path to store the attachments into. */
     storage: string
     /** Glob pattern to match the notes-path against. */
@@ -31,6 +33,7 @@ export interface CacheRule {
 export const DEFAULT_CACHE_RULE = Object.freeze<CacheRule>({
     id: 'FALLBACK',
     enabled: true,
+    replace: false,
     storage: '{folderpath}',
     pattern: '*',
     remotes: 'w *',
@@ -50,6 +53,7 @@ export function prepareCacheRules(
         return {
             id: rule.id ?? '',
             enabled: rule.enabled ?? false,
+            replace: rule.replace ?? false,
             storage: rule.storage ?? rule.target ?? '',
             pattern: rule.pattern ?? '',
             remotes,

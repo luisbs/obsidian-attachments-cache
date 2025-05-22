@@ -105,8 +105,8 @@ export class CacheRuleSettings {
 
         let state = 0
         const removeSetting = new Setting(this.#cacheRuleDetails)
-        removeSetting.setName(i18n.translate('cacheRuleRemoveName'))
-        removeSetting.setDesc(i18n.translate('cacheRuleRemoveDesc'))
+        removeSetting.setName(i18n.translate('cacheRule_removeName'))
+        removeSetting.setDesc(i18n.translate('cacheRule_removeDesc'))
         removeSetting.addButton((button) => {
             button.setButtonText(i18n.translate('remove'))
             button.onClick(() => {
@@ -119,6 +119,14 @@ export class CacheRuleSettings {
                     button.setButtonText(i18n.translate('removeConfirmation'))
                 }
             })
+        })
+
+        const replaceSetting = new Setting(this.#cacheRuleDetails)
+        replaceSetting.setName(i18n.translate('cacheRule_replaceName'))
+        replaceSetting.setDesc(i18n.translate('cacheRule_replaceDesc'))
+        replaceSetting.addToggle((toggle) => {
+            toggle.setValue(this.#rule.replace)
+            toggle.onChange(this.#update.bind(this, 'replace'))
         })
 
         const [idSetting, idHandler] = this.#initSetting('id')

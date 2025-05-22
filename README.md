@@ -46,9 +46,7 @@ Based on the Obsidian supported [file-formats](https://help.obsidian.md/file-for
 
 ### From within Obsidian
 
-> I'm working ⚒️ on making this posible.
-
-From Obsidian v1.8+, you can activate this plugin within Obsidian by doing the following:
+You can activate this plugin within Obsidian by doing the following:
 
 - Open Settings > Third-party plugin
 - Make sure Safe mode is **off**
@@ -65,8 +63,8 @@ You can activate this plugin, building from source by doing the following:
 
 - Clone the repository
 - Install the dependencies
-- Run `pnpm build:dist`
-- Copy the content of the repository `dist` folder to your vault, the path should look like `your-vault/.obsidian/plugins/attachments-cache`
+- Run `pnpm build:dist` or an equivalent.
+- Copy the content of the repository `dist` folder to your vault, the path should look like `<path-to-your-vault>/.obsidian/plugins/attachments-cache`
 - Open your vault in _Obsidian_ and activate the newly installed plugin
 
 ---

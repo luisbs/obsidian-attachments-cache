@@ -79,7 +79,7 @@ export class PluginSettingTab extends BaseSettingTab {
         pluginLogLevelSetting.setName(i18n.translate('pluginLogLevelName'))
         pluginLogLevelSetting.setDesc(i18n.translate('pluginLogLevelDesc'))
         pluginLogLevelSetting.addDropdown((dropdown) => {
-            // `addOptions` should called before `setValue`
+            // options should be added before the value
             dropdown.addOptions({
                 ERROR: 'ERROR',
                 WARN: ' WARN',
@@ -95,7 +95,7 @@ export class PluginSettingTab extends BaseSettingTab {
         pluginPrioritySetting.setName(i18n.translate('pluginPriorityName'))
         pluginPrioritySetting.setDesc(i18n.translate('pluginPriorityDesc'))
         pluginPrioritySetting.addDropdown((dropdown) => {
-            // `addOptions` should called before `setValue`
+            // options should be added before the value
             dropdown.addOptions({
                 LOWER: i18n.translate('pluginPriorityOptionLower'),
                 NORMAL: i18n.translate('pluginPriorityOptionNormal'),

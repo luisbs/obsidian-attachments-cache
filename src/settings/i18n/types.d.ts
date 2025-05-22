@@ -11,8 +11,8 @@ type Overrides_Settings =
     | `${'url' | 'note'}${'Ignore' | 'Cache'}`
     | 'noteCacheRule'
 
-type CacheRule_Settings =
-    `cacheRule_${'id' | 'pattern' | 'storage' | 'remotes'}`
+type CacheRule_Strings = 'id' | 'pattern' | 'storage' | 'remotes'
+type CacheRule_Settings = 'remove' | 'enabled' | 'replace' | CacheRule_Strings
 
 /** Translations that REQUIRE to be strings */
 export type TextTranslation =
@@ -26,8 +26,8 @@ export type TextTranslation =
     // * CacheRule Section
     | `cacheRule${'Add' | 'Edit' | 'MoveAbove' | 'MoveBelow'}`
     // ? CacheRule Settings
-    | `${CacheRule_Settings}Hint`
     | `cacheRule_enabled_${true_false}`
+    | `cacheRule_${CacheRule_Strings}Hint`
 
 /** Translations that not require to be strings */
 export type FlexibleTranslation =
@@ -46,9 +46,7 @@ export type FlexibleTranslation =
     | `cacheRule${Name_Desc}`
     | `cacheRule${'Note' | 'File'}Example`
     // ? CacheRule Settings
-    | `cacheRuleRemove${Name_Desc}`
-    | `cacheRule_enabled${Name_Desc}`
-    | `${CacheRule_Settings}${Name_Desc}`
+    | `cacheRule_${CacheRule_Settings}${Name_Desc}`
     // ? CacheRuleRemotes Validations
     | 'patternDuplicated'
     | 'patternAfterFallback'
