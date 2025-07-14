@@ -149,8 +149,6 @@ But, it may be prefered to use vault links, enabling this setting will update th
 
 ### CacheRule `identifier`
 
-> NOTE: this feature is not ready yet
-
 The **CacheRules** identifier can be used to relate a note to a **CacheRule** even if the notepath does not matches the **CacheRule** pattern. e.g.:
 
 ````yml
