@@ -80,13 +80,13 @@ export const en: Translations = {
     ],
     //
     cacheRule_enabledName: 'Is this rule enabled?',
-    cacheRule_enabledDesc: 'When disabled the rule is ignored on caching.',
+    cacheRule_enabledDesc: 'When disabled, the rule is ignored on caching.',
     cacheRule_enabled_true: 'Disable CacheRule',
     cacheRule_enabled_false: 'Enable CacheRule',
     //
-    cacheRule_replaceName: 'Update attachment link?',
-    cacheRule_replaceDesc:
-        'When enabled the attachment link on the note will be updated.',
+    cacheRule_archiveName: 'Update attachment link?',
+    cacheRule_archiveDesc:
+        'When enabled, the link on the note will be updated when the attachment is downloaded.',
     //
     cacheRule_idName: 'Rule identifier',
     cacheRule_idDesc:

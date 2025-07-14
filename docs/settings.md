@@ -139,6 +139,14 @@ The next settings can be changed on a per-**CacheRule** basis allowing to have d
 
 The **CacheRules** can be individually removed, but is recommend to just disable them since the removal can not be reversed.
 
+### CacheRule `Update attachment link?`
+
+By default, attachments links on the note are not changed. This allows to:
+- Use the content of the note outside of Obsidian without changes.
+- Remove the files cached by the plugin any time.
+
+But, it may be prefered to use vault links, enabling this setting will update the link used on the note to reference the attachment, when the file is cached.
+
 ### CacheRule `identifier`
 
 > NOTE: this feature is not ready yet

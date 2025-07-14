@@ -8,11 +8,13 @@ If you search help about the **Settings** you can check the [documentation](./do
 
 This plugin for Obsidian, stores remote attachments (currently only images) locally inside the vault.
 
-The note is **NOT** modified, this way even outside of the vault the attachments keep working with the remotes URL.
+The note is not modified by default, this way even outside of the vault the attachments keep working with the remotes URL.
+
+> _Note:_ The attachments can be _"archived"_ instead, which makes the note reference the local file, check [`Update attachment link?`](./docs/settings.md#cacherule-update-attachment-link).
 
 When the attachment is rendered in a note, the local version is used instead of the remote working as a local cache.
 
-> The cached attachments can be deleted any time to free up disk space.
+> _Note:_ The cached attachments can be deleted any time to free up disk space.
 
 In detail, during the Obsidian render process, when an `img` is found:
 
@@ -95,16 +97,17 @@ On other environments where the package can not be used as a dependency, the API
 
 ```ts
 declare namespace AttachmentsCache {
-  /** Test whether the attachments should be cached. */
-  function mayCache(notepath: string, remote: string): boolean
-  /** Test whether a remote file is already cached. */
-  function isCached(notepath: string, remote: string): Promise<boolean>
-  /** Tries to map a remote url into a Vault resourcePath. */
-  function resource(notepath: string, remote: string): Promise<string | undefined>
-  /** Tries to map a remote url into a Vault filePath. */
-  function resolve(notepath: string, remote: string): Promise<string | undefined>
-  /** Tries to cache a file locally and returns a Vault resourcePath. */
-  function cache(notepath: string, remote: string): Promise<string | undefined>
+    /** Determine whether the attachment matches a **short-term** storage rule. */
+    isCacheable(remote: string, notepath: string, frontmatter?: unknown): boolean
+    /** Determine whether the attachment matches a **long-term** storage rule. */
+    isArchivable(remote: string, notepath: string, frontmatter?: unknown): boolean
+    /** Download the attachment and provide a resourcePath. */
+    cache(remote: string, notepath: string, frontmatter?: unknown): Promise<string | undefined>
+    /**
+     * Download the attachment and update the reference on the note.
+     * @returns a resourcePath if the attachment is cacheable but not archivable.
+     */
+    archive(remote: string, notepath: string, frontmatter?: unknown): Promise<string | undefined>
 }
 ```
 

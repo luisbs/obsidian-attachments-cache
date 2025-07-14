@@ -12,7 +12,7 @@ type Overrides_Settings =
     | 'noteCacheRule'
 
 type CacheRule_Strings = 'id' | 'pattern' | 'storage' | 'remotes'
-type CacheRule_Settings = 'remove' | 'enabled' | 'replace' | CacheRule_Strings
+type CacheRule_Settings = 'remove' | 'enabled' | 'archive' | CacheRule_Strings
 
 /** Translations that REQUIRE to be strings */
 export type TextTranslation =

@@ -122,11 +122,11 @@ export class CacheRuleSettings {
         })
 
         const replaceSetting = new Setting(this.#cacheRuleDetails)
-        replaceSetting.setName(i18n.translate('cacheRule_replaceName'))
-        replaceSetting.setDesc(i18n.translate('cacheRule_replaceDesc'))
+        replaceSetting.setName(i18n.translate('cacheRule_archiveName'))
+        replaceSetting.setDesc(i18n.translate('cacheRule_archiveDesc'))
         replaceSetting.addToggle((toggle) => {
-            toggle.setValue(this.#rule.replace)
-            toggle.onChange(this.#update.bind(this, 'replace'))
+            toggle.setValue(this.#rule.archive)
+            toggle.onChange(this.#update.bind(this, 'archive'))
         })
 
         const [idSetting, idHandler] = this.#initSetting('id')

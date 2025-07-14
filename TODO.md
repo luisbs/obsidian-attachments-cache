@@ -6,6 +6,7 @@
 - [x] Support per-path URL lists.
 - [x] Support glob patterns on Vault paths.
 - [x] Whitelist/blacklist remote URLs to cache.
+- [x] Support updating the attachment link on the note.
 - [x] Support per-link overrides to cache/ignore an individual attachment.
 - [x] Support per-note overrides to cache/ignore notes attachments.
 - [x] Support per-note overrides to attach to the behavior of a CacheRule.
