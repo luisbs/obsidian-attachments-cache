@@ -1,5 +1,6 @@
 import { URI } from '@luis.bs/obsidian-fnc/lib/utility/uri'
 import { minimatch } from 'minimatch'
+import type { FrontMatterCache } from 'obsidian'
 import {
     type AttachmentsCacheState,
     type ExtendedCacheRule,
@@ -20,8 +21,8 @@ export interface CacheRule {
     id: string
     /** Allow disabling the rule instead of been removed. */
     enabled: boolean
-    /** Whether or not the attachment links should be replaced. */
-    replace: boolean
+    /** Whether to update the attachment reference on the note. */
+    archive: boolean
     /** Vault path to store the attachments into. */
     storage: string
     /** Glob pattern to match the notes-path against. */
@@ -33,7 +34,7 @@ export interface CacheRule {
 export const DEFAULT_CACHE_RULE = Object.freeze<CacheRule>({
     id: 'FALLBACK',
     enabled: true,
-    replace: false,
+    archive: false,
     storage: '{folderpath}',
     pattern: '*',
     remotes: 'w *',
@@ -53,7 +54,7 @@ export function prepareCacheRules(
         return {
             id: rule.id ?? '',
             enabled: rule.enabled ?? false,
-            replace: rule.replace ?? false,
+            archive: rule.archive ?? false,
             storage: rule.storage ?? rule.target ?? '',
             pattern: rule.pattern ?? '',
             remotes,
@@ -65,11 +66,11 @@ export function prepareCacheRules(
 export function findCacheRule(
     state: AttachmentsCacheState,
     notepath: string,
-    frontmatter?: Record<string, unknown>,
+    frontmatter?: FrontMatterCache,
 ): ExtendedCacheRule | undefined {
     // match based on the CacheRule reference
     if (frontmatter && state.note_param_rule in frontmatter) {
-        const id = frontmatter[state.note_param_rule]
+        const id = frontmatter[state.note_param_rule] as unknown
         if (typeof id === 'string') {
             for (const rule of state.cache_rules) {
                 if (!rule.enabled) continue

@@ -14,7 +14,7 @@ import { prepareState, type ExtendedCacheRule } from '../PluginState'
 const A = Object.freeze<ExtendedCacheRule>({
     id: 'papers',
     enabled: true,
-    replace: false,
+    archive: false,
     pattern: 'notes/**',
     storage: '{folderpath}/attachments',
     remotes: 'w *',
@@ -23,7 +23,7 @@ const A = Object.freeze<ExtendedCacheRule>({
 const B = Object.freeze<ExtendedCacheRule>({
     id: 'files',
     enabled: true,
-    replace: false,
+    archive: false,
     pattern: '*',
     storage: 'attachments/{notepath}',
     remotes: 'w *',
@@ -32,7 +32,7 @@ const B = Object.freeze<ExtendedCacheRule>({
 const C = Object.freeze<ExtendedCacheRule>({
     id: 'files',
     enabled: false,
-    replace: false,
+    archive: false,
     pattern: '*',
     storage: 'attachments/{notepath}',
     remotes: 'w *',
@@ -41,7 +41,7 @@ const C = Object.freeze<ExtendedCacheRule>({
 const N = Object.freeze<ExtendedCacheRule>({
     id: 'images',
     enabled: true,
-    replace: false,
+    archive: false,
     pattern: 'images/**',
     storage: 'attachments/images/{notename}',
     remotes: [
@@ -64,7 +64,7 @@ const N = Object.freeze<ExtendedCacheRule>({
 const O = Object.freeze<Partial<LoadedCacheRule>>({
     id: 'images',
     enabled: true,
-    replace: false,
+    archive: false,
     pattern: 'images/**',
     target: 'attachments/images/{notename}',
     remotes: [

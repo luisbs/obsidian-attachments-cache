@@ -3,31 +3,34 @@ import type { App } from 'obsidian'
 
 /** Public API for third-party integration. */
 export interface AttachmentsCacheApi {
-    /** Test whether the attachments should be cached. */
-    mayCache(remote: string, notepath: string, frontmatter?: unknown): boolean
-    /** Test whether a remote file is already cached. */
-    isCached(remote: string, notepath: string, frontmatter?: unknown): boolean
-    /** Tries to map a remote url into a Vault resourcePath. */
-    resource(
+    /** Determine whether the attachment matches a **short-term** storage rule. */
+    isCacheable(
         remote: string,
         notepath: string,
         frontmatter?: unknown,
-    ): undefined | string
-    /** Tries to map a remote url into a Vault filePath. */
-    resolve(
-        remote: string,
-        notepath: string,
-        frontmatter?: unknown,
-    ): undefined | string
-    /**
-     * Tries to cache a file localy and returns a Vault resourcePath.
-     * @returns the Vault resourcePath or a Promise for it.
-     */
+    ): boolean
+    /** Download the attachment and provide a resourcePath. */
     cache(
         remote: string,
         notepath: string,
         frontmatter?: unknown,
-    ): undefined | string | Promise<undefined | string>
+    ): Promise<string | undefined>
+
+    /** Determine whether the attachment matches a **long-term** storage rule. */
+    isArchivable(
+        remote: string,
+        notepath: string,
+        frontmatter?: unknown,
+    ): boolean
+    /**
+     * Download the attachment and update the reference on the note.
+     * @returns a resourcePath if the attachment is cacheable but not archivable.
+     */
+    archive(
+        remote: string,
+        notepath: string,
+        frontmatter?: unknown,
+    ): Promise<string | undefined>
 }
 
 ///////////////////////

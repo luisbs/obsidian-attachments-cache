@@ -1,5 +1,5 @@
 import { type Logger, type LoggingGroup, URI, URL } from '@luis.bs/obsidian-fnc'
-import { normalizePath, requestUrl } from 'obsidian'
+import { type FrontMatterCache, normalizePath, requestUrl } from 'obsidian'
 import { AttachmentError } from './commons/AttachmentError'
 import {
     type CacheRule,
@@ -24,135 +24,88 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         this.#plugin = plugin
     }
 
-    mayCache(remote: string, notepath: string, frontmatter?: unknown): boolean {
-        return !!this.#findCache(remote, notepath, frontmatter, this.#log)
-    }
-
-    isCached(remote: string, notepath: string, frontmatter?: unknown): boolean {
-        const filepath = this.resolve(remote, notepath, frontmatter)
-        return !!filepath && !!this.#plugin.app.vault.getFileByPath(filepath)
-    }
-
-    resource(
+    isCacheable(
         remote: string,
         notepath: string,
         frontmatter?: unknown,
-    ): undefined | string {
-        const filepath = this.resolve(remote, notepath, frontmatter)
-        if (!filepath) return
-
-        const file = this.#plugin.app.vault.getFileByPath(filepath)
-        return file ? this.#plugin.app.vault.getResourcePath(file) : undefined
+    ): boolean {
+        return !!this.#findCacheRule(remote, notepath, frontmatter, this.#log)
     }
 
-    resolve(
+    isArchivable(
         remote: string,
         notepath: string,
         frontmatter?: unknown,
-    ): undefined | string {
-        const group = this.#log.group()
-
-        try {
-            group.debug('Resolving', { remote, notepath, frontmatter })
-            const filepath = this.#resolve(remote, notepath, frontmatter, group)
-            if (filepath) {
-                group.flush(`remote resolved <${remote}>`)
-                return filepath
-            }
-        } catch (error) {
-            group.error(error)
-        }
-
-        group.flush(`remote could not be resolved <${remote}>`)
-        return
+    ): boolean {
+        return !!this.#findCacheRule(remote, notepath, frontmatter, this.#log)
+            ?.archive
     }
 
-    cache(
+    async cache(
         remote: string,
         notepath: string,
         frontmatter?: unknown,
-    ): undefined | string | Promise<undefined | string> {
-        if (remote.startsWith('app')) return
+    ): Promise<string | undefined> {
         if (!remote.startsWith('http')) {
-            this.#log.info(`remote(${remote}) should at least start with http`)
+            this.#log.debug(`not an URL «${remote}»`)
             return
         }
 
         const group = this.#log.group()
         try {
             group.debug('Caching', { remote, notepath, frontmatter })
-            const filepath = this.#resolve(remote, notepath, frontmatter, group)
-            if (!filepath) {
-                group.debug('remote could not be resolved')
-                group.flush(`remote was not cached <${remote}>`)
-                return
-            }
+            const [localpath] = //
+                this.#resolveLocalpath(remote, notepath, frontmatter, group)
 
-            // check existence
-            const cachedFile = this.#plugin.app.vault.getFileByPath(filepath)
-            if (cachedFile) {
-                group.flush(`remote is already in cache <${remote}>`)
-                return this.#plugin.app.vault.getResourcePath(cachedFile)
-            }
-
-            // download file
-            return this.#cache(remote, filepath, group)
+            return await this.#downloadAttachment(remote, localpath, group)
         } catch (error) {
-            group.error(error)
+            if (error instanceof AttachmentError) group.info(error)
+            else group.warn(error)
         }
 
-        group.flush(`remote could not be cached <${remote}>`)
+        group.flush(`failed cache of «${remote}»`)
         return
     }
 
-    /** @throws {AttachmentError} */
-    #resolve(
+    async archive(
         remote: string,
         notepath: string,
-        frontmatter: unknown,
-        log: Logger,
-    ): undefined | string {
-        const baseUrl = URL.getBaseurl(remote)
-        if (!baseUrl || !URI.hasExt(remote)) {
-            log.debug('remote is not a valid URL')
-            throw new AttachmentError('remote-no-url', `remote(${remote})`)
-        }
-
-        // faster resolution
-        const cachedPath = this.#memo.get(baseUrl)
-        if (cachedPath) {
-            log.debug('remote resolved from cache', cachedPath)
-            return cachedPath
-        }
-
-        // match cache rules
-        const rule = this.#findCache(remote, notepath, frontmatter, log)
-        if (!rule) {
-            log.debug('a cache rule could not be matched')
+        frontmatter?: unknown,
+    ): Promise<string | undefined> {
+        if (!remote.startsWith('http')) {
+            this.#log.info(`remote(${remote}) is not an URL`)
             return
         }
 
-        // ensure path normalization
-        const filename = URI.getName(baseUrl)
-        if (!filename) {
-            log.warn(`a filename could not be identified from <${filename}>`)
-            return
+        const group = this.#log.group()
+        try {
+            group.debug('Archiving', { remote, notepath, frontmatter })
+            const [localpath, rule] = //
+                this.#resolveLocalpath(remote, notepath, frontmatter, group)
+            const filepath = //
+                await this.#downloadAttachment(remote, localpath, group)
+
+            // only archive if the user wants that
+            const cacherule = //
+                rule ??
+                this.#findCacheRule(remote, notepath, frontmatter, group)
+
+            if (!cacherule?.archive) {
+                await this.#updateReferences(remote, notepath, localpath, group)
+            }
+
+            return filepath
+        } catch (error) {
+            if (error instanceof AttachmentError) group.info(error)
+            else group.warn(error)
         }
 
-        const filepath = resolveCachePath(rule.storage, notepath, filename)
-        const localPath = !this.#plugin.state.allow_characters
-            ? normalizePath(URI.normalize(filepath))
-            : normalizePath(filepath)
-
-        // save for faster resolution
-        this.#memo.set(baseUrl, localPath)
-
-        log.debug(`remote resolved <${localPath}>`)
-        return localPath
+        group.flush(`remote could not be cached «${remote}»`)
+        return
     }
 
     /** Try to match the remote against the active cache rules. */
-    #findCache(
+    #findCacheRule(
         remote: string,
         notepath: string,
         frontmatter: unknown,
@@ -161,7 +114,7 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         log.debug('searching an active cache rule')
         const fm =
             typeof frontmatter === 'object'
-                ? (frontmatter as Record<string, unknown>)
+                ? (frontmatter as FrontMatterCache)
                 : this.#plugin.app.metadataCache.getCache(notepath)?.frontmatter
 
         const rule = findCacheRule(this.#plugin.state, notepath, fm)
@@ -191,51 +144,125 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         }
 
         // standard behavior
-        if (testCacheRemote(rule.remote_patterns, remote)) {
-            log.debug('remote has to be cached')
-            return rule
+        if (!testCacheRemote(rule.remote_patterns, remote)) {
+            log.debug('remote has to be ignored')
+            return
         }
-        log.debug('remote has to be ignored')
-        return
+        log.debug('remote has to be cached')
+        return rule
     }
 
     /** @throws {AttachmentError} */
-    async #cache(
+    #resolveLocalpath(
         remote: string,
-        filepath: string,
-        group: LoggingGroup,
-    ): Promise<undefined | string> {
-        group.debug(`Downloading ${remote}`)
-        try {
-            const referer = URL.getOrigin(remote)
-            const response = await requestUrl({
-                url: remote + '?api',
-                throw: false,
-                method: 'GET',
-                headers: { Referer: referer ? referer + '/' : '' },
-            })
-            AttachmentError.assertResponse(remote, response, 'url-request-get')
-
-            group.debug(`Storing <${filepath}>`)
-            const parentpath = URI.getParent(filepath) ?? '/'
-            if (!this.#plugin.app.vault.getFolderByPath(parentpath)) {
-                await this.#plugin.app.vault.createFolder(parentpath)
-            }
-
-            // prettier-ignore
-            await this.#plugin.app.vault.createBinary(filepath, response.arrayBuffer)
-
-            // check result
-            const localFile = this.#plugin.app.vault.getFileByPath(filepath)
-            if (localFile) {
-                group.flush(`remote was cached <${remote}>`)
-                return this.#plugin.app.vault.getResourcePath(localFile)
-            }
-        } catch (error) {
-            group.error(error)
+        notepath: string,
+        frontmatter: unknown,
+        log: Logger,
+    ): [string, CacheRule?] {
+        // matches full URL including `#ids?and=params`
+        const cachedPath1 = this.#memo.get(remote)
+        if (cachedPath1) {
+            log.debug(`resolved from cache «${cachedPath1}»`)
+            return [cachedPath1]
         }
 
-        group.flush(`remote failed when caching <${remote}>`)
-        return
+        const baseUrl = URL.getBaseurl(remote)
+        if (!baseUrl || !URI.hasExt(remote))
+            throw new AttachmentError('remote is not a valid URL')
+
+        // matches base URL excluding anything after # or ?
+        const cachedPath2 = this.#memo.get(baseUrl)
+        if (cachedPath2) {
+            log.debug(`resolved from cache «${cachedPath2}»`)
+            return [cachedPath2]
+        }
+
+        const rule = this.#findCacheRule(remote, notepath, frontmatter, log)
+        if (!rule) throw new AttachmentError('missing active cache rule')
+
+        const filename = URI.getName(baseUrl)
+        if (!filename) throw new AttachmentError('unidentifiable filename')
+
+        // ensure path normalization
+        const localpath = resolveCachePath(rule.storage, notepath, filename)
+        const filepath = !this.#plugin.state.allow_characters
+            ? normalizePath(URI.normalize(localpath))
+            : normalizePath(localpath)
+
+        // save for faster resolution
+        this.#memo.set(baseUrl, filepath)
+        this.#memo.set(remote, filepath)
+
+        log.debug(`resolved «${filepath}»`)
+        return [filepath, rule]
+    }
+
+    /** @throws {AttachmentError} */
+    async #downloadAttachment(
+        remote: string,
+        filepath: string,
+        log: LoggingGroup,
+    ): Promise<string | undefined> {
+        // check existence
+        const cachedFile = this.#plugin.app.vault.getFileByPath(filepath)
+        if (cachedFile) {
+            log.debug(`remote was previously downloaded`)
+            return this.#plugin.app.vault.getResourcePath(cachedFile)
+        }
+
+        log.debug(`downloading «${remote}»`)
+        const referer = URL.getOrigin(remote)
+        const response = await requestUrl({
+            url: remote, //+ '?api',
+            throw: false,
+            method: 'GET',
+            headers: { Referer: referer ? referer + '/' : '' },
+        })
+        if (response.status >= 400) {
+            throw new AttachmentError(
+                `requested url: ${remote}` +
+                    `\nresponse status: ${response.status}` +
+                    `\nresponse headers:\n${JSON.stringify(response.headers)}`,
+            )
+        }
+
+        log.debug(`storing «${filepath}»`)
+        const parentpath = URI.getParent(filepath) ?? '/'
+        if (!this.#plugin.app.vault.getFolderByPath(parentpath)) {
+            await this.#plugin.app.vault.createFolder(parentpath)
+        }
+
+        // prettier-ignore
+        await this.#plugin.app.vault.createBinary(filepath, response.arrayBuffer)
+
+        // check result
+        const localFile = this.#plugin.app.vault.getFileByPath(filepath)
+        if (!localFile) throw new AttachmentError('attachment download failed')
+
+        log.debug(`remote was downloaded`)
+        return this.#plugin.app.vault.getResourcePath(localFile)
+    }
+
+    /** @throws {AttachmentError} */
+    async #updateReferences(
+        remote: string,
+        notepath: string,
+        filepath: string,
+        log: LoggingGroup,
+    ): Promise<void> {
+        const noteFile = this.#plugin.app.vault.getFileByPath(notepath)
+        if (!noteFile) throw new AttachmentError(`missing note «${notepath}»`)
+
+        const url = remote.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&')
+        const matcher = new RegExp(`!\\[([^\\]]*)\\]\\( *${url} *\\)`, 'g')
+
+        // transform `![label](remote)` into `![[remote|label]]`
+        log.debug('persisting local attachment')
+        await this.#plugin.app.vault.process(noteFile, (content) => {
+            return content.replaceAll(matcher, (_match, label, _index) => {
+                return `![[${filepath}|${label}]]`
+            })
+        })
+        log.debug('persisted local attachment')
     }
 }

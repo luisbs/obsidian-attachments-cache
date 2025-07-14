@@ -89,58 +89,46 @@ export default class AttachmentsCachePlugin extends Plugin {
     #registerMarkdownProcessor(): void {
         this.#mpp = this.registerMarkdownPostProcessor(
             (element, { sourcePath, frontmatter }) => {
-                // inmediate execution for static attachments
-                // avoid the creation of 2 requests for them
-                this.#handleCache(element, sourcePath, frontmatter)
+                // static attachments can be archived
+                this.#handleAttachments(element, (remote) => {
+                    return this.#api.archive(remote, sourcePath, frontmatter)
+                })
 
-                // defers a second execution, with a timeout to
-                // allow async or slow PostProcessors to render extra content
-                if (this.state.plugin_timeout) {
-                    setTimeout(() => {
-                        this.#handleCache(element, sourcePath, frontmatter)
-                    }, this.state.plugin_timeout)
-                }
+                // dynamic attachments from async or slow PostProcessors
+                // can only be cached and require a defered execution
+                if (!this.state.plugin_timeout) return
+                setTimeout(() => {
+                    this.#handleAttachments(element, (remote) => {
+                        return this.#api.cache(remote, sourcePath, frontmatter)
+                    })
+                }, this.state.plugin_timeout)
             },
         )
     }
 
-    #handleCache(
+    #handleAttachments(
         element: HTMLElement,
-        notepath: string,
-        frontmatter: unknown,
+        resolve: (remote: string) => Promise<string | undefined>,
     ): void {
-        for (const el of Array.from(element.querySelectorAll('img'))) {
-            const resolved = this.#api.cache(el.src, notepath, frontmatter)
-            // when `result = undefined` keep the original URL
-            if (!resolved) continue
+        // TODO: add support for other types of attachments
+        // other attachments to support: https://help.obsidian.md/file-formats
 
-            // when `result is string` the attachment it's already cached
-            if (String.isString(resolved)) {
-                el.src = resolved
-                continue
-            }
-
-            // otherwise the image is been downloaded, so
+        element.querySelectorAll('img').forEach((el) => {
             // restrain Obsidian from downloading the original URL
-            const source = [el.src, el.title]
+            const [remote, title] = [el.src, el.title]
             el.title = 'Caching...'
             el.src = ''
 
-            // when the download is completed
-            void resolved.then((resourcepath) => {
+            // wrapped download
+            void resolve(remote).then((resourcepath) => {
                 if (resourcepath) {
-                    // when the download succeded, use the local URL
+                    el.title = title || remote
                     el.src = resourcepath
-                    el.title = source[1] ?? source[0]
                 } else {
-                    // otherwise restore the original URL
-                    el.src = source[0]
-                    el.title = source[1]
+                    el.title = title
+                    el.src = remote
                 }
             })
-        }
-
-        // TODO: add support for other types of attachments
-        // other attachments to support: https://help.obsidian.md/file-formats
+        })
     }
 }
