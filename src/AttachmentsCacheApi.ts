@@ -57,13 +57,14 @@ export class AttachmentsCache implements AttachmentsCacheApi {
             const [localpath] = //
                 this.#resolveLocalpath(remote, notepath, frontmatter, group)
 
+            group.flush(`remote was cached «${remote}»`)
             return await this.#downloadAttachment(remote, localpath, group)
         } catch (error) {
             if (error instanceof AttachmentError) group.info(error)
             else group.warn(error)
         }
 
-        group.flush(`failed cache of «${remote}»`)
+        group.flush(`remove could not be cached «${remote}»`)
         return
     }
 
@@ -89,18 +90,18 @@ export class AttachmentsCache implements AttachmentsCacheApi {
             const cacherule = //
                 rule ??
                 this.#findCacheRule(remote, notepath, frontmatter, group)
-
-            if (!cacherule?.archive) {
+            if (cacherule?.archive) {
                 await this.#updateReferences(remote, notepath, localpath, group)
             }
 
+            group.flush(`remote was archived «${remote}»`)
             return filepath
         } catch (error) {
             if (error instanceof AttachmentError) group.info(error)
             else group.warn(error)
         }
 
-        group.flush(`remote could not be cached «${remote}»`)
+        group.flush(`remote could not be archived «${remote}»`)
         return
     }
 

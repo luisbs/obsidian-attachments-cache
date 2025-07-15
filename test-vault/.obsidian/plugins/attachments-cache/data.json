@@ -11,6 +11,7 @@
     {
       "id": "empty",
       "enabled": false,
+      "archive": false,
       "storage": "attachments/{notename}",
       "pattern": "*",
       "remotes": ""
@@ -18,6 +19,15 @@
     {
       "id": "rule_override",
       "enabled": true,
+      "archive": false,
+      "storage": "attachments/{notename}",
+      "pattern": "doesnt-match",
+      "remotes": "w *"
+    },
+    {
+      "id": "rule_archive",
+      "enabled": true,
+      "archive": true,
       "storage": "attachments/{notename}",
       "pattern": "doesnt-match",
       "remotes": "w *"
@@ -25,6 +35,7 @@
     {
       "id": "default",
       "enabled": true,
+      "archive": false,
       "storage": "attachments/{notepath}",
       "pattern": "*",
       "remotes": "b 4kwallpapers.com/images\nw github.com/elementary/wallpapers\nw images.pexels.com/photos\n\n# fallback behavior\nb *"
