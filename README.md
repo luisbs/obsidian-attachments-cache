@@ -35,12 +35,9 @@ In detail, during the Obsidian render process, when an `img` is found:
 Based on the Obsidian supported [file-formats](https://help.obsidian.md/file-formats) the next attachments formats are been cached:
 
 - [x] Images: `.avif`, `.bmp`, `.gif`, `.jpeg`, `.jpg`, `.png`, `.svg`, `.webp`
-- [ ] Audio: `.flac`, `.m4a`, `.mp3`, `.ogg`, `.wav`, `.webm`, `.3gp`
-- [ ] Video: `.mkv`, `.mov`, `.mp4`, `.ogv`, `.webm`
-- [ ] PDF: `.pdf`
-
-> The unmarked formats are not cached currently.
-> Caching the missing files formats is a main objective for future releases.
+- [x] Audio: `.flac`, `.m4a`, `.mp3`, `.ogg`, `.wav`, `.webm`, `.3gp`
+- [x] Video: `.mkv`, `.mov`, `.mp4`, `.ogv`, `.webm`
+- [x] PDF: `.pdf`
 
 ---
 
@@ -101,12 +98,9 @@ declare namespace AttachmentsCache {
     isCacheable(remote: string, notepath: string, frontmatter?: unknown): boolean
     /** Determine whether the attachment matches a **long-term** storage rule. */
     isArchivable(remote: string, notepath: string, frontmatter?: unknown): boolean
-    /** Download the attachment and provide a resourcePath. */
+    /** Download the attachment and get the localpath. */
     cache(remote: string, notepath: string, frontmatter?: unknown): Promise<string | undefined>
-    /**
-     * Download the attachment and update the reference on the note.
-     * @returns a resourcePath if the attachment is cacheable but not archivable.
-     */
+    /** Download the attachment, update the reference on the note and get the localpath. */
     archive(remote: string, notepath: string, frontmatter?: unknown): Promise<string | undefined>
 }
 ```

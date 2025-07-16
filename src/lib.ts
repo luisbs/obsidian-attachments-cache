@@ -9,7 +9,7 @@ export interface AttachmentsCacheApi {
         notepath: string,
         frontmatter?: unknown,
     ): boolean
-    /** Download the attachment and provide a resourcePath. */
+    /** Download the attachment and get the localpath. */
     cache(
         remote: string,
         notepath: string,
@@ -22,10 +22,7 @@ export interface AttachmentsCacheApi {
         notepath: string,
         frontmatter?: unknown,
     ): boolean
-    /**
-     * Download the attachment and update the reference on the note.
-     * @returns a resourcePath if the attachment is cacheable but not archivable.
-     */
+    /** Download the attachment, update the reference on the note and get the localpath. */
     archive(
         remote: string,
         notepath: string,

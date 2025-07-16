@@ -1,5 +1,6 @@
 import { Logger, LogLevel } from '@luis.bs/obsidian-fnc'
 import {
+    MarkdownRenderer,
     Plugin,
     type App,
     type MarkdownPostProcessor,
@@ -88,47 +89,77 @@ export default class AttachmentsCachePlugin extends Plugin {
      */
     #registerMarkdownProcessor(): void {
         this.#mpp = this.registerMarkdownPostProcessor(
-            (element, { sourcePath, frontmatter }) => {
+            (element, { sourcePath: notepath, frontmatter: fm }) => {
                 // static attachments can be archived
-                this.#handleAttachments(element, (remote) => {
-                    return this.#api.archive(remote, sourcePath, frontmatter)
+                element.querySelectorAll('img').forEach((imageEl) => {
+                    void this.#handle(imageEl, notepath, (remote) => {
+                        return this.#api.archive(remote, notepath, fm)
+                    })
                 })
 
                 // dynamic attachments from async or slow PostProcessors
                 // can only be cached and require a defered execution
                 if (!this.state.plugin_timeout) return
                 setTimeout(() => {
-                    this.#handleAttachments(element, (remote) => {
-                        return this.#api.cache(remote, sourcePath, frontmatter)
+                    element.querySelectorAll('img').forEach((imageEl) => {
+                        void this.#handle(imageEl, notepath, (remote) => {
+                            return this.#api.cache(remote, notepath, fm)
+                        })
                     })
                 }, this.state.plugin_timeout)
             },
         )
     }
 
-    #handleAttachments(
-        element: HTMLElement,
+    async #handle(
+        imageEl: HTMLImageElement,
+        notepath: string,
         resolve: (remote: string) => Promise<string | undefined>,
-    ): void {
-        // TODO: add support for other types of attachments
-        // other attachments to support: https://help.obsidian.md/file-formats
+    ): Promise<void> {
+        if (
+            imageEl.hasClass('attachments-cache-cached') ||
+            !imageEl.parentElement?.contains(imageEl)
+        ) {
+            // since handleAttachments runs twice,
+            // it may have been handled already
+            return
+        }
 
-        element.querySelectorAll('img').forEach((el) => {
-            // restrain Obsidian from downloading the original URL
-            const [remote, title] = [el.src, el.title]
-            el.title = 'Caching...'
-            el.src = ''
+        // restrain Obsidian from downloading the original URL
+        const [remote, title] = [imageEl.src, imageEl.title]
+        imageEl.addClass('attachments-cache-cached')
+        imageEl.title = 'Caching...'
+        imageEl.src = ''
 
-            // wrapped download
-            void resolve(remote).then((resourcepath) => {
-                if (resourcepath) {
-                    el.title = title || remote
-                    el.src = resourcepath
-                } else {
-                    el.title = title
-                    el.src = remote
-                }
-            })
-        })
+        const localpath = await resolve(remote)
+        if (!localpath) {
+            imageEl.title = title
+            imageEl.src = remote
+            return
+        }
+
+        // images maybe rendered without change
+        if (/\.(avif|bmp|gif|jpeg|jpg|png|svg|webp)($|#|\?)/.test(remote)) {
+            const localFile = this.app.vault.getFileByPath(localpath)
+            if (localFile) {
+                imageEl.src = this.app.vault.getResourcePath(localFile)
+                imageEl.title = title || remote
+            } else imageEl.title = `Missing file '${localpath}'`
+            return
+        }
+
+        // prettier-ignore
+        const wrapperEl = createEl('p', { cls: 'auto attachments-cache-wrapper' })
+        imageEl.parentElement.replaceChild(wrapperEl, imageEl)
+
+        // let Obsidian handle the rendering
+        // TODO: PDF attachments may be renderer shorter
+        void MarkdownRenderer.render(
+            this.app,
+            `![[${localpath}|${title || remote}]]`,
+            wrapperEl,
+            notepath,
+            this,
+        )
     }
 }

@@ -57,8 +57,11 @@ export class AttachmentsCache implements AttachmentsCacheApi {
             const [localpath] = //
                 this.#resolveLocalpath(remote, notepath, frontmatter, group)
 
+            // save to vault
+            await this.#downloadAttachment(remote, localpath, group)
+
             group.flush(`remote was cached «${remote}»`)
-            return await this.#downloadAttachment(remote, localpath, group)
+            return localpath
         } catch (error) {
             if (error instanceof AttachmentError) group.info(error)
             else group.warn(error)
@@ -83,10 +86,11 @@ export class AttachmentsCache implements AttachmentsCacheApi {
             group.debug('Archiving', { remote, notepath, frontmatter })
             const [localpath, rule] = //
                 this.#resolveLocalpath(remote, notepath, frontmatter, group)
-            const filepath = //
-                await this.#downloadAttachment(remote, localpath, group)
 
-            // only archive if the user wants that
+            // save to vault
+            await this.#downloadAttachment(remote, localpath, group)
+
+            // only update links if the user wants that
             const cacherule = //
                 rule ??
                 this.#findCacheRule(remote, notepath, frontmatter, group)
@@ -95,7 +99,7 @@ export class AttachmentsCache implements AttachmentsCacheApi {
             }
 
             group.flush(`remote was archived «${remote}»`)
-            return filepath
+            return localpath
         } catch (error) {
             if (error instanceof AttachmentError) group.info(error)
             else group.warn(error)
@@ -203,12 +207,12 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         remote: string,
         filepath: string,
         log: LoggingGroup,
-    ): Promise<string | undefined> {
+    ): Promise<void> {
         // check existence
         const cachedFile = this.#plugin.app.vault.getFileByPath(filepath)
         if (cachedFile) {
             log.debug(`remote was previously downloaded`)
-            return this.#plugin.app.vault.getResourcePath(cachedFile)
+            return
         }
 
         log.debug(`downloading «${remote}»`)
@@ -241,7 +245,7 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         if (!localFile) throw new AttachmentError('attachment download failed')
 
         log.debug(`remote was downloaded`)
-        return this.#plugin.app.vault.getResourcePath(localFile)
+        return
     }
 
     /** @throws {AttachmentError} */
