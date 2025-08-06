@@ -29,7 +29,20 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         notepath: string,
         frontmatter?: unknown,
     ): boolean {
-        return !!this.#findCacheRule(remote, notepath, frontmatter, this.#log)
+        const log = this.#log.group()
+        try {
+            log.debug('Cacheable check', { remote, notepath, frontmatter })
+            const found = !!this.#findRule(remote, notepath, frontmatter, log)
+
+            log.flush('CacheRule found', { remote, found })
+            return found
+        } catch (error) {
+            if (error instanceof AttachmentError) log.info(error)
+            else log.warn(error)
+
+            log.flush('Cacheable check failed')
+            return false
+        }
     }
 
     isArchivable(
@@ -37,8 +50,21 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         notepath: string,
         frontmatter?: unknown,
     ): boolean {
-        return !!this.#findCacheRule(remote, notepath, frontmatter, this.#log)
-            ?.archive
+        const log = this.#log.group()
+        try {
+            log.debug('Archivable check', { remote, notepath, frontmatter })
+            const found = !!this.#findRule(remote, notepath, frontmatter, log)
+                .archive
+
+            log.flush('CacheRule found', { remote, found })
+            return found
+        } catch (error) {
+            if (error instanceof AttachmentError) log.info(error)
+            else log.warn(error)
+
+            log.flush('Archivable check failed')
+            return false
+        }
     }
 
     async cache(
@@ -46,29 +72,22 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         notepath: string,
         frontmatter?: unknown,
     ): Promise<string | undefined> {
-        if (!remote.startsWith('http')) {
-            this.#log.debug(`not an URL «${remote}»`)
-            return
-        }
-
-        const group = this.#log.group()
+        const log = this.#log.group()
         try {
-            group.debug('Caching', { remote, notepath, frontmatter })
-            const [localpath] = //
-                this.#resolveLocalpath(remote, notepath, frontmatter, group)
+            log.debug('Caching', { remote, notepath, frontmatter })
+            const rule = this.#findRule(remote, notepath, frontmatter, log)
+            const localpath = this.#getLocalpath(remote, notepath, rule, log)
+            await this.#downloadAttachment(remote, localpath, log)
 
-            // save to vault
-            await this.#downloadAttachment(remote, localpath, group)
-
-            group.flush(`remote was cached «${remote}»`)
+            log.flush(`remote was cached «${remote}»`)
             return localpath
         } catch (error) {
-            if (error instanceof AttachmentError) group.info(error)
-            else group.warn(error)
-        }
+            if (error instanceof AttachmentError) log.info(error)
+            else log.warn(error)
 
-        group.flush(`remove could not be cached «${remote}»`)
-        return
+            log.flush(`remote could not be cached «${remote}»`)
+            return
+        }
     }
 
     async archive(
@@ -76,46 +95,39 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         notepath: string,
         frontmatter?: unknown,
     ): Promise<string | undefined> {
-        if (!remote.startsWith('http')) {
-            this.#log.info(`remote(${remote}) is not an URL`)
-            return
-        }
-
-        const group = this.#log.group()
+        const log = this.#log.group()
         try {
-            group.debug('Archiving', { remote, notepath, frontmatter })
-            const [localpath, rule] = //
-                this.#resolveLocalpath(remote, notepath, frontmatter, group)
-
-            // save to vault
-            await this.#downloadAttachment(remote, localpath, group)
+            log.debug('Archiving', { remote, notepath, frontmatter })
+            const rule = this.#findRule(remote, notepath, frontmatter, log)
+            const localpath = this.#getLocalpath(remote, notepath, rule, log)
+            await this.#downloadAttachment(remote, localpath, log)
 
             // only update links if the user wants that
-            const cacherule = //
-                rule ??
-                this.#findCacheRule(remote, notepath, frontmatter, group)
-            if (cacherule?.archive) {
-                await this.#updateReferences(remote, notepath, localpath, group)
+            if (rule.archive) {
+                await this.#updateReferences(remote, notepath, localpath, log)
             }
 
-            group.flush(`remote was archived «${remote}»`)
+            log.flush(`remote was archived «${remote}»`)
             return localpath
         } catch (error) {
-            if (error instanceof AttachmentError) group.info(error)
-            else group.warn(error)
-        }
+            if (error instanceof AttachmentError) log.info(error)
+            else log.warn(error)
 
-        group.flush(`remote could not be archived «${remote}»`)
-        return
+            log.flush(`remote could not be archived «${remote}»`)
+            return
+        }
     }
 
-    /** Try to match the remote against the active cache rules. */
-    #findCacheRule(
+    /** @throws {AttachmentError} */
+    #findRule(
         remote: string,
         notepath: string,
         frontmatter: unknown,
         log: Logger,
-    ): CacheRule | undefined {
+    ): CacheRule {
+        if (!remote.startsWith('http'))
+            throw new AttachmentError(`not an URL «${remote}»`)
+
         log.debug('searching an active cache rule')
         const fm =
             typeof frontmatter === 'object'
@@ -123,69 +135,59 @@ export class AttachmentsCache implements AttachmentsCacheApi {
                 : this.#plugin.app.metadataCache.getCache(notepath)?.frontmatter
 
         const rule = findCacheRule(this.#plugin.state, notepath, fm)
-        if (!rule?.enabled) {
-            log.debug('notepath does not match and active rule')
-            return
-        }
+        if (!rule?.enabled)
+            throw new AttachmentError(`missing active rule «${notepath}»`)
 
         // URL overrides
-        if (testUrlParam(this.#plugin.state.url_param_ignore, remote)) {
-            log.debug('remote has to be ignored (URL param)')
-            return
-        }
+        if (testUrlParam(this.#plugin.state.url_param_ignore, remote))
+            throw new AttachmentError('ignore remote by URL param')
         if (testUrlParam(this.#plugin.state.url_param_cache, remote)) {
-            log.debug('remote has to be cached (URL param)')
+            log.debug('cache remote by URL param')
             return rule
         }
 
         // Frontmatter overrides
-        if (testFmEntry(fm, this.#plugin.state.note_param_ignore, remote)) {
-            log.debug('remote has to be ignored (Frontmatter attribute)')
-            return
-        }
+        if (testFmEntry(fm, this.#plugin.state.note_param_ignore, remote))
+            throw new AttachmentError('ignore remote by Frontmatter attribute')
         if (testFmEntry(fm, this.#plugin.state.note_param_cache, remote)) {
-            log.debug('remote has to be cached (Frontmatter attribute)')
+            log.debug('cache remote by Frontmatter attribute')
             return rule
         }
 
         // standard behavior
-        if (!testCacheRemote(rule.remote_patterns, remote)) {
-            log.debug('remote has to be ignored')
-            return
+        if (testCacheRemote(rule.remote_patterns, remote)) {
+            log.debug('remote has to be cached')
+            return rule
         }
-        log.debug('remote has to be cached')
-        return rule
+        throw new AttachmentError('ignore remote')
     }
 
     /** @throws {AttachmentError} */
-    #resolveLocalpath(
+    #getLocalpath(
         remote: string,
         notepath: string,
-        frontmatter: unknown,
+        rule: CacheRule,
         log: Logger,
-    ): [string, CacheRule?] {
+    ): string {
         // matches full URL including `#ids?and=params`
         const cachedPath1 = this.#memo.get(remote)
         if (cachedPath1) {
             log.debug(`resolved from cache «${cachedPath1}»`)
-            return [cachedPath1]
+            return cachedPath1
         }
 
-        const baseUrl = URL.getBaseurl(remote)
-        if (!baseUrl || !URI.hasExt(remote))
+        const baseurl = URL.getBaseurl(remote)
+        if (!baseurl || !URI.hasExt(remote))
             throw new AttachmentError('remote is not a valid URL')
 
         // matches base URL excluding anything after # or ?
-        const cachedPath2 = this.#memo.get(baseUrl)
+        const cachedPath2 = this.#memo.get(baseurl)
         if (cachedPath2) {
             log.debug(`resolved from cache «${cachedPath2}»`)
-            return [cachedPath2]
+            return cachedPath2
         }
 
-        const rule = this.#findCacheRule(remote, notepath, frontmatter, log)
-        if (!rule) throw new AttachmentError('missing active cache rule')
-
-        const filename = URI.getName(baseUrl)
+        const filename = URI.getName(baseurl)
         if (!filename) throw new AttachmentError('unidentifiable filename')
 
         // ensure path normalization
@@ -195,11 +197,11 @@ export class AttachmentsCache implements AttachmentsCacheApi {
             : normalizePath(localpath)
 
         // save for faster resolution
-        this.#memo.set(baseUrl, filepath)
+        this.#memo.set(baseurl, filepath)
         this.#memo.set(remote, filepath)
 
         log.debug(`resolved «${filepath}»`)
-        return [filepath, rule]
+        return filepath
     }
 
     /** @throws {AttachmentError} */
