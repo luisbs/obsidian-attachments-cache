@@ -7,6 +7,7 @@ import {
     type PluginManifest,
 } from 'obsidian'
 import { AttachmentsCache } from './AttachmentsCacheApi'
+import { detectRemotes, type DetectedRemote } from './commons/EditorFunctions'
 import {
     prepareSettings,
     type AttachmentsCacheSettings,
@@ -51,7 +52,7 @@ export default class AttachmentsCachePlugin extends Plugin {
         this.addSettingTab(new PluginSettingTab(this))
 
         this.#prepareState(group)
-        this.#registerMarkdownProcessor()
+        this.#registerHandlers()
         group.flush('Loaded AttachmentsCache')
     }
 
@@ -73,21 +74,71 @@ export default class AttachmentsCachePlugin extends Plugin {
         if (this.#mpp) this.#mpp.sortOrder = this.state.plugin_priority
     }
 
-    /**
-     * Priorities sorts the **PostProcesors** order of execution, `higher == after`.
-     * When **PostProcesors** use an `async` function, it is not awaited
-     * so the sortOrder is not enforced.
-     *
-     * When a **PostProcesors** runs after the cache **PostProcesor**,
-     * any attachment generated will not be detected.
-     *
-     * For context on priority of other plugins:
-     * * luisbs/obsidian-components: `-100`
-     * * blacksmithgu/obsidian-dataview: `-100`
-     *
-     * @default `1` caches attachments of normal PostProcesors (`priority = 0`)
-     */
-    #registerMarkdownProcessor(): void {
+    #registerHandlers(): void {
+        this.registerEvent(
+            this.app.workspace.on('editor-paste', async (ev, editor, view) => {
+                if (ev.defaultPrevented) return
+
+                const notepath = view.file?.path
+                if (!notepath) return
+
+                const pasted = ev.clipboardData?.getData('text/plain')
+                if (!pasted) return
+
+                const matches = detectRemotes(pasted)
+                if (matches.length < 1) return
+
+                ev.preventDefault()
+
+                // perform all caches
+                const editions: Array<string | undefined> = []
+                for (const match of matches) {
+                    editions.push(await this.#handleEdition(match, notepath))
+                }
+
+                // no editions to the pasted content are required
+                if (editions.length < 1) {
+                    this.log.debug('Attachments cached on Paste', { pasted })
+                    editor.replaceSelection(pasted)
+                    return
+                }
+
+                // correctly edit the pasted content
+                let offset = 0
+                let result = pasted
+                for (let i = 0; i < matches.length; i++) {
+                    const e = editions[i]
+                    if (!e) continue
+
+                    const m = matches[i]
+                    const head = result.substring(0, offset) // already replaced
+                    const tail = result.substring(offset).replace(m.match, e) // replacing
+
+                    result = head + tail
+                    offset = head.length + e.length
+                }
+
+                console.log({ offset, result })
+                this.log.debug('Attachments cached on Paste', { result })
+                editor.replaceSelection(result)
+                return
+            }),
+        )
+
+        /**
+         * Priorities sorts the **PostProcesors** order of execution, `higher == after`.
+         * When **PostProcesors** use an `async` function, it is not awaited
+         * so the sortOrder is not enforced.
+         *
+         * When a **PostProcesors** runs after the cache **PostProcesor**,
+         * any attachment generated will not be detected.
+         *
+         * For context on priority of other plugins:
+         * * luisbs/obsidian-components: `-100`
+         * * blacksmithgu/obsidian-dataview: `-100`
+         *
+         * @default `1` caches attachments of normal PostProcesors (`priority = 0`)
+         */
         this.#mpp = this.registerMarkdownPostProcessor(
             (element, { sourcePath: notepath, frontmatter: fm }) => {
                 // static attachments can be archived
@@ -109,6 +160,16 @@ export default class AttachmentsCachePlugin extends Plugin {
                 }, this.state.plugin_timeout)
             },
         )
+    }
+
+    async #handleEdition(match: DetectedRemote, notepath: string) {
+        // use cache method to prevent replacement of the url on all file
+        const localpath = await this.#api.cache(match.remote, notepath)
+        if (localpath && this.#api.isArchivable(match.remote, notepath)) {
+            return match.label
+                ? `![[${localpath}|${match.label}]]`
+                : `![[${localpath}]]`
+        }
     }
 
     async #handle(
