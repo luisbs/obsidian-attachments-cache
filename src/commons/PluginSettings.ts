@@ -31,7 +31,9 @@ export interface AttachmentsCacheSettings {
     plugin_level: PluginLevel
     /** Defines the **CachePostProcessor** priority. */
     plugin_priority: PluginPriority
-    /** Defines whether links should be cached on paste. */
+    /** Defines whether attachments should be handled on render. */
+    handle_onrender: boolean
+    /** Defines whether attachments should be handled on paste. */
     handle_onpaste: boolean
     /** Defines the preference over `UTF-8` characters. */
     allow_characters: boolean
@@ -64,6 +66,7 @@ export const DEFAULT_SETTINGS = Object.freeze<AttachmentsCacheSettings>({
     // * and PostProcessors with default priority
     plugin_priority: 'NORMAL',
     //
+    handle_onrender: true,
     handle_onpaste: true,
     allow_characters: false,
     url_param_cache: 'cache_file',
@@ -85,6 +88,7 @@ export function prepareSettings(settings: unknown): AttachmentsCacheSettings {
         plugin_level:      s.plugin_level      ?? DEFAULT_SETTINGS.plugin_level,
         plugin_priority:   s.plugin_priority   ?? DEFAULT_SETTINGS.plugin_priority,
         handle_onpaste:    s.handle_onpaste    ?? DEFAULT_SETTINGS.handle_onpaste,
+        handle_onrender:   s.handle_onrender   ?? DEFAULT_SETTINGS.handle_onrender,
         allow_characters:  s.allow_characters  ?? DEFAULT_SETTINGS.allow_characters,
         url_param_cache:   s.url_param_cache   ?? DEFAULT_SETTINGS.url_param_cache,
         url_param_ignore:  s.url_param_ignore  ?? DEFAULT_SETTINGS.url_param_ignore,

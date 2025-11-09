@@ -2,4 +2,4 @@
 '@luis.bs/obsidian-attachments-cache': patch
 ---
 
-Added triggers for caching attachments onCommand
+Added toggle to cache onRender

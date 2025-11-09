@@ -21,8 +21,12 @@ export type TextTranslation =
     | 'removeConfirmation'
     // * General Section
     | `pluginPriorityOption${'Lower' | 'Normal' | 'Higher'}`
-    | `handleOnpaste${Name_Desc}`
+    // * Triggers Section
+    | 'triggersSection'
+    | `handleOnrenderName`
+    | `handleOnpasteName`
     // * Overrides Section
+    | 'overridesSection'
     | `${Overrides_Settings}Hint`
     // * CacheRule Section
     | `cacheRule${'Add' | 'Edit' | 'MoveAbove' | 'MoveBelow'}`
@@ -30,15 +34,16 @@ export type TextTranslation =
     | `cacheRule_enabled_${true_false}`
     | `cacheRule_${CacheRule_Strings}Hint`
 
-/** Translations that not require to be strings */
+/** Translations that may contain more than plain strings */
 export type FlexibleTranslation =
     | 'valueMayNotBeEmpty'
     // * General Section
     | `pluginLogLevel${Name_Desc}`
     | `pluginPriority${Name_Desc}`
     | `allowCharacters${Name_Desc}`
+    // * Triggers Section
+    | 'triggersSectionDesc'
     // * Overrides Section
-    | 'overridesSection'
     | 'overridesSectionDesc'
     | `${Overrides_Settings}${Name_Desc}`
     // * CacheRule Section

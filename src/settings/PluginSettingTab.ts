@@ -30,6 +30,11 @@ export class PluginSettingTab extends BaseSettingTab {
 
         this.#displayGeneralSettings()
 
+        const triggersSettings = new Setting(this.containerEl).setHeading()
+        triggersSettings.setName(i18n.translate('triggersSection'))
+        triggersSettings.setDesc(i18n.translate('triggersSectionDesc'))
+        this.#displayTriggersSettings()
+
         const overridesSection = new Setting(this.containerEl).setHeading()
         overridesSection.setName(i18n.translate('overridesSection'))
         overridesSection.setDesc(i18n.translate('overridesSectionDesc'))
@@ -105,20 +110,28 @@ export class PluginSettingTab extends BaseSettingTab {
             dropdown.onChange(this.#update.bind(this, 'plugin_priority'))
         })
 
-        const handleOnpasteSetting = new Setting(this.containerEl)
-        handleOnpasteSetting.setName(i18n.translate('handleOnpasteName'))
-        handleOnpasteSetting.setDesc(i18n.translate('handleOnpasteDesc'))
-        handleOnpasteSetting.addToggle((toggle) => {
-            toggle.setValue(this.#plugin.settings.handle_onpaste)
-            toggle.onChange(this.#update.bind(this, 'handle_onpaste'))
-        })
-
         const allowCharactersSetting = new Setting(this.containerEl)
         allowCharactersSetting.setName(i18n.translate('allowCharactersName'))
         allowCharactersSetting.setDesc(i18n.translate('allowCharactersDesc'))
         allowCharactersSetting.addToggle((toggle) => {
             toggle.setValue(this.#plugin.settings.allow_characters)
             toggle.onChange(this.#update.bind(this, 'allow_characters'))
+        })
+    }
+
+    #displayTriggersSettings(): void {
+        const handleOnrenderSetting = new Setting(this.containerEl)
+        handleOnrenderSetting.setName(i18n.translate('handleOnrenderName'))
+        handleOnrenderSetting.addToggle((toggle) => {
+            toggle.setValue(this.#plugin.settings.handle_onrender)
+            toggle.onChange(this.#update.bind(this, 'handle_onrender'))
+        })
+
+        const handleOnpasteSetting = new Setting(this.containerEl)
+        handleOnpasteSetting.setName(i18n.translate('handleOnpasteName'))
+        handleOnpasteSetting.addToggle((toggle) => {
+            toggle.setValue(this.#plugin.settings.handle_onpaste)
+            toggle.onChange(this.#update.bind(this, 'handle_onpaste'))
         })
     }
 

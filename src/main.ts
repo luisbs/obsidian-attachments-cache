@@ -132,6 +132,8 @@ export default class AttachmentsCachePlugin extends Plugin {
          */
         this.#mpp = this.registerMarkdownPostProcessor(
             (element, { sourcePath: notepath, frontmatter: fm }) => {
+                if (!this.state.handle_onrender) return
+
                 // static attachments can be archived
                 element.querySelectorAll('img').forEach((imageEl) => {
                     void this.#handle(imageEl, notepath, (remote) => {

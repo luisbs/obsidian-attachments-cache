@@ -72,6 +72,32 @@ When this setting is disabled any non-standard character is replaced with an und
 
 ---
 
+## Triggers Settings
+
+The next settings are the available ways to run the cache/archive proccess on the attachments.
+
+There are also **Commands** that can be attached to **Hotkeys** available for:
+- running on a selected text
+- or running on the full content of a note
+
+### `Cache/archive the attachments on render`
+
+Runs while the note is been shown on **Reading View** and the attachments are been rendered
+
+The first load may be lower on showing the attachments since they are been downloaded and indexed, but if configured they will be downloaded making any later reading faster.
+
+### `Cache/archive the attachments on paste`
+
+Runs on the **Editor view** when the user pastes any content that contains an URL, making an early download so that when render the attachment is already on storage.
+
+It matches and downloads all the attachmets on the pasted content of the next patterns:
+
+- Markdown attachment `'![label](https://example.com/attachment.jpg)'`
+- Markdown link `'[label](https://example.com/attachment.jpg)'`
+- URL `'https://example.com/attachment.jpg'`
+
+---
+
 ## Overrides Settings
 
 The next settings are the available ways to override the behavior of a **CacheRule** on an individual attachment or on a note.

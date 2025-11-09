@@ -2,4 +2,4 @@
 '@luis.bs/obsidian-attachments-cache': patch
 ---
 
-Added caching command for selected region
+Added caching command for selected regions

@@ -22,14 +22,22 @@ export const en: Translations = {
     pluginPriorityOptionNormal: 'Cache most of the attachments',
     pluginPriorityOptionHigher: 'Cache all posible attachments',
     //
-    handleOnpasteName: 'Cache/archive the attachments on paste',
-    handleOnpasteDesc: 'This can also be triggered using command/hotkeys',
-    //
     allowCharactersName: 'Keep special characters',
     allowCharactersDesc: [
         'Disable if you are having problems with special characters on paths. ',
         ['docs', 'keep-special-characters'],
     ],
+    //
+    // * Triggers Section
+    triggersSection: 'Triggers',
+    triggersSectionDesc: [
+        'There are also ',
+        ['b', { text: 'commands and hotkeys' }],
+        ' available.',
+        ['docs', 'triggers-settings'],
+    ],
+    handleOnrenderName: 'Cache/archive the attachments on render',
+    handleOnpasteName: 'Cache/archive the attachments on paste',
     //
     // * Overrides Section
     overridesSection: 'Overrides',
