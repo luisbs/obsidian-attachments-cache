@@ -10,6 +10,7 @@ const rules = Object.freeze<CacheRule[]>([
     {
         id: 'images',
         enabled: true,
+        archive: true,
         pattern: 'images/**',
         storage: 'attachments/images/{notename}',
         remotes: [
@@ -24,6 +25,7 @@ const rules = Object.freeze<CacheRule[]>([
     {
         id: 'files',
         enabled: true,
+        archive: false,
         pattern: '*',
         storage: 'attachments/{notepath}',
         remotes: 'w *',
