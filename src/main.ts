@@ -1,13 +1,14 @@
 import { Logger, LogLevel } from '@luis.bs/obsidian-fnc'
 import {
     MarkdownRenderer,
+    Notice,
     Plugin,
     type App,
     type MarkdownPostProcessor,
     type PluginManifest,
 } from 'obsidian'
 import { AttachmentsCache } from './AttachmentsCacheApi'
-import { detectRemotes, type DetectedRemote } from './commons/EditorFunctions'
+import { detectRemotes } from './commons/EditorFunctions'
 import {
     prepareSettings,
     type AttachmentsCacheSettings,
@@ -75,53 +76,32 @@ export default class AttachmentsCachePlugin extends Plugin {
     }
 
     #registerHandlers(): void {
+        this.addCommand({
+            id: 'handle-attachments',
+            name: 'Archive or cache the attachments on the editor',
+            editorCallback: async (editor, ctx) => {
+                const notepath = ctx.file?.path
+                const content = editor.getValue()
+                if (!content || !notepath) return
+
+                const result = await this.#prepareReplacement(content, notepath)
+                if (result) editor.setValue(result)
+            },
+        })
+
         this.registerEvent(
-            this.app.workspace.on('editor-paste', async (ev, editor, view) => {
+            this.app.workspace.on('editor-paste', async (ev, editor, ctx) => {
                 if (ev.defaultPrevented) return
+                // TODO: enabled/disable replacement from settings
 
-                const notepath = view.file?.path
-                if (!notepath) return
+                const notepath = ctx.file?.path
+                const content = ev.clipboardData?.getData('text/plain')
+                if (!content || !notepath) return
+                ev.preventDefault() // prevent early
 
-                const pasted = ev.clipboardData?.getData('text/plain')
-                if (!pasted) return
-
-                const matches = detectRemotes(pasted)
-                if (matches.length < 1) return
-
-                ev.preventDefault()
-
-                // perform all caches
-                const editions: Array<string | undefined> = []
-                for (const match of matches) {
-                    editions.push(await this.#handleEdition(match, notepath))
-                }
-
-                // no editions to the pasted content are required
-                if (editions.length < 1) {
-                    this.log.debug('Attachments cached on Paste', { pasted })
-                    editor.replaceSelection(pasted)
-                    return
-                }
-
-                // correctly edit the pasted content
-                let offset = 0
-                let result = pasted
-                for (let i = 0; i < matches.length; i++) {
-                    const e = editions[i]
-                    if (!e) continue
-
-                    const m = matches[i]
-                    const head = result.substring(0, offset) // already replaced
-                    const tail = result.substring(offset).replace(m.match, e) // replacing
-
-                    result = head + tail
-                    offset = head.length + e.length
-                }
-
-                console.log({ offset, result })
-                this.log.debug('Attachments cached on Paste', { result })
-                editor.replaceSelection(result)
-                return
+                const result = await this.#prepareReplacement(content, notepath)
+                if (result) editor.replaceSelection(result)
+                else editor.replaceSelection(content) // perform prevented default
             }),
         )
 
@@ -162,14 +142,51 @@ export default class AttachmentsCachePlugin extends Plugin {
         )
     }
 
-    async #handleEdition(match: DetectedRemote, notepath: string) {
-        // use cache method to prevent replacement of the url on all file
-        const localpath = await this.#api.cache(match.remote, notepath)
-        if (localpath && this.#api.isArchivable(match.remote, notepath)) {
-            return match.label
-                ? `![[${localpath}|${match.label}]]`
-                : `![[${localpath}]]`
+    async #prepareReplacement(
+        content: string,
+        notepath: string,
+    ): Promise<string | undefined> {
+        const matches = detectRemotes(content)
+        if (matches.length < 1) return
+
+        // perform all caches
+        const editions: Record<number, string> = []
+        for (let i = 0; i < matches.length; i++) {
+            const { label, remote } = matches[i]
+            // use cache method to prevent auto-replacement on the note
+            const localpath = await this.#api.cache(remote, notepath)
+            if (localpath && this.#api.isArchivable(remote, notepath)) {
+                editions[i] = label //
+                    ? `![[${localpath}|${label}]]`
+                    : `![[${localpath}]]`
+            }
         }
+
+        // no editions to the content are required
+        if (Object.isEmpty(editions)) {
+            this.log.debug('Cached attachments', { content })
+            new Notice('Cached attachments')
+            return
+        }
+
+        // correctly edit the content
+        let offset = 0
+        let result = content
+        for (let i = 0; i < matches.length; i++) {
+            const e = editions[i]
+            if (!e) continue
+
+            const m = matches[i]
+            const head = result.substring(0, offset) // already replaced
+            const tail = result.substring(offset).replace(m.match, e) // replacing
+
+            result = head + tail
+            offset = head.length + e.length
+        }
+
+        this.log.debug('Archived attachments', { result })
+        new Notice('Archived attachments')
+        return result
     }
 
     async #handle(
