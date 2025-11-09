@@ -22,6 +22,9 @@ export const en: Translations = {
     pluginPriorityOptionNormal: 'Cache most of the attachments',
     pluginPriorityOptionHigher: 'Cache all posible attachments',
     //
+    handleOnpasteName: 'Cache/archive the attachments on paste',
+    handleOnpasteDesc: 'This can also be triggered using command/hotkeys',
+    //
     allowCharactersName: 'Keep special characters',
     allowCharactersDesc: [
         'Disable if you are having problems with special characters on paths. ',

@@ -21,6 +21,7 @@ export type TextTranslation =
     | 'removeConfirmation'
     // * General Section
     | `pluginPriorityOption${'Lower' | 'Normal' | 'Higher'}`
+    | `handleOnpaste${Name_Desc}`
     // * Overrides Section
     | `${Overrides_Settings}Hint`
     // * CacheRule Section

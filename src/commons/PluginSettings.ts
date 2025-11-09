@@ -31,7 +31,9 @@ export interface AttachmentsCacheSettings {
     plugin_level: PluginLevel
     /** Defines the **CachePostProcessor** priority. */
     plugin_priority: PluginPriority
-    /** Stores the user preference over `UTF-8` characters. */
+    /** Defines whether links should be cached on paste. */
+    handle_onpaste: boolean
+    /** Defines the preference over `UTF-8` characters. */
     allow_characters: boolean
     /** User defined URL param to cache, overrides standard rules. */
     url_param_cache: string
@@ -47,6 +49,7 @@ export interface AttachmentsCacheSettings {
     cache_rules: CacheRule[]
     /**
      * Will be supported for 6 months.
+     * At some point i may remove it xd, it doesn't brokes anything to keep it.
      * @deprecated use `cache_rules` instead
      * @since 2025-04-16
      */
@@ -61,6 +64,7 @@ export const DEFAULT_SETTINGS = Object.freeze<AttachmentsCacheSettings>({
     // * and PostProcessors with default priority
     plugin_priority: 'NORMAL',
     //
+    handle_onpaste: true,
     allow_characters: false,
     url_param_cache: 'cache_file',
     url_param_ignore: 'ignore_file',
@@ -80,6 +84,7 @@ export function prepareSettings(settings: unknown): AttachmentsCacheSettings {
         // ignore/remove any non-standard/deprecated settings
         plugin_level:      s.plugin_level      ?? DEFAULT_SETTINGS.plugin_level,
         plugin_priority:   s.plugin_priority   ?? DEFAULT_SETTINGS.plugin_priority,
+        handle_onpaste:    s.handle_onpaste    ?? DEFAULT_SETTINGS.handle_onpaste,
         allow_characters:  s.allow_characters  ?? DEFAULT_SETTINGS.allow_characters,
         url_param_cache:   s.url_param_cache   ?? DEFAULT_SETTINGS.url_param_cache,
         url_param_ignore:  s.url_param_ignore  ?? DEFAULT_SETTINGS.url_param_ignore,

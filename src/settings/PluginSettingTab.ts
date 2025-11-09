@@ -105,6 +105,14 @@ export class PluginSettingTab extends BaseSettingTab {
             dropdown.onChange(this.#update.bind(this, 'plugin_priority'))
         })
 
+        const handleOnpasteSetting = new Setting(this.containerEl)
+        handleOnpasteSetting.setName(i18n.translate('handleOnpasteName'))
+        handleOnpasteSetting.setDesc(i18n.translate('handleOnpasteDesc'))
+        handleOnpasteSetting.addToggle((toggle) => {
+            toggle.setValue(this.#plugin.settings.handle_onpaste)
+            toggle.onChange(this.#update.bind(this, 'handle_onpaste'))
+        })
+
         const allowCharactersSetting = new Setting(this.containerEl)
         allowCharactersSetting.setName(i18n.translate('allowCharactersName'))
         allowCharactersSetting.setDesc(i18n.translate('allowCharactersDesc'))

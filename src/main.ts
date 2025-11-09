@@ -78,7 +78,7 @@ export default class AttachmentsCachePlugin extends Plugin {
     #registerHandlers(): void {
         this.addCommand({
             id: 'handle-attachments',
-            name: 'Archive or cache the attachments on the editor',
+            name: 'Cache/archive the attachments on the editor',
             editorCallback: async (editor, ctx) => {
                 const notepath = ctx.file?.path
                 const content = editor.getValue()
@@ -91,8 +91,7 @@ export default class AttachmentsCachePlugin extends Plugin {
 
         this.registerEvent(
             this.app.workspace.on('editor-paste', async (ev, editor, ctx) => {
-                if (ev.defaultPrevented) return
-                // TODO: enabled/disable replacement from settings
+                if (ev.defaultPrevented || !this.state.handle_onpaste) return
 
                 const notepath = ctx.file?.path
                 const content = ev.clipboardData?.getData('text/plain')

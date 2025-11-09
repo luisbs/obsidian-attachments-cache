@@ -1,6 +1,7 @@
 {
   "plugin_level": "WARN",
   "plugin_priority": "NORMAL",
+  "handle_onpaste": false,
   "allow_characters": false,
   "url_param_cache": "cache_file",
   "url_param_ignore": "ignore_file",
