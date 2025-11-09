@@ -2,7 +2,7 @@
 	"id": "attachments-cache",
 	"name": "Attachments Cache",
 	"version": "0.6.1",
-	"minAppVersion": "1.8.4",
+	"minAppVersion": "1.9.14",
 	"description": "Store images and other attachments on the vault",
 	"author": "luisbs",
 	"authorUrl": "https://github.com/luisbs",
