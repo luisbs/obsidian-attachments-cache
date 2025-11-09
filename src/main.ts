@@ -77,7 +77,19 @@ export default class AttachmentsCachePlugin extends Plugin {
 
     #registerHandlers(): void {
         this.addCommand({
-            id: 'handle-attachments',
+            id: 'handle-attachments-selection',
+            name: 'Cache/archive the attachments on the selection',
+            editorCallback: async (editor, ctx) => {
+                const notepath = ctx.file?.path
+                const content = editor.getSelection()
+                if (!content || !notepath) return
+
+                const result = await this.#prepareReplacement(content, notepath)
+                if (result) editor.replaceSelection(result, content)
+            },
+        })
+        this.addCommand({
+            id: 'handle-attachments-file',
             name: 'Cache/archive the attachments on the editor',
             editorCallback: async (editor, ctx) => {
                 const notepath = ctx.file?.path
