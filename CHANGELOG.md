@@ -1,5 +1,20 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.7.0
+
+### Minor Changes
+
+- 4075c63: Added support for all Obsidian supported [file-formats](https://help.obsidian.md/file-formats).
+- ce88026: Added caching command for current editor
+- 260811d: Added logic for archiving attachments and updating the notes.
+- e65128b: Added caching process on paste event
+- c9a590a: Added caching command for selected text
+
+### Patch Changes
+
+- 51bf6b6: Added setting to toggle caching onRender
+- 7f4b529: Added setting to toggle caching onPaste
+
 ## 0.6.1
 
 ### Patch Changes
