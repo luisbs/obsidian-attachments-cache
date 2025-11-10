@@ -1,5 +1,5 @@
 ---
-'@luis.bs/obsidian-attachments-cache': patch
+'@luis.bs/obsidian-attachments-cache': minor
 ---
 
-Added onPaste attachments caching
+Added caching process on paste event

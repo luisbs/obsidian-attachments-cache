@@ -1,5 +1,5 @@
 ---
-'@luis.bs/obsidian-attachments-cache': patch
+'@luis.bs/obsidian-attachments-cache': minor
 ---
 
-Added triggers for caching attachments onCommand
+Added caching command for current editor

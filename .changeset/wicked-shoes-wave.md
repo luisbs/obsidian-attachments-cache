@@ -1,5 +1,5 @@
 ---
-'@luis.bs/obsidian-attachments-cache': patch
+'@luis.bs/obsidian-attachments-cache': minor
 ---
 
-Added caching command for selected regions
+Added caching command for selected text
