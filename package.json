@@ -49,33 +49,33 @@
     },
     "dependencies": {
         "@luis.bs/obsidian-fnc": "^1.4.9",
-        "minimatch": "^10.0.1"
+        "minimatch": "^10.2.6"
     },
     "devDependencies": {
-        "@changesets/cli": "^2.29.2",
-        "@commitlint/cli": "^19.8.0",
-        "@commitlint/config-conventional": "^19.8.0",
-        "@eslint/js": "^9.24.0",
-        "@types/node": "^22.14.1",
-        "clean-pkg-json": "^1.2.1",
-        "eslint": "^9.24.0",
-        "eslint-config-prettier": "^10.1.2",
-        "globals": "^16.0.0",
-        "lint-staged": "^15.5.1",
-        "obsidian": "^1.8.7",
-        "prettier": "^3.5.3",
-        "simple-git-hooks": "^2.12.1",
+        "@changesets/cli": "^3.0.1",
+        "@commitlint/cli": "^21.2.2",
+        "@commitlint/config-conventional": "^21.2.2",
+        "@eslint/js": "^10.0.1",
+        "@types/node": "^26.4.0",
+        "clean-pkg-json": "^2.0.0",
+        "eslint": "^10.9.1",
+        "eslint-config-prettier": "^10.1.8",
+        "globals": "^17.11.0",
+        "lint-staged": "^17.4.1",
+        "obsidian": "^1.13.1",
+        "prettier": "^3.9.6",
+        "simple-git-hooks": "^2.13.1",
         "tslib": "^2.8.1",
-        "typescript": "^5.8.3",
-        "typescript-eslint": "^8.30.1",
-        "vite": "^6.3.1",
-        "vite-plugin-banner": "^0.8.0",
-        "vite-plugin-static-copy": "^2.3.1",
-        "vitest": "^3.1.1"
+        "typescript": "^6.0.3",
+        "typescript-eslint": "^8.68.0",
+        "vite": "^8.2.2",
+        "vite-plugin-banner": "^0.8.1",
+        "vite-plugin-static-copy": "^4.1.1",
+        "vitest": "^4.1.11"
     },
     "simple-git-hooks": {
-        "pre-commit": "npx lint-staged",
-        "commit-msg": "npx commitlint -e -V"
+        "pre-commit": "pnx lint-staged",
+        "commit-msg": "pnx commitlint -e -V"
     },
     "commitlint": {
         "extends": [
