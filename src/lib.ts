@@ -37,7 +37,7 @@ export interface AttachmentsCacheApi {
 /** Determine if Dataview is enabled in the given application. */
 export const isPluginEnabled = (app: App) => {
     // @ts-expect-error non-standard API
-    // eslint-disable-next-line
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- non-standard API
     app.plugins.enabledPlugins.has('attachments-cache')
 }
 
@@ -48,9 +48,9 @@ export const isPluginEnabled = (app: App) => {
  */
 export const getAPI = (app?: App): AttachmentsCacheApi | undefined => {
     // @ts-expect-error non-standard API
-    // eslint-disable-next-line
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access -- non-standard API
     if (app) return app.plugins.plugins['attachments-cache']?.api
     // @ts-expect-error non-standard API
-    // eslint-disable-next-line
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- non-standard API
     return window.AttachmentsCache
 }

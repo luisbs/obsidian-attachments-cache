@@ -2,11 +2,13 @@ import js from '@eslint/js'
 import ts from 'typescript-eslint'
 import globals from 'globals'
 import prettierConfig from 'eslint-config-prettier'
+import comments from '@eslint-community/eslint-plugin-eslint-comments/configs'
 
 export default ts.config(
     js.configs.recommended, //
     ts.configs.strictTypeChecked,
     ts.configs.stylisticTypeChecked,
+    comments.recommended,
     prettierConfig,
     {
         languageOptions: {
@@ -43,6 +45,7 @@ export default ts.config(
                 'error',
                 { fixStyle: 'inline-type-imports' },
             ],
+            "@eslint-community/eslint-comments/require-description": "error",
         },
     },
     {

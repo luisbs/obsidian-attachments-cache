@@ -97,7 +97,7 @@ export function prepareSettings(settings: unknown): AttachmentsCacheSettings {
         note_param_rule:   s.note_param_rule   ?? DEFAULT_SETTINGS.note_param_rule,
 
         // ensure correct sorting of RemoteRules
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        // eslint-disable-next-line @typescript-eslint/no-deprecated -- backwards compatibility
         cache_rules: prepareCacheRules(s.cache_rules ?? s.cache_configs ?? DEFAULT_SETTINGS.cache_rules),
     }
 }
