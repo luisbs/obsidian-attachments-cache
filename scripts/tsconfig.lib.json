@@ -29,8 +29,8 @@
         "esModuleInterop": true,
         "resolveJsonModule": true,
 
+        "skipLibCheck": true,
         "importHelpers": true,
-        "skipDefaultLibCheck": true,
         "moduleResolution": "bundler",
         "lib": ["DOM", "ES2022"],
     }

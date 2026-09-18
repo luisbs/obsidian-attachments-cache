@@ -1,7 +1,7 @@
 import { rmSync, readFileSync, writeFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
-const run = (command) => console.log(execSync(command).toString('utf8'))
+const exec = (command) => execSync(command, { stdio: 'inherit' })
 
 const NEW_VERSION = process.env.npm_package_version
 
@@ -21,7 +21,7 @@ writeFileSync('release-notes.md', section)
 
 // create release
 console.log('Creating Release')
-run(
+exec(
     `gh release create "${NEW_VERSION}" dist/*` +
         ' --notes-file release-notes.md' +
         ` --title "${NEW_VERSION}"`,
