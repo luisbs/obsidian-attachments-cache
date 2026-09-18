@@ -7,14 +7,13 @@ import {
     type MarkdownPostProcessor,
     type PluginManifest,
 } from 'obsidian'
-import { AttachmentsCache } from './AttachmentsCacheApi'
+import { AttachmentsCacheApi } from './AttachmentsCacheApi'
 import { detectRemotes } from './commons/EditorFunctions'
 import {
     prepareSettings,
     type AttachmentsCacheSettings,
 } from './commons/PluginSettings'
 import { prepareState, type AttachmentsCacheState } from './commons/PluginState'
-import type { AttachmentsCacheApi } from './lib'
 import { PluginSettingTab } from './settings/PluginSettingTab'
 
 export default class AttachmentsCachePlugin extends Plugin {
@@ -34,14 +33,12 @@ export default class AttachmentsCachePlugin extends Plugin {
         this.log.setFormat('[hh:mm:ss.ms] level:')
 
         // thrid-party API
-        this.#api = new AttachmentsCache(this)
-        // @ts-expect-error non-standard API
-        window.AttachmentsCache = this.#api
+        this.#api = new AttachmentsCacheApi(this)
+        window.AttachmentsCacheAPI = this.#api
     }
 
     onunload(): void {
-        // @ts-expect-error non-standard API
-        delete window.AttachmentsCache
+        delete window.AttachmentsCacheAPI
     }
 
     async onload(): Promise<void> {
