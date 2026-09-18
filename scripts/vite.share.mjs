@@ -1,6 +1,6 @@
 import banner from 'vite-plugin-banner'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
-import pkg from '../package.json'
+import pkg from '../package.json' with { type: 'json' }
 
 export function packageBanner() {
     return banner(

@@ -5,7 +5,7 @@ import { packageBanner, rollupOptions } from './vite.share.mjs'
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [packageBanner()],
-    resolve: { alias: { '@': resolve(__dirname, '../src') } },
+    resolve: { alias: { '@': resolve(import.meta.dirname, '../src') } },
     build: {
         outDir: 'lib',
         target: 'es2022',
@@ -14,7 +14,7 @@ export default defineConfig({
         lib: {
             formats: ['es'],
             fileName: () => 'obsidian-attachments-cache.esm.js',
-            entry: resolve(__dirname, '../src/lib.ts'),
+            entry: resolve(import.meta.dirname, '../src/lib.ts'),
         },
     },
 })
