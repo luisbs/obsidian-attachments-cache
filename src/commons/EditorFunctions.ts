@@ -1,3 +1,5 @@
+import type { App, View } from 'obsidian'
+
 export interface DetectedRemote {
     match: string
     offset: number
@@ -48,4 +50,24 @@ export function detectRemotes(source: string): DetectedRemote[] {
     }
 
     return detections
+}
+
+export async function findElementView(
+    app: App,
+    el: HTMLElement,
+): Promise<View | undefined> {
+    const search = () => {
+        let foundView: View | undefined
+        app.workspace.iterateAllLeaves((leaf) => {
+            if (leaf.view.containerEl.contains(el)) foundView = leaf.view
+        })
+        return foundView
+    }
+
+    const view = search()
+    if (view) return view
+
+    // Timming issues on first render
+    await new Promise((resolve) => requestAnimationFrame(resolve))
+    return search()
 }

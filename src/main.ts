@@ -4,11 +4,12 @@ import {
     Notice,
     Plugin,
     type App,
+    type Component,
     type MarkdownPostProcessor,
     type PluginManifest,
 } from 'obsidian'
 import { AttachmentsCacheApi } from './AttachmentsCacheApi'
-import { detectRemotes } from './commons/EditorFunctions'
+import { detectRemotes, findElementView } from './commons/EditorFunctions'
 import {
     prepareSettings,
     type AttachmentsCacheSettings,
@@ -128,12 +129,15 @@ export default class AttachmentsCachePlugin extends Plugin {
          * @default `1` caches attachments of normal PostProcesors (`priority = 0`)
          */
         this.#mpp = this.registerMarkdownPostProcessor(
-            (element, { sourcePath: notepath, frontmatter: fm }) => {
+            async (element, { sourcePath: notepath, frontmatter: fm }) => {
                 if (!this.state.handle_onrender) return
 
+                const view = await findElementView(this.app, element)
+                if (!view) return
+
                 // static attachments can be archived
-                element.querySelectorAll('img').forEach((imageEl) => {
-                    void this.#handle(imageEl, notepath, (remote) => {
+                element.querySelectorAll('img').forEach((el) => {
+                    void this.#handle(view, el, notepath, (remote) => {
                         return this.#api.archive(remote, notepath, fm)
                     })
                 })
@@ -141,9 +145,9 @@ export default class AttachmentsCachePlugin extends Plugin {
                 // dynamic attachments from async or slow PostProcessors
                 // can only be cached and require a defered execution
                 if (!this.state.plugin_timeout) return
-                setTimeout(() => {
-                    element.querySelectorAll('img').forEach((imageEl) => {
-                        void this.#handle(imageEl, notepath, (remote) => {
+                activeWindow.setTimeout(() => {
+                    element.querySelectorAll('img').forEach((el) => {
+                        void this.#handle(view, el, notepath, (remote) => {
                             return this.#api.cache(remote, notepath, fm)
                         })
                     })
@@ -200,6 +204,7 @@ export default class AttachmentsCachePlugin extends Plugin {
     }
 
     async #handle(
+        view: Component,
         imageEl: HTMLImageElement,
         notepath: string,
         resolve: (remote: string) => Promise<string | undefined>,
@@ -219,6 +224,7 @@ export default class AttachmentsCachePlugin extends Plugin {
         imageEl.title = 'Caching...'
         imageEl.src = ''
 
+        // failed caching
         const localpath = await resolve(remote)
         if (!localpath) {
             imageEl.title = title
@@ -247,7 +253,7 @@ export default class AttachmentsCachePlugin extends Plugin {
             `![[${localpath}|${title || remote}]]`,
             wrapperEl,
             notepath,
-            this,
+            view,
         )
     }
 }
