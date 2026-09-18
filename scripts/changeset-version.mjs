@@ -1,9 +1,15 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { execSync } from 'node:child_process'
 
-const run = (command) => console.log(execSync(command).toString('utf8'))
+const exec = (command) => execSync(command, { stdio: 'inherit' })
 
-const NEW_VERSION = process.env.npm_package_version
+// bump version
+console.log('🦋 Versioning changes')
+exec('pnpm changeset version')
+console.log() // spacing
+
+// retrieve new version
+const NEW_VERSION = JSON.parse(readFileSync('package.json', 'utf8')).version
 
 // update manifest.json with target version
 const manifest = JSON.parse(readFileSync('manifest.json', 'utf8'))
@@ -16,16 +22,5 @@ versions[NEW_VERSION] = manifest.minAppVersion
 writeFileSync('versions.json', JSON.stringify(versions, null, '\t'))
 
 // feedback
-console.log('🦋  Generated changes')
-run('git status --porcelain')
-
-// feedback
-console.log('⧗  Committing changes')
-run('git config user.name "github-actions[bot]"')
-run('git config user.email "github-actions[bot]@users.noreply.github.com"')
-run('git commit manifest.json versions.json -m"chore: sync plugin manifest"')
-
-// feedback
-console.log('⧗  Pushing changes')
-run('git push')
-console.log('✔  Applied changes')
+console.log('🦋 Generated changes')
+exec('git status --porcelain')

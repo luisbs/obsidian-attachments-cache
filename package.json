@@ -20,6 +20,18 @@
         "provenance": true,
         "access": "public"
     },
+    "devEngines": {
+        "packageManager": {
+            "name": "pnpm",
+            "version": "12.4.2",
+            "onFail": "download"
+        },
+        "runtime": {
+            "name": "node",
+            "version": "^24.4.0",
+            "onFail": "download"
+        }
+    },
     "files": [
         "lib/**/*"
     ],
@@ -42,9 +54,9 @@
         "build:lib": "vite build -c ./scripts/vite.config.lib.mjs && tsc -p ./scripts/tsconfig.lib.json",
         "build:dist": "vite build -c ./scripts/vite.config.dist.mjs",
         "build:demo": "vite build -c ./scripts/vite.config.demo.mjs",
+        "ci:version": "node ./scripts/changeset-version.mjs",
         "ci:publish": "pnpm build:lib && clean-pkg-json && changeset publish --no-git-tag",
         "ci:obsidian": "pnpm build:dist && node ./scripts/obsidian-release.mjs",
-        "ci:manifest": "node ./scripts/update-manifest.mjs",
         "release": "changeset"
     },
     "dependencies": {

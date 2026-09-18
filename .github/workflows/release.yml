@@ -2,66 +2,112 @@ name: Release
 
 on:
   push:
-    branches: [main]
+    branches: [dev]
+
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  release:
+  plan:
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
+      contents: read
+    outputs:
+      mode: ${{ steps.plan.outputs.mode }}
+      publish-plan-artifact-id: ${{ steps.plan.outputs.publish-plan-artifact-id }}
     steps:
-      # Since GITHUB_TOKEN will not trigger manifest.yml generate a replacement
-      - name: Generate Access Token
-        uses: actions/create-github-app-token@v1
-        id: access
+      - name: Check out repo
+        uses: actions/checkout@v7
         with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.PRIVATE_KEY }}
-
-      - name: Checkout Repo
-        uses: actions/checkout@v4
-        with:
-          token: ${{ steps.access.outputs.token }}
-          # Prevents the usage of GITHUB_TOKEN
           persist-credentials: false
-          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
-          fetch-depth: 0
 
-      - name: Install PnPM
-        uses: pnpm/action-setup@v4
+      - name: Install pnpm
+        uses: pnpm/setup@v2
         with:
-          version: 10
+          cache: true
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Select Changesets mode
+        uses: changesets/action/select-mode@v2
+        id: plan
+
+  version:
+    if: needs.plan.outputs.mode == 'version'
+    needs: plan
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      version-dir-artifact-id: ${{ steps.version.outputs.version-dir-artifact-id }}
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v7
         with:
-          node-version: lts/*
-          registry-url: 'https://registry.npmjs.org'
-          cache: pnpm
+          persist-credentials: false
 
-      - name: Install Dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Create Release Pull Request or Publish to NPM
-        # fork to correctly handle `changeset publish --no-git-tag`
-        uses: luisbs/changesets-action@v1
-        id: changesets
+      - name: Install pnpm
+        uses: pnpm/setup@v2
         with:
-          title: "chore: release @luis.bs/obsidian-attachments-cache"
-          commit: "chore: release @luis.bs/obsidian-attachments-cache"
-          publish: pnpm run ci:publish
-          noGitTags: true
-          createGithubReleases: false
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          GITHUB_TOKEN: ${{ steps.access.outputs.token }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          cache: true
 
-      - name: Create GitHub Release
-        if: steps.changesets.outputs.published == 'true'
-        # reverse what clean-pkg-json did before publishing
-        run: |
-          git reset --hard HEAD
-          pnpm run ci:obsidian
-        env:
-          GH_TOKEN: ${{ steps.access.outputs.token }}
+      - name: Version packages
+        uses: changesets/action/version@v2
+        id: version
+        with:
+          commit-message: "chore: release @luis.bs/obsidian-attachments-cache"
+          pr-title: "chore: release @luis.bs/obsidian-attachments-cache"
+#         pr-base-branch: main
+          script: pnpm run ci:version
+
+#   pack:
+#     if: needs.plan.outputs.mode == 'publish'
+#     needs: plan
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: read
+#     outputs:
+#       pack-dir-artifact-id: ${{ steps.pack.outputs.pack-dir-artifact-id }}
+#     steps:
+#       - name: Check out repo
+#         uses: actions/checkout@v7
+#         with:
+#           persist-credentials: false
+
+#       - name: Install pnpm
+#         uses: pnpm/setup@v2
+#         with:
+#           cache: true
+
+# # TODO
+#       - name: Build packages
+#         run: npm build
+
+#       - name: Pack packages
+#         uses: changesets/action/pack@v2
+#         id: pack
+#         with:
+#           publish-plan-artifact-id: ${{ needs.plan.outputs.publish-plan-artifact-id }}
+
+#   publish:
+#     needs: pack
+#     runs-on: ubuntu-latest
+#     permissions:
+#       contents: write
+#       id-token: write
+#     steps:
+#       - name: Check out repo
+#         uses: actions/checkout@v7
+#         with:
+#           persist-credentials: false
+
+#       - name: Install pnpm
+#         uses: pnpm/setup@v2
+#         with:
+#           cache: true
+
+#       - name: Publish packages
+#         uses: changesets/action/publish@v2
+#         with:
+#           pack-dir-artifact-id: ${{ needs.pack.outputs.pack-dir-artifact-id }}
