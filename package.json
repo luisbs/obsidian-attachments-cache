@@ -20,6 +20,18 @@
         "provenance": true,
         "access": "public"
     },
+    "devEngines": {
+        "packageManager": {
+            "name": "pnpm",
+            "version": "12.4.2",
+            "onFail": "download"
+        },
+        "runtime": {
+            "name": "node",
+            "version": "^24.4.0",
+            "onFail": "download"
+        }
+    },
     "files": [
         "lib/**/*"
     ],

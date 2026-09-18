@@ -9,41 +9,35 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+
     steps:
-      # Since GITHUB_TOKEN will not trigger manifest.yml generate a replacement
+      # Since GITHUB_TOKEN will not trigger manifest.yml, generate a replacement
       - name: Generate Access Token
-        uses: actions/create-github-app-token@v1
+        uses: actions/create-github-app-token@v3
         id: access
         with:
-          app-id: ${{ secrets.APP_ID }}
+          client-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.PRIVATE_KEY }}
 
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           token: ${{ steps.access.outputs.token }}
           # Prevents the usage of GITHUB_TOKEN
           persist-credentials: false
-          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+          # Changesets needs the complete Git history
           fetch-depth: 0
 
-      - name: Install PnPM
-        uses: pnpm/action-setup@v4
+      - name: Install pnpm
+        uses: pnpm/setup@v2
         with:
-          version: 10
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: lts/*
-          registry-url: 'https://registry.npmjs.org'
-          cache: pnpm
+          cache: true
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Create Release Pull Request or Publish to NPM
-        # fork to correctly handle `changeset publish --no-git-tag`
+        # Forked to correctly handle `changeset publish --no-git-tag`
         uses: luisbs/changesets-action@v1
         id: changesets
         with:
@@ -59,7 +53,7 @@ jobs:
 
       - name: Create GitHub Release
         if: steps.changesets.outputs.published == 'true'
-        # reverse what clean-pkg-json did before publishing
+        # Reverse what clean-pkg-json did before publishing
         run: |
           git reset --hard HEAD
           pnpm run ci:obsidian
