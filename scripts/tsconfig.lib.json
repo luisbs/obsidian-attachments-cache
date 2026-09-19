@@ -1,7 +1,7 @@
 {
     "include": ["../src/lib.ts"],
     "compilerOptions": {
-        "baseUrl": ".",
+        "rootDir": "../src",
         "paths": {
             "@/*": ["../src/*"]
         },
@@ -28,7 +28,6 @@
 
         "esModuleInterop": true,
         "resolveJsonModule": true,
-        "downlevelIteration": true,
 
         "importHelpers": true,
         "skipDefaultLibCheck": true,

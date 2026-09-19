@@ -1,45 +1,32 @@
-// Idea taken from obsidian-dataview
-import type { App } from 'obsidian'
+import type { App } from 'obsidian';
+import type { AttachmentsCacheApi } from './AttachmentsCacheApi';
 
-/** Public API for third-party integration. */
-export interface AttachmentsCacheApi {
-    /** Determine whether the attachment matches a **short-term** storage rule. */
-    isCacheable(
-        remote: string,
-        notepath: string,
-        frontmatter?: unknown,
-    ): boolean
-    /** Download the attachment and get the localpath. */
-    cache(
-        remote: string,
-        notepath: string,
-        frontmatter?: unknown,
-    ): Promise<string | undefined>
-
-    /** Determine whether the attachment matches a **long-term** storage rule. */
-    isArchivable(
-        remote: string,
-        notepath: string,
-        frontmatter?: unknown,
-    ): boolean
-    /** Download the attachment, update the reference on the note and get the localpath. */
-    archive(
-        remote: string,
-        notepath: string,
-        frontmatter?: unknown,
-    ): Promise<string | undefined>
+declare module "obsidian" {
+    interface App {
+        plugins: {
+            enabledPlugins: Set<string>;
+            plugins: {
+                ['attachments-cache']?: {
+                    api: AttachmentsCacheApi;
+                };
+            };
+        };
+    }
 }
 
-///////////////////////
-// Utility Functions //
-///////////////////////
-
-/** Determine if Dataview is enabled in the given application. */
-export const isPluginEnabled = (app: App) => {
-    // @ts-expect-error non-standard API
-    // eslint-disable-next-line
-    app.plugins.enabledPlugins.has('attachments-cache')
+declare global {
+    interface Window {
+        AttachmentsCacheAPI?: AttachmentsCacheApi;
+    }
 }
+
+///////////////////////////////////////
+//         Utility Functions         //
+// Idea taken from obsidian-dataview //
+///////////////////////////////////////
+
+/** Determine if AttachmentsCache is enabled in the given application. */
+export const isPluginEnabled = (app: App) => app.plugins.enabledPlugins.has('attachments-cache')
 
 /**
  * Get the current AttachmentsCache API from the app if provided;
@@ -47,10 +34,6 @@ export const isPluginEnabled = (app: App) => {
  * on the window.
  */
 export const getAPI = (app?: App): AttachmentsCacheApi | undefined => {
-    // @ts-expect-error non-standard API
-    // eslint-disable-next-line
     if (app) return app.plugins.plugins['attachments-cache']?.api
-    // @ts-expect-error non-standard API
-    // eslint-disable-next-line
-    return window.AttachmentsCache
+    return window.AttachmentsCacheAPI
 }

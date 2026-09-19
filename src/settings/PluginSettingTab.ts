@@ -182,7 +182,7 @@ export class PluginSettingTab extends BaseSettingTab {
 
     #store = new Map<string, { index: number; childEl: CacheRuleSettings }>()
     #newKey(): string {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- will stop when a unique id is generated
         while (true) {
             const newId = Math.floor(Math.abs(Math.random() * 10e6)).toString()
             if (!this.#store.has(newId)) return newId
@@ -196,7 +196,7 @@ export class PluginSettingTab extends BaseSettingTab {
         const cacheRuleSetting = new CacheRuleSettings(cacheRule)
 
         cacheRuleSetting.onChange((newCacheRule) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- null asseted here for easier usage of the variable
             const state = this.#store.get(key)!
 
             // persist CacheRule change
@@ -207,7 +207,7 @@ export class PluginSettingTab extends BaseSettingTab {
         })
 
         cacheRuleSetting.onRemove(() => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- null asseted here for easier usage of the variable
             const state = this.#store.get(key)!
 
             // forget CacheRule
@@ -227,11 +227,11 @@ export class PluginSettingTab extends BaseSettingTab {
         })
 
         cacheRuleSetting.onMove((dir) => {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- null asseted here for easier usage of the variable
             const state = this.#store.get(key)!
             const indexAbove = dir === 'above' ? state.index - 1 : state.index
             const indexBelow = dir === 'above' ? state.index : state.index + 1
-            const otherIndex = state.index + (dir === 'above' ? -1 : +1)
+            const otherIndex = state.index + (dir === 'above' ? -1 : 1)
 
             // persist CacheRule reorder
             const temp = this.#plugin.settings.cache_rules[indexAbove]

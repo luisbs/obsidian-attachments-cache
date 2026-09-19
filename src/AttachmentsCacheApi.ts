@@ -11,19 +11,20 @@ import {
     testFmEntry,
     testUrlParam,
 } from './commons/PluginMatchers'
-import type { AttachmentsCacheApi } from './lib'
 import type AttachmentsCachePlugin from './main'
 
-export class AttachmentsCache implements AttachmentsCacheApi {
+/** Public API for third-party integration. */
+export class AttachmentsCacheApi {
     #log: Logger
     #plugin: AttachmentsCachePlugin
     #memo = new Map<string, undefined | string>()
 
     constructor(plugin: AttachmentsCachePlugin) {
-        this.#log = plugin.log.make(AttachmentsCache.name)
+        this.#log = plugin.log.make(AttachmentsCacheApi.name)
         this.#plugin = plugin
     }
 
+    /** Determine whether the attachment matches a **short-term** storage rule. */
     isCacheable(
         remote: string,
         notepath: string,
@@ -45,6 +46,7 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         }
     }
 
+    /** Determine whether the attachment matches a **long-term** storage rule. */
     isArchivable(
         remote: string,
         notepath: string,
@@ -53,8 +55,7 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         const log = this.#log.group()
         try {
             log.debug('Archivable check', { remote, notepath, frontmatter })
-            const found = !!this.#findRule(remote, notepath, frontmatter, log)
-                .archive
+            const found = this.#findRule(remote, notepath, frontmatter, log).archive
 
             log.flush('CacheRule found', { remote, found })
             return found
@@ -67,6 +68,7 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         }
     }
 
+    /** Download the attachment and get the localpath. */
     async cache(
         remote: string,
         notepath: string,
@@ -90,6 +92,7 @@ export class AttachmentsCache implements AttachmentsCacheApi {
         }
     }
 
+    /** Download the attachment, update the reference on the note and get the localpath. */
     async archive(
         remote: string,
         notepath: string,
