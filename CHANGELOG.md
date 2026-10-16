@@ -1,5 +1,12 @@
 # @luis.bs/obsidian-attachments-cache
 
+## 0.7.1
+
+### Patch Changes
+
+- 6b58823: Replace the usage of the Plugin with the WorkspaceLeaf for the lifecycle of rendered attachments
+- c5666a8: Renamed `window.AttachmentsCache` into `window.AttachmentsCacheAPI`
+
 ## 0.7.0
 
 ### Minor Changes
